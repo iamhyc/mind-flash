@@ -4,12 +4,15 @@ This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
 import lzma
+import platform
 from os import path
 from sys import argv
 from time import ctime
 from termcolor import colored, cprint
 
 MF_HISTORY=path.expanduser('~/.mf/mf_history')
+MF_HOSTNAME=platform.node()
+MF_CTIME=ctime()
 MF_HINT = '> '
 
 '''=================== Utility Function ==================='''
@@ -23,6 +26,7 @@ def Y_T(text): return colored(text, 'yellow')
 '''=================== Private Function ==================='''
 def mf_dump():
     fd = open(MF_HISTORY, 'r+')
+    #TODO: restrict number of dump items
     print(fd.read(), end='')
     pass
 
@@ -39,7 +43,7 @@ def mf_main():
     fd = open(MF_HISTORY, 'a+')
     mf_txt = ''
     while True:
-        mf_prefix = '[%s]\n'%(Y_T(ctime()))
+        mf_prefix = '[%s @ %s]\n'%(G_T(MF_HOSTNAME), Y_T(MF_CTIME))
         txt = input(MF_HINT)
         if txt=='':
             fd.write(mf_prefix + mf_txt + '\n')
