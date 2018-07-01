@@ -3,6 +3,7 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
+import lzma
 from os import path
 from sys import argv
 from time import ctime
@@ -27,7 +28,10 @@ def mf_dump():
 
 MF_ACTION={
     'dump':mf_dump,
-    'backup':exit,
+    'sync':exit, # rsync archived files to/from cloud
+    'import':exit, # import from lzma with private key
+    'export':exit, # export to lzma with private key
+    'setkey':exit, # set private key and sync to cloud
 }
 
 '''=================== Main Function ==================='''
