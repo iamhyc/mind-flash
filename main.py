@@ -54,6 +54,6 @@ if __name__ == '__main__':
             mf_main()
             pass
     except Exception as e:
-        print(e)
+        pass
     finally:
         exit()
