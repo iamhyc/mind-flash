@@ -4,9 +4,8 @@ It's a flash over your mind.
 
 ### TODO
 
-- [ ] Add Backup function
-- [ ] Add Day Splitter for history archive
-- [ ] Add Sync function
-- [ ] Add Chinese support
-- [ ] Add GUI, bind shortcuts
+- [ ] Add rsync Function
+- [ ] Add Index Function, and Day Splitter
+- [ ] Add GUI, Shortcuts Binding
+- [ ] Add Chinese Characters Support
 - [ ] port to Android
