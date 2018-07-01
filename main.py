@@ -22,7 +22,7 @@ def Y_T(text): return colored(text, 'yellow')
 '''=================== Private Function ==================='''
 def mf_dump():
     fd = open(MF_HISTORY, 'r+')
-    print(fd.read())
+    print(fd.read(), end='')
     pass
 
 MF_ACTION={
