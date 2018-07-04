@@ -1,10 +1,5 @@
 #!/usr/bin/python3
-'''Mind Flash
-This is *mf*, a flash pass your mind.
-You Write, You Listen.
-'''
-import lzma
-import platform
+import lzma, json, platform, subprocess
 from os import path
 from sys import argv
 from time import ctime

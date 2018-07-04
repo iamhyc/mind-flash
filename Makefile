@@ -1,10 +1,13 @@
 
-all:dependency install
+all:depends install
 
-dependency:
-	sudo pip3 install termcolor
+depends:
+	sudo apt install qt5-qmake qtbase5-dev-tools libqt5core5a libqt5widgets5 python3-pip \
+	&& sudo pip3 install termcolor
 
 install:
 	mkdir -p ~/.mf
-	touch ~/.mf/mf_history
-	sudo cp -f ./main.py /usr/bin/msh
+	sudo mkdir -p /opt/mind-flash
+	sudo cp -rf ./* /opt/mind-flash
+	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
+	# sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
