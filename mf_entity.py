@@ -26,7 +26,7 @@ class MFEntity:
         }
         pass
 
-    def mf_record(self, args):
+    def mf_record(self, *args):
         text = args
         stp = TextStamp()
         with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
@@ -36,7 +36,7 @@ class MFEntity:
             pass
         pass
 
-    def mf_fetch(self, args):
+    def mf_fetch(self, *args):
         mf_type, mf_range = args
         if mf_type==int:
             mf_type = MFRetrieve(mf_type)
@@ -53,24 +53,24 @@ class MFEntity:
             pass
         pass
 
-    def mf_sync(self, args):
+    def mf_sync(self, *args):
         pass
 
-    def mf_import(self, args):
+    def mf_import(self, *args):
         pass
 
-    def mf_export(self, args):
+    def mf_export(self, *args):
         pass
 
-    def mf_setkey(self, args):
+    def mf_setkey(self, *args):
         pass
 
-    def act_dump(self, args):
+    def act_dump(self, *args):
         fd = open(path.join(self.base_path, 'mf_history'), 'r+')
         print(fd.read(), end='')
         pass
 
-    def act(self, mf_cmd, args):
+    def act(self, mf_cmd, *args):
         if mf_cmd in self.MF_ACTION.keys():
             self.MF_ACTION[mf_cmd](args)
         pass

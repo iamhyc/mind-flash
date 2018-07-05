@@ -5,10 +5,10 @@ You Write, You Listen.
 '''
 import sys, signal
 from os import path, getcwd, chdir
-from PyQt5.QtCore import Qt, QPoint, QTimer
+from PyQt5.QtCore import Qt, QPoint, QTimer, QMargins
 from PyQt5.QtGui import QFont, QIcon, QTextOption
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, 
-                    QLineEdit, QPlainTextEdit, QSizePolicy)
+from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
+                    QGridLayout, QTextEdit, QPlainTextEdit, QSizePolicy)
 from mf_entity import MFEntity
 from MFUtility import MFRetrieve
 
@@ -18,11 +18,12 @@ MF_DIR=path.expanduser('~/.mf/')
 class MFTextEdit(QPlainTextEdit):
 
     mf_flash_binding = [Qt.Key_Return]
-    mf_edit_binding = [Qt.Key_Control, Qt.Key_Return]
+    mf_edit_binding  = [Qt.Key_Control, Qt.Key_Return]
 
-    def __init__(self, parent):
+    def __init__(self, parent, w_history):
         super().__init__(parent)
         self.parent = parent
+        self.w_history = w_history
         self.edit_keys = list()
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
@@ -31,12 +32,16 @@ class MFTextEdit(QPlainTextEdit):
 
     def styleHelper(self):
         # Basic Style
+        self.setStyleSheet("""
+            border: 0px solid white;
+            border-top: 1px solid #CCCCCC 
+        """)
+        # self.setStyleSheet("border: 1px solid #CCCCCC")
+        self.setFixedSize(600, 70)
         self.setTabChangesFocus(True)
-        self.setWordWrapMode(QTextOption.WrapAnywhere)
+        self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.resize( self.parent.size() )
         # Font Style
         self.setFont( QFont('Noto Sans CJK SC',14) )
         # Cursor Style
@@ -64,6 +69,23 @@ class MFTextEdit(QPlainTextEdit):
             pass
         pass
 
+    def mouseDoubleClickEvent(self, e):
+        size_half = self.w_history.height()/2
+        if self.w_history.isVisible():
+            self.w_history.setVisible(False)
+            self.parent.adjustSize()
+            self.parent.resize(self.size())
+            self.parent.move(self.parent.pos() + QPoint(0, size_half))
+            pass
+        else:
+            mf_exec.mf_fetch(MFRetrieve.DAY, 1)
+            self.w_history.setVisible(True)
+            self.parent.adjustSize()
+            self.parent.move(self.parent.pos() - QPoint(0, size_half))
+            pass
+        self.setFocus() # for convinience
+        pass
+
     def keyPressEvent(self, e):
         if e.key() in self.mf_edit_binding: # ctrl keys
             self.edit_keys.append(e.key())
@@ -72,7 +94,9 @@ class MFTextEdit(QPlainTextEdit):
                 self.insertPlainText('\n')
                 pass
             elif self.edit_keys == self.mf_flash_binding: # flash recording
-                mf_exec.mf_record( repr(self.toPlainText()) )
+                mf_text = self.toPlainText()
+                if mf_text:
+                    mf_exec.mf_record( repr(mf_text) )
                 self.parent.close()
                 pass
             pass
@@ -83,17 +107,70 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def keyReleaseEvent(self, e):
-        if e.key() in self.mf_edit_binding:
+        if e.key() in self.edit_keys:
             self.edit_keys.remove(e.key())
-            pass
+            pass        
+
         pass
     
+    pass
+
+class MFHistory(QTextEdit):
+
+    mf_text_wrapper = """
+        <div style="{item_css}">
+            <a style="{time_css}">{0}</a>
+            <a style="{text_css}">{1}</a>
+        </div>
+    """.format(
+        '{}', '{}',
+        item_css="""
+            background-color: #F6F6F6;
+        """,
+        time_css="""
+            color: #B4B5B8;
+            font-size: 12px;
+        """,
+        text_css="""
+            color: #252526;
+            font-size: 16px;
+        """
+    )
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.styleHelper()
+        pass
+    
+    def styleHelper(self):
+        self.setStyleSheet("""
+            border: 0px solid black;
+        """)
+        self.setReadOnly(True)
+        self.setFixedSize(600, 450)
+        self.setVisible(False)
+        pass
+
+    def appendItem(self, *item):
+        self.append(self.mf_text_wrapper.format(item[0], item[1]))
+        pass
+
     pass
 
 class MFGui(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(600, 70)
+
+        w_history = MFHistory(self)
+        w_editor = MFTextEdit(self, w_history)
+
+        grid = QGridLayout()
+        grid.setSpacing(0)
+        grid.setContentsMargins(0,0,0,0)
+        grid.addWidget(w_history, 0, 0)
+        grid.addWidget(w_editor, 1, 0)
+        self.setLayout(grid)
+        self.resize(self.sizeHint())
 
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -103,10 +180,6 @@ class MFGui(QWidget):
         self.setWindowTitle(MF_NAME)
         self.setWindowIcon( QIcon('./icons/pulse_heart.png') )
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-
-        editor = MFTextEdit(self)
-        # history = MFWidget(self)
-        
         self.show()
         pass
 
