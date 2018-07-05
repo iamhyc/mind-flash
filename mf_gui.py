@@ -3,24 +3,26 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import sys
-import signal, platform
-from os import path
-from PyQt5 import QtCore
+import sys, signal
+from os import path, getcwd, chdir
 from PyQt5.QtCore import Qt, QPoint, QTimer
 from PyQt5.QtGui import QFont, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, 
                     QLineEdit, QPlainTextEdit, QSizePolicy)
+from mf_entity import MFEntity
 
 MF_NAME="Mind Flash"
 MF_DIR=path.expanduser('~/.mf/')
-MF_HOSTNAME=platform.node()
 
-class MFEditor(QPlainTextEdit):
+class MFTextEdit(QPlainTextEdit):
+
+    mf_flash_binding = [Qt.Key_Return]
+    mf_edit_binding = [Qt.Key_Control, Qt.Key_Return]
 
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.edit_keys = list()
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
@@ -62,14 +64,29 @@ class MFEditor(QPlainTextEdit):
         pass
 
     def keyPressEvent(self, e):
-        if e.key()==Qt.Key_Return or e.key()==Qt.Key_Enter:
-            self.parent.close()
+        if e.key() in self.mf_edit_binding: # ctrl keys
+            self.edit_keys.append(e.key())
+            if self.edit_keys == self.mf_edit_binding: # insert newline
+                self.setReadOnly(False)
+                self.insertPlainText('\n')
+                pass
+            elif self.edit_keys == self.mf_flash_binding: # flash recording
+                mf_exec.mf_record( repr(self.toPlainText()) )
+                self.parent.close()
+                pass
             pass
-        else:
+        else: #ascii keys
             self.setReadOnly(False)
             super().keyPressEvent(e)
             pass
         pass
+
+    def keyReleaseEvent(self, e):
+        if e.key() in self.mf_edit_binding:
+            self.edit_keys.remove(e.key())
+            pass
+        pass
+    
     pass
 
 class MFGui(QWidget):
@@ -86,7 +103,7 @@ class MFGui(QWidget):
         self.setWindowIcon( QIcon('./icons/pulse_heart.png') )
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 
-        editor = MFEditor(self)
+        editor = MFTextEdit(self)
         # history = MFWidget(self)
         
         self.show()
@@ -95,7 +112,14 @@ class MFGui(QWidget):
     pass
 
 if __name__ == '__main__':
+    global mf_exec
+    # ignore interrupt signal
     signal.signal(signal.SIGINT, signal.SIG_IGN)
+    # change workspace root
+    chdir(path.dirname(path.realpath(__file__)))
+    # init MF Entity
+    mf_exec = MFEntity(MF_DIR)
+    # init MF GUI
     app = QApplication(sys.argv)
     mf = MFGui()
     sys.exit(app.exec_())
