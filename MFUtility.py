@@ -1,7 +1,16 @@
 import time, bisect
 import lzma, json, subprocess
 from datetime import datetime
+from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
+
+class MFRetrieve(Enum):
+    DAY  = 1
+    WEEK = 2
+    MONTH= 3
+    YEAR = 4
+    ALL  = 5
+    pass
 
 class TextStamp():
     def __init__(self):
@@ -72,6 +81,10 @@ class MFRecord:
     def read(self, unix):
         idx = self.time_line.index(unix)
         return self.text_line[idx]
+        pass
+
+    def readAll(self):
+        return zip(self.time_line, self.text_line)
         pass
 
     pass

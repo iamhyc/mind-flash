@@ -18,7 +18,7 @@ class MFEntity:
         self.MF_ACTION={
             'dump':self.act_dump,
             'record': self.mf_record,
-            'search': self.mf_search,
+            'fetch': self.mf_fetch,
             'sync':self.mf_sync, # rsync archived files to/from cloud
             'import':self.mf_import, # import from lzma with private key
             'export':self.mf_export, # export to lzma with private key
@@ -26,7 +26,8 @@ class MFEntity:
         }
         pass
 
-    def mf_record(self, text):
+    def mf_record(self, args):
+        text = args
         stp = TextStamp()
         with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
             with MFRecord(stp.dayno) as rec:
@@ -35,29 +36,43 @@ class MFEntity:
             pass
         pass
 
-    def mf_search(self, params):
+    def mf_fetch(self, args):
+        mf_type, mf_range = args
+        if mf_type==int:
+            mf_type = MFRetrieve(mf_type)
+        
+        if mf_type==MFRetrieve.DAY:
+            pass
+        elif mf_type==MFRetrieve.WEEK:
+            pass
+        elif mf_type==MFRetrieve.MONTH:
+            pass
+        elif mf_type==MFRetrieve.YEAR:
+            pass
+        else: # retrieve all
+            pass
         pass
 
-    def mf_sync(self, params):
+    def mf_sync(self, args):
         pass
 
-    def mf_import(self, params):
+    def mf_import(self, args):
         pass
 
-    def mf_export(self, params):
+    def mf_export(self, args):
         pass
 
-    def mf_setkey(self, params):
+    def mf_setkey(self, args):
         pass
 
-    def act_dump(self, params):
+    def act_dump(self, args):
         fd = open(path.join(self.base_path, 'mf_history'), 'r+')
         print(fd.read(), end='')
         pass
 
-    def act(self, mf_cmd, params):
+    def act(self, mf_cmd, args):
         if mf_cmd in self.MF_ACTION.keys():
-            self.MF_ACTION[mf_cmd](params)
+            self.MF_ACTION[mf_cmd](args)
         pass
 
     def interact(self):

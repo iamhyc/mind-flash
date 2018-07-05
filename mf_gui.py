@@ -10,6 +10,7 @@ from PyQt5.QtGui import QFont, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, 
                     QLineEdit, QPlainTextEdit, QSizePolicy)
 from mf_entity import MFEntity
+from MFUtility import MFRetrieve
 
 MF_NAME="Mind Flash"
 MF_DIR=path.expanduser('~/.mf/')
