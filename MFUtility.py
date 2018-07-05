@@ -1,7 +1,7 @@
 import time, bisect
 import lzma, json, subprocess
 from datetime import datetime
-from os import path, getcwd, chdir, makedirs
+from os import path, getcwd, chdir, listdir, makedirs
 
 class TextStamp():
     def __init__(self):
@@ -55,8 +55,8 @@ class MFRecord:
         if self.updated:
             fd = open(self.file, 'w')
             for tt in zip(self.time_line, self.text_line):
-                fd.write(tt[0] + '\n')
-                fd.write(tt[1] + '\n')
+                fd.write(tt[0])
+                fd.write(tt[1])
                 fd.write('\n')
                 pass
             pass
@@ -64,8 +64,8 @@ class MFRecord:
 
     def write(self, unix, text):
         idx = bisect.bisect_right(self.time_line, unix)
-        self.time_line.insert(idx, unix)
-        self.text_line.insert(idx, text)
+        self.time_line.insert(idx, unix+'\n')
+        self.text_line.insert(idx, text+'\n')
         self.updated = True
         pass
 
@@ -79,6 +79,10 @@ class MFRecord:
 def isPrefix(sList, fList):
     sList, fList = list(sList), list(fList)
     return sList==fList[:len(sList)]
+
+def listDirs(path_name):
+    filter(path.isdir, listdir(path_name))
+    pass
 
 def expandPath(path_name):
     return path.abspath(path.expanduser(path_name))
