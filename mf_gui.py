@@ -119,12 +119,14 @@ class MFHistory(QTextEdit):
 
     mf_text_wrapper = """
         <div style="{item_css}">
-            <a style="{time_css}">{0}</a>
+            <a style="{time_css}">{0}</a><br>
             <a style="{text_css}">{1}</a>
         </div>
     """.format(
         '{}', '{}',
         item_css="""
+            margin: 5px 5px 5px 5px;
+            padding: 1px 1px 1px 1px;
             background-color: #F6F6F6;
         """,
         time_css="""
