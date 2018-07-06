@@ -27,7 +27,7 @@ class MFEntity:
         pass
 
     def mf_record(self, *args):
-        text = args
+        text = args[0]
         stp = TextStamp()
         with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
             with MFRecord(stp.dayno) as rec:

@@ -6,7 +6,9 @@ It's a flash over your mind.
 
 - [ ] Add rsync Function, with Private Key
 - [ ] Implement Fetch Function
+- [ ] Vi-like mode
+- [ ] Clipboard Images
 - [x] Add Index Function, and Day Splitter
 - [x] Add GUI, Shortcuts Binding
-- [x] Add Chinese Characters Support
+- [ ] Add Chinese Characters Support
 - [ ] port to Android
