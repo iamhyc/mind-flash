@@ -41,7 +41,12 @@ class MFEntity:
         if mf_type==int:
             mf_type = MFRetrieve(mf_type)
         
-        if mf_type==MFRetrieve.DAY:
+        if mf_type==MFRetrieve.DAY: #FIXME: only display the current day now
+            stp = TextStamp()
+            with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
+                with MFRecord(stp.dayno) as rec:
+                    return rec.readAll()
+                pass
             pass
         elif mf_type==MFRetrieve.WEEK:
             pass

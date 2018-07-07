@@ -78,7 +78,9 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.move(self.parent.pos() + QPoint(0, size_half))
             pass
         else:
-            mf_exec.mf_fetch(MFRetrieve.DAY, 1)
+            items = mf_exec.mf_fetch(MFRetrieve.DAY, 1)
+            for item in items:
+                self.w_history.appendItem(item)
             self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
@@ -153,7 +155,7 @@ class MFHistory(QTextEdit):
         self.setVisible(False)
         pass
 
-    def appendItem(self, *item):
+    def appendItem(self, item):
         self.append(self.mf_text_wrapper.format(item[0], item[1]))
         pass
 
