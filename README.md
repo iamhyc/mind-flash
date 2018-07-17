@@ -1,6 +1,6 @@
 # Mind Flash
 
-It's a flash over your mind. <img src="./icons/pulse_heart.png" width="32">
+It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 
 ### Preview
 
@@ -28,7 +28,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="32">
 
 - [ ] Add rsync function, with Private Key
 - [ ] Implement Fetch Function
-- [ ] Vi-like mode (Fn:=Alt)
+- [ ] Listview for History
 - [ ] Clipboard Images
 - [ ] Single Instance (backend daemon)
 - [x] Add Index Function, and Day Splitter
