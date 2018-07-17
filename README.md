@@ -1,6 +1,6 @@
 # Mind Flash
 
-It's a flash over your mind.
+It's a flash over your mind. <img src="./icons/pulse_heart.png" width="32">
 
 ### Preview
 
