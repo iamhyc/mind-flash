@@ -37,7 +37,7 @@ class MFEntity:
         pass
 
     def mf_fetch(self, *args):
-        mf_type, mf_range = args
+        mf_type, mf_range, mf_anchor = args
         if mf_type==int:
             mf_type = MFRetrieve(mf_type)
         

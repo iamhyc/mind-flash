@@ -30,7 +30,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="32">
 - [ ] Implement Fetch Function
 - [ ] Vi-like mode (Fn:=Alt)
 - [ ] Clipboard Images
-- [ ] Single Instance (backend daemon)
+- [x] Single Instance (now with socket)
 - [x] Add Index Function, and Day Splitter
 - [x] Add GUI, Shortcuts Binding
 - [ ] Add Chinese Characters Support

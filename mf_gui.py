@@ -3,7 +3,7 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import sys, signal
+import sys, signal, socket
 from os import path, getcwd, chdir
 from PyQt5.QtCore import Qt, QPoint, QTimer, QMargins
 from PyQt5.QtGui import QFont, QIcon, QTextOption
@@ -28,6 +28,13 @@ class MFTextEdit(QPlainTextEdit):
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
+        self.defaultHistory()
+        pass
+
+    def defaultHistory(self):
+        items = mf_exec.mf_fetch(MFRetrieve.DAY, 1, None)
+        for item in items:
+            self.w_history.appendItem(item)
         pass
 
     def styleHelper(self):
@@ -78,9 +85,6 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.move(self.parent.pos() + QPoint(0, size_half))
             pass
         else:
-            items = mf_exec.mf_fetch(MFRetrieve.DAY, 1)
-            for item in items:
-                self.w_history.appendItem(item)
             self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
@@ -190,7 +194,13 @@ class MFGui(QWidget):
     pass
 
 if __name__ == '__main__':
-    global mf_exec
+    global mf_exec, mf_sock
+    # singleton instance
+    try:
+        mf_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        mf_sock.bind(('', 19216))
+    except:
+        exit()
     # ignore interrupt signal
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     # change workspace root
