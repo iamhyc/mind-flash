@@ -10,25 +10,47 @@ from PyQt5.QtGui import QFont, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                     QGridLayout, QTextEdit, QPlainTextEdit, QSizePolicy)
 from mf_entity import MFEntity
-from MFUtility import MFRetrieve
+from MFUtility import MFRetrieve, KeysReactor
 
 MF_NAME="Mind Flash"
 MF_DIR=path.expanduser('~/.mf/')
 
 class MFTextEdit(QPlainTextEdit):
-
-    mf_flash_binding = [Qt.Key_Return]
-    mf_edit_binding  = [Qt.Key_Control, Qt.Key_Return]
-
     def __init__(self, parent, w_history):
         super().__init__(parent)
         self.parent = parent
         self.w_history = w_history
-        self.edit_keys = list()
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
         self.defaultHistory()
+
+        self.keysFn = KeysReactor()
+        self.registerKeys()
+        pass
+
+    def registerKeys(self):
+        ### insert newline ###
+        def mf_edit_binding():
+            self.setReadOnly(False)
+            self.insertPlainText('\n')
+            pass
+        self.keysFn.register([Qt.Key_Return], mf_edit_binding)
+
+        ### flash recording ###
+        def mf_flash_binding():
+            mf_text = self.toPlainText()
+            if mf_text:
+                mf_exec.mf_record( repr(mf_text) )
+            self.parent.close()
+            pass
+        self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_flash_binding)
+
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V], exit)
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], exit)
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], exit)
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], exit)
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], exit)
         pass
 
     def defaultHistory(self):
@@ -93,19 +115,10 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def keyPressEvent(self, e):
-        if e.key() in self.mf_edit_binding: # ctrl keys
-            self.edit_keys.append(e.key())
-            if self.edit_keys == self.mf_edit_binding: # insert newline
-                self.setReadOnly(False)
-                self.insertPlainText('\n')
-                pass
-            elif self.edit_keys == self.mf_flash_binding: # flash recording
-                mf_text = self.toPlainText()
-                if mf_text:
-                    mf_exec.mf_record( repr(mf_text) )
-                self.parent.close()
-                pass
-            pass
+        returnFn = self.keysFn.pressed(e.key())
+
+        if returnFn:
+            returnFn()
         else: #ascii keys
             self.setReadOnly(False)
             super().keyPressEvent(e)
@@ -113,10 +126,7 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def keyReleaseEvent(self, e):
-        if e.key() in self.edit_keys:
-            self.edit_keys.remove(e.key())
-            pass        
-
+        self.keysFn.released(e.key())
         pass
     
     pass
@@ -195,7 +205,7 @@ class MFGui(QWidget):
 
 if __name__ == '__main__':
     global mf_exec, mf_sock
-    # singleton instance
+    # singleton instance using local socket
     try:
         mf_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         mf_sock.bind(('', 19216))

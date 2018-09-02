@@ -1,8 +1,10 @@
+#!/usr/bin/python3
 import time, bisect
 import lzma, json, subprocess
 from datetime import datetime
 from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
+from PyQt5.QtCore import Qt
 
 class MFRetrieve(Enum):
     DAY  = 1
@@ -20,6 +22,49 @@ class TextStamp():
         self.unixtime = str(int(time.time()))
         pass
     pass
+
+class KeysReactor():
+
+    keySpecs = {
+        Qt.Key_Control: 0x01,
+        Qt.Key_Alt:     0x02,
+        Qt.Key_Shift:   0x04
+    }
+
+    def __init__(self):
+        self.keyL = list(0x00)
+        self.reactor = dict()
+        pass
+    
+    def register(self, keys, hookfn):
+        a_key = [0x00]
+        for tmp in keys:
+            if tmp_key in keySpecs.keys(): # for specific keys
+                a_key[0] = a_key[0] | self.keySpecs[tmp_key]
+            else:                          # for general keys
+                a_key.append(tmp_key)
+            pass
+        self.reactor[a_key] = hookfn
+        pass
+    
+    def pressed(self, key):
+        if key in self.keySpecs.keys():
+            self.keyL[0] = self.keyL[0] | self.keySpecs[key] #add
+        else:
+            self.keyL.append[key]
+        
+        if self.keyL in self.reactor:
+            return self.reactor[self.keyL] #return the hook function
+        else:
+            return NULL
+        pass
+    
+    def released(self, key):
+        if key in self.keySpecs.keys():
+            self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
+        if self.keyL[0]==0x00:
+            self.keyL = list(0x00) #reset, if specific keys all released
+        pass
 
 class workSpace:
     def __init__(self, p, *p_l):

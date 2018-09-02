@@ -16,13 +16,13 @@ class MFEntity:
     def __init__(self, base_path):
         self.base_path = base_path
         self.MF_ACTION={
-            'dump':self.act_dump,
+            'dump': self.act_dump,
             'record': self.mf_record,
             'fetch': self.mf_fetch,
-            'sync':self.mf_sync, # rsync archived files to/from cloud
-            'import':self.mf_import, # import from lzma with private key
-            'export':self.mf_export, # export to lzma with private key
-            'setkey':self.mf_setkey, # set private key and sync to cloud
+            'sync': self.mf_sync, # rsync archived files to/from cloud
+            'import': self.mf_import, # import from lzma with private key
+            'export': self.mf_export, # export to lzma with private key
+            'setkey': self.mf_setkey, # set private key and sync to cloud
         }
         pass
 
@@ -81,13 +81,12 @@ class MFEntity:
         pass
 
     def interact(self):
-        fd = open(path.join(self.base_path, 'mf_history'), 'a+')
         mf_txt = ''
         while True:
             mf_prefix = '[%s @ %s]\n'%(G_T(MF_HOSTNAME), Y_T(MF_CTIME))
             txt = input(MF_HINT)
             if txt=='':
-                fd.write(mf_prefix + mf_txt + '\n')
+                self.mf_record(mf_txt)
                 break
             else:
                 mf_txt += txt + '\n'
