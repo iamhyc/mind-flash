@@ -30,6 +30,7 @@ class KeysReactor():
         Qt.Key_Alt:     0x02,
         Qt.Key_Shift:   0x04
     }
+    keySpecsKeys = keySpecs.keys()
 
     def __init__(self):
         self.keyL = list(0x00)
@@ -39,7 +40,7 @@ class KeysReactor():
     def register(self, keys, hookfn):
         a_key = [0x00]
         for tmp in keys:
-            if tmp_key in keySpecs.keys(): # for specific keys
+            if tmp_key in self.keySpecsKeys: # for specific keys
                 a_key[0] = a_key[0] | self.keySpecs[tmp_key]
             else:                          # for general keys
                 a_key.append(tmp_key)
@@ -48,8 +49,8 @@ class KeysReactor():
         pass
     
     def pressed(self, key):
-        if key in self.keySpecs.keys():
-            self.keyL[0] = self.keyL[0] | self.keySpecs[key] #add
+        if key in self.keySpecsKeys:
+            self.keyL[0] = self.keyL[0] | self.keySpecs[key] #append specific keys
         else:
             self.keyL.append[key]
         
@@ -60,10 +61,10 @@ class KeysReactor():
         pass
     
     def released(self, key):
-        if key in self.keySpecs.keys():
+        if key in self.keySpecsKeys:
             self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
-        if self.keyL[0]==0x00:
-            self.keyL = list(0x00) #reset, if specific keys all released
+            if self.keyL[0]==0x00: # without specific keys present
+                self.keyL = list(0x00) #reset, if specific keys all released
         pass
 
 class workSpace:
