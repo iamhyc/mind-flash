@@ -54,7 +54,8 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def defaultHistory(self):
-        items = mf_exec.mf_fetch(MFRetrieve.DAY, 1, None)
+        items = mf_exec.mf_fetch(MFRetrieve.DAY, 0, None)
+        #TODO: update the render logic
         for item in items:
             self.w_history.appendItem(item)
         pass

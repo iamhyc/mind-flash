@@ -140,8 +140,7 @@ def isPrefix(sList, fList):
     return sList==fList[:len(sList)]
 
 def listDirs(path_name):
-    filter(path.isdir, listdir(path_name))
-    pass
+    return [x for x in filter(path.isdir, listdir(path_name))]
 
 def expandPath(path_name):
     return path.abspath(path.expanduser(path_name))

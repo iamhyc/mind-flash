@@ -37,11 +37,12 @@ class MFEntity:
         pass
 
     def mf_fetch(self, *args):
-        mf_type, mf_range, mf_anchor = args
+        mf_type, mf_anchor, mf_filter = args
         if mf_type==int:
             mf_type = MFRetrieve(mf_type)
-        
-        if mf_type==MFRetrieve.DAY: #FIXME: only display the current day now
+        #TODO: aggregate the records of multi-users
+
+        if mf_type==MFRetrieve.DAY:
             stp = TextStamp()
             with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
                 with MFRecord(stp.dayno) as rec:
@@ -108,10 +109,10 @@ def Y_T(text): return colored(text, 'yellow')
 if __name__ == '__main__':
     try:
         e = MFEntity(path.expanduser('~/.mf/'))
-        if len(argv)>1:
+        if len(argv)>1:     # interact with parameters
             e.act(argv[1], argv[2:])
         else:
-            e.interact()
+            e.interact()    # interact with console
     except Exception as e:
         pass
     finally:
