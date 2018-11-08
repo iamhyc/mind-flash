@@ -15,9 +15,9 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 |    Save&Exit    |            <kbd>Return</kbd>             |
 |                 |                                          |
 |  Popup History  |         Double <kbd>click</kbd>          |
-|  History - Day  | <kbd>Alt</kbd> + <kbd>v</kbd> |
-| History - Week  | <kbd>Alt</kbd> + <kbd>vv</kbd> |
-| History - Month | <kbd>Alt</kbd> + <kbd>vvv</kbd> |
+|  History - Week  | <kbd>Alt</kbd> + <kbd>v</kbd> |
+| History - Month  | <kbd>Alt</kbd> + <kbd>vv</kbd> |
+| History - Year | <kbd>Alt</kbd> + <kbd>vvv</kbd> |
 |  Last History   | <kbd>Alt</kbd> + <kbd>k</kbd> |
 |  Next History   | <kbd>Alt</kbd> + <kbd>j</kbd> |
 

@@ -22,10 +22,11 @@ class MFTextEdit(QPlainTextEdit):
         super().__init__(parent)
         self.parent = parent
         self.w_history = w_history
+        self.time_type, self.time_anchor = MFRetrieve.DAY, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
-        self.defaultHistory()
+        self.updateHistory(MFRetrieve.DAY, 0) #default history for today
 
         self.keysFn = KeysReactor()
         self.registerKeys()
@@ -48,18 +49,27 @@ class MFTextEdit(QPlainTextEdit):
             pass
         self.keysFn.register([Qt.Key_Return], mf_flash_binding)
 
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V], lambda:print('Alt+V'))
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], lambda:print('Alt+VV'))
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], lambda:print('Alt+VVV'))
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], lambda:print('Alt+K'))
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], lambda:print('Alt+J'))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V],
+            lambda:self.updateHistory(MFRetrieve.WEEK,  self.time_anchor) )
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], 
+            lambda:self.updateHistory(MFRetrieve.MONTH, self.time_anchor) )
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], 
+            lambda:self.updateHistory(MFRetrieve.YEAR,  self.time_anchor) )
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V, Qt.Key_V], 
+            lambda:self.updateHistory(MFRetrieve.DAY,   self.time_anchor) )
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor - 1))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor + 1))
         pass
 
-    def defaultHistory(self):
-        items = mf_exec.mf_fetch(MFRetrieve.DAY, 0, None)
-        #TODO: update the render logic
-        for item in items:
-            self.w_history.appendItem(item)
+    def updateHistory(self, mf_type, mf_anchor):
+        if mf_anchor > 0: return #no future history
+        items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
+        if not items: return #not update when empty
+
+        self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
+        self.w_history.render(items)
         pass
 
     def styleHelper(self):

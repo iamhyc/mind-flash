@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from PyQt5.QtWidgets import (QTextEdit, )
 
 class MFHistory(QTextEdit):
@@ -39,8 +40,13 @@ class MFHistory(QTextEdit):
         self.setVisible(False)
         pass
 
-    def appendItem(self, item):
-        self.append(self.mf_text_wrapper.format(item[0], item[1]))
+    def render(self, items):
+        #TODO: update the render logic
+        self.setPlainText('')
+        for item in items:
+            itime = datetime.utcfromtimestamp(int(item[0])).strftime('%Y-%m-%d %H:%M:%S')
+            itext = item[1].replace('\\n', '<br>')
+            self.append(self.mf_text_wrapper.format(itime, itext))
         pass
 
     pass
