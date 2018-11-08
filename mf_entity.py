@@ -3,6 +3,7 @@ import platform
 from os import path
 from sys import argv
 from time import ctime
+from getpass import getpass
 from termcolor import colored, cprint
 from MFUtility import *
 
@@ -22,7 +23,6 @@ class MFEntity:
             'sync': self.mf_sync, # rsync archived files to/from cloud
             'import': self.mf_import, # import from lzma with private key
             'export': self.mf_export, # export to lzma with private key
-            'setkey': self.mf_setkey, # set private key and sync to cloud
         }
         pass
 
@@ -60,15 +60,17 @@ class MFEntity:
         pass
 
     def mf_sync(self, *args):
+        print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))
         pass
 
     def mf_import(self, *args):
+        filep = args[0]
+        passwd = getpass()
         pass
 
     def mf_export(self, *args):
-        pass
-
-    def mf_setkey(self, *args):
+        filep = args[0]
+        passwd = getpass()
         pass
 
     def act_dump(self, *args):
