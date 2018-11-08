@@ -2,9 +2,7 @@
 from datetime import datetime
 from PyQt5.QtWidgets import (QTextEdit, )
 
-class MFHistory(QTextEdit):
-
-    mf_text_wrapper = """
+mf_text_wrapper = """
         <div style="{item_css}">
             <a style="{time_css}">{0}</a><br>
             <a style="{text_css}">{1}</a>
@@ -26,6 +24,10 @@ class MFHistory(QTextEdit):
         """
     )
 
+class MFHistory(QTextEdit):
+
+   
+
     def __init__(self, parent):
         super().__init__(parent)
         self.styleHelper()
@@ -46,7 +48,7 @@ class MFHistory(QTextEdit):
         for item in items:
             itime = datetime.utcfromtimestamp(int(item[0])).strftime('%Y-%m-%d %H:%M:%S')
             itext = item[1].replace('\\n', '<br>')
-            self.append(self.mf_text_wrapper.format(itime, itext))
+            self.append(mf_text_wrapper.format(itime, itext))
         pass
 
     pass
