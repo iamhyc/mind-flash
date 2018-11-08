@@ -35,7 +35,7 @@ class MFTextEdit(QPlainTextEdit):
             self.setReadOnly(False)
             self.insertPlainText('\n')
             pass
-        self.keysFn.register([Qt.Key_Return], mf_edit_binding)
+        self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_edit_binding)
 
         ### flash recording ###
         def mf_flash_binding():
@@ -44,13 +44,13 @@ class MFTextEdit(QPlainTextEdit):
                 mf_exec.mf_record( repr(mf_text) )
             self.parent.close()
             pass
-        self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_flash_binding)
+        self.keysFn.register([Qt.Key_Return], mf_flash_binding)
 
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V], exit)
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], exit)
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], exit)
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], exit)
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], exit)
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V], lambda:print('Alt+V'))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], lambda:print('Alt+VV'))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], lambda:print('Alt+VVV'))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], lambda:print('Alt+K'))
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], lambda:print('Alt+J'))
         pass
 
     def defaultHistory(self):

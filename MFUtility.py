@@ -33,38 +33,40 @@ class KeysReactor():
     keySpecsKeys = keySpecs.keys()
 
     def __init__(self):
-        self.keyL = list(0x00)
+        self.keyL = [0x00]
         self.reactor = dict()
         pass
     
     def register(self, keys, hookfn):
-        a_key = [0x00]
-        for tmp in keys:
+        key_hash = [0x00]
+        for tmp_key in keys:
             if tmp_key in self.keySpecsKeys: # for specific keys
-                a_key[0] = a_key[0] | self.keySpecs[tmp_key]
+                key_hash[0] = key_hash[0] | self.keySpecs[tmp_key]
             else:                          # for general keys
-                a_key.append(tmp_key)
+                key_hash.append(tmp_key)
             pass
-        self.reactor[a_key] = hookfn
+        key_hash = '_'.join([str(x) for x in key_hash])
+        self.reactor[key_hash] = hookfn
         pass
     
     def pressed(self, key):
         if key in self.keySpecsKeys:
             self.keyL[0] = self.keyL[0] | self.keySpecs[key] #append specific keys
         else:
-            self.keyL.append[key]
+            self.keyL.append(key)
         
-        if self.keyL in self.reactor:
-            return self.reactor[self.keyL] #return the hook function
+        key_hash = '_'.join([str(x) for x in self.keyL])
+        if key_hash in self.reactor:
+            return self.reactor[key_hash] #return the hook function
         else:
-            return NULL
+            return None
         pass
     
     def released(self, key):
         if key in self.keySpecsKeys:
             self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
             if self.keyL[0]==0x00: # without specific keys present
-                self.keyL = list(0x00) #reset, if specific keys all released
+                self.keyL = [0x00] #reset, if specific keys all released
         pass
 
 class workSpace:
