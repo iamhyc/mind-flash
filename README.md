@@ -20,18 +20,19 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 | History - Month | <kbd>Alt</kbd> + <kbd>vvv</kbd> |
 |  Last History   | <kbd>Alt</kbd> + <kbd>k</kbd> |
 |  Next History   | <kbd>Alt</kbd> + <kbd>j</kbd> |
-|  Index History  | <kbd>Alt</kbd> + <kbd>Number</kbd> (not impl.) |
 
 > for now, you should bind the `quick launch` shortcut by yourself
 
 ### TODO
 
-- [ ] Add rsync function, with Private Key
-- [ ] Implement Fetch Function
-- [ ] Listview for History
-- [ ] Clipboard Images
+- [x] Add GUI, Shortcuts Binding
 - [x] Single Instance (now with socket)
 - [x] Add Index Function, and Day Splitter
-- [x] Add GUI, Shortcuts Binding
+- [x] Implement Complex Key Binding
+- [ ] Implement Fetch Function
+- [ ] Add rsync function, with Private Key
+- [ ] Clipboard Images
+- [ ] Listview for History
+- [ ] Listview for Todolist
 - [ ] Add Chinese Characters Support
 - [ ] port to Android
