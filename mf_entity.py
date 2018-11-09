@@ -8,7 +8,7 @@ from termcolor import colored, cprint
 from MFUtility import *
 
 MF_HISTORY=path.expanduser('~/.mf/mf_history')
-MF_HOSTNAME=platform.node()
+MF_HOSTNAME=platform.node().split('-')[0]
 MF_CTIME=ctime()
 MF_HINT = '>_<: '
 
@@ -37,16 +37,21 @@ class MFEntity:
             pass
         pass
 
-    def mf_fetch(self, *args): #TODO: aggregate the records of multi-users
+    def mf_fetch(self, *args):
         mf_type, mf_anchor, mf_filter = args
         if type(mf_type)==int: mf_type = MFRetrieve(mf_type)
 
         items = list()
         stp = TextStamp(mf_type, mf_anchor)
         while stp.Next():
-            with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
-                with MFRecord(stp.dayno) as rec:
-                    items += rec.readAll()
+            for userDir in listDirs(self.base_path):
+                # workSpace(self.base_path, MF_HOSTNAME, stp.weekno)
+                userHint = 'Myself' if userDir==MF_HOSTNAME else userDir
+                with workSpace(self.base_path, userDir, stp.weekno) as wrk:
+                    with MFRecord(stp.dayno, userHint) as rec:
+                        items += rec.readAll()
+                    pass
+                items.sort(key=lambda x:x[0])
                 pass
             pass
         

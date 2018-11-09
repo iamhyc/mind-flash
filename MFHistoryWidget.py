@@ -53,8 +53,9 @@ class MFHistory(QTextEdit):
         self.setText(mf_text_hint.format(hint))
         for item in items:
             itime = datetime.fromtimestamp(int(item[0]), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+            ihint = '%s&nbsp;&nbsp;@&nbsp;&nbsp;%s'%(item[2], itime)
             itext = eval( item[1].replace('\\n', '<br>') )
-            self.append(mf_text_wrapper.format(itime, itext))
+            self.append(mf_text_wrapper.format(ihint, itext))
         pass
 
     pass

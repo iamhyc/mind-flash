@@ -127,9 +127,10 @@ class workSpace:
     pass
 
 class MFRecord:
-    def __init__(self, file):
+    def __init__(self, file, hint=''):
         self.updated = False
         self.file = file
+        self.hint = hint
         pass
 
     def __enter__(self):
@@ -171,7 +172,8 @@ class MFRecord:
         return self.text_line[idx]
 
     def readAll(self):
-        return list(zip(self.time_line, self.text_line))
+        user_hint = [self.hint] * len(self.time_line)
+        return list(zip(self.time_line, self.text_line, user_hint))
 
     pass
 
@@ -180,7 +182,7 @@ def isPrefix(sList, fList):
     return sList==fList[:len(sList)]
 
 def listDirs(path_name):
-    return [x for x in filter(path.isdir, listdir(path_name))]
+    return [x for x in filter(lambda x:not path.isdir(x), listdir(path_name))]
 
 def expandPath(path_name):
     return path.abspath(path.expanduser(path_name))

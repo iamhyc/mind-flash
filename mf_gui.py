@@ -101,7 +101,7 @@ class MFTextEdit(QPlainTextEdit):
             # print(self.parent.pos() - self.init_pos)
             pass
         elif e.buttons() & Qt.RightButton:
-            # TODO: toggle history widget, remember to cache the dump content
+            #TODO: toggle history widget, remember to cache the dump content
             pass
         pass
 
