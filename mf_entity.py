@@ -50,7 +50,7 @@ class MFEntity:
                 pass
             pass
         
-        return items
+        return stp.hint, items
 
     def mf_sync(self, *args):
         print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))

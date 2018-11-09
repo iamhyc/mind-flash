@@ -2,6 +2,13 @@
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtWidgets import (QTextEdit, )
+from MFUtility import MFRetrieveMap
+
+mf_text_hint = """
+        <div style="width:100%;font-weight:bold;padding: 1px 1px 1px 1px">
+            <div style="font-size:12px;">{}</div>
+        </div>
+"""
 
 mf_text_wrapper = """
         <div style="{item_css}">
@@ -27,8 +34,6 @@ mf_text_wrapper = """
 
 class MFHistory(QTextEdit):
 
-   
-
     def __init__(self, parent):
         super().__init__(parent)
         self.styleHelper()
@@ -43,9 +48,9 @@ class MFHistory(QTextEdit):
         self.setVisible(False)
         pass
 
-    def render(self, items):
+    def render(self, hint, items):
         #TODO: update the render logic
-        self.setPlainText('')
+        self.setText(mf_text_hint.format(hint))
         for item in items:
             itime = datetime.fromtimestamp(int(item[0]), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
             itext = eval( item[1].replace('\\n', '<br>') )

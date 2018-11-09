@@ -14,6 +14,13 @@ class MFRetrieve(Enum):
     YEAR = 3
     pass
 
+MFRetrieveMap = {
+    0: 'DAY',
+    1: 'WEEK',
+    2: 'MONTH',
+    3: 'YEAR'
+}
+
 class TextStamp():
     def __init__(self, mf_type=0, mf_anchor=0, now=0):
         self.date = datetime.now()
@@ -24,12 +31,16 @@ class TextStamp():
             self.date = self.start + relativedelta(days=1)
             if mf_type==MFRetrieve.DAY:
                 self.end = self.start + relativedelta(days=mf_anchor)
+                self.hint = self.end.strftime('%Y-%m-%d')
             elif mf_type==MFRetrieve.WEEK:
-                self.end = self.start + relativedelta(days=mf_anchor*7)
+                self.end = self.start + relativedelta(weeks=mf_anchor*7)
+                self.hint = self.end.strftime('Week %U, %Y')
             elif mf_type==MFRetrieve.MONTH:
-                self.end = self.start - relativedelta(month=-mf_anchor)
+                self.end = self.start + relativedelta(months=mf_anchor)
+                self.hint = self.end.strftime('%B, %Y')
             elif mf_type==MFRetrieve.YEAR:
-                self.end = self.start - relativedelta(year=-mf_anchor)
+                self.end = self.start + relativedelta(years=mf_anchor)
+                self.hint = self.end.strftime('Year %Y')
             pass
         
         self.update()
