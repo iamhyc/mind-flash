@@ -4,7 +4,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 
 ### Preview
 
-![preview-00](./previews/preview-00.gif)
+![preview-01](./previews/preview-01.gif)
 
 ### Usage
 
