@@ -43,7 +43,7 @@ class MFEntity:
         #TODO: aggregate the records of multi-users
 
         if mf_type==MFRetrieve.DAY:
-            stp = TextStamp()
+            stp = TextStamp(MFRetrieve.DAY, mf_anchor)
             with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
                 with MFRecord(stp.dayno) as rec:
                     return rec.readAll()

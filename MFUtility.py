@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import time, bisect
 import lzma, json, subprocess
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
 from PyQt5.QtCore import Qt
@@ -15,12 +15,20 @@ class MFRetrieve(Enum):
     pass
 
 class TextStamp():
-    def __init__(self):
+    def __init__(self, mf_type, mf_anchor):
+        self.stepper = timedelta(days=-1)
         self.date = datetime.utcnow()
+        self.start = self.date
+        # self.end = self.start + timedelta(days=-1)
+        pass
+    
+    def update(self):
+        self.date += self.stepper
         self.weekno = self.date.strftime('%Y-%U')
         self.dayno = self.date.strftime('%m-%d')
         self.unixtime = str(int(time.time()))
         pass
+
     pass
 
 class KeysReactor():
