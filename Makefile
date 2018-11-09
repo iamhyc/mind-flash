@@ -2,8 +2,7 @@
 all:depends install
 
 depends:
-	sudo apt install qt5-qmake qtbase5-dev-tools libqt5core5a libqt5widgets5 python3-pip \
-	&& sudo pip3 install termcolor python-dateutil
+	sudo pip3 install termcolor python-dateutil
 
 install:
 	mkdir -p ~/.mf
