@@ -54,7 +54,7 @@ class KeysReactor():
             self.keyL[0] = self.keyL[0] | self.keySpecs[key] #append specific keys
         else:
             self.keyL.append(key)
-            
+        
         key_hash = '_'.join([str(x) for x in self.keyL])
         if key_hash in self.reactor:
             return self.reactor[key_hash] #return the hook function
@@ -67,7 +67,7 @@ class KeysReactor():
             self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
             if self.keyL[0]==0x00: # without specific keys present
                 self.keyL = [0x00] #reset, if specific keys all released
-        elif key in self.keyL:
+        elif key in self.keyL and self.keyL[0]==0:
             self.keyL.remove(key)
         pass
 
