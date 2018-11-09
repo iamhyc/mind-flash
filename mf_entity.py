@@ -28,7 +28,8 @@ class MFEntity:
 
     def mf_record(self, *args):
         text = args[0]
-        stp = TextStamp()
+        stp = TextStamp(now=1)
+
         with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
             with MFRecord(stp.dayno) as rec:
                 rec.write(stp.unixtime, text)
@@ -36,28 +37,20 @@ class MFEntity:
             pass
         pass
 
-    def mf_fetch(self, *args):
+    def mf_fetch(self, *args): #TODO: aggregate the records of multi-users
         mf_type, mf_anchor, mf_filter = args
-        if mf_type==int:
-            mf_type = MFRetrieve(mf_type)
-        #TODO: aggregate the records of multi-users
+        if type(mf_type)==int: mf_type = MFRetrieve(mf_type)
 
-        if mf_type==MFRetrieve.DAY:
-            stp = TextStamp(MFRetrieve.DAY, mf_anchor)
+        items = list()
+        stp = TextStamp(mf_type, mf_anchor)
+        while stp.Next():
             with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
                 with MFRecord(stp.dayno) as rec:
-                    return rec.readAll()
+                    items += rec.readAll()
                 pass
             pass
-        elif mf_type==MFRetrieve.WEEK:
-            pass
-        elif mf_type==MFRetrieve.MONTH:
-            pass
-        elif mf_type==MFRetrieve.YEAR:
-            pass
-        else: # retrieve all
-            pass
-        pass
+        
+        return items
 
     def mf_sync(self, *args):
         print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))

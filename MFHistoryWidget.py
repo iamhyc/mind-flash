@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtWidgets import (QTextEdit, )
 
 mf_text_wrapper = """
@@ -12,15 +13,15 @@ mf_text_wrapper = """
         item_css="""
             margin: 5px 5px 5px 5px;
             padding: 1px 1px 1px 1px;
-            background-color: #F6F6F6;
+            background-color: #CDE2B8;
         """,
         time_css="""
             color: #B4B5B8;
-            font-size: 12px;
+            font-size: 14px;
         """,
         text_css="""
             color: #252526;
-            font-size: 16px;
+            font-size: 20px;
         """
     )
 
@@ -46,8 +47,8 @@ class MFHistory(QTextEdit):
         #TODO: update the render logic
         self.setPlainText('')
         for item in items:
-            itime = datetime.utcfromtimestamp(int(item[0])).strftime('%Y-%m-%d %H:%M:%S')
-            itext = item[1].replace('\\n', '<br>')
+            itime = datetime.fromtimestamp(int(item[0]), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+            itext = eval( item[1].replace('\\n', '<br>') )
             self.append(mf_text_wrapper.format(itime, itext))
         pass
 

@@ -1,32 +1,51 @@
 #!/usr/bin/python3
 import time, bisect
 import lzma, json, subprocess
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
 from PyQt5.QtCore import Qt
 
 class MFRetrieve(Enum):
-    DAY  = 1
-    WEEK = 2
-    MONTH= 3
-    YEAR = 4
-    ALL  = 5
+    DAY  = 0
+    WEEK = 1
+    MONTH= 2
+    YEAR = 3
     pass
 
 class TextStamp():
-    def __init__(self, mf_type, mf_anchor):
-        self.stepper = timedelta(days=-1)
-        self.date = datetime.utcnow()
-        self.start = self.date
-        # self.end = self.start + timedelta(days=-1)
+    def __init__(self, mf_type=0, mf_anchor=0, now=0):
+        self.date = datetime.now()
+        
+        if not now:
+            self.stepper = relativedelta(days=-1)
+            self.start = datetime(self.date.year, self.date.month, self.date.day)
+            self.date = self.start + relativedelta(days=1)
+            if mf_type==MFRetrieve.DAY:
+                self.end = self.start + relativedelta(days=mf_anchor)
+            elif mf_type==MFRetrieve.WEEK:
+                self.end = self.start + relativedelta(days=mf_anchor*7)
+            elif mf_type==MFRetrieve.MONTH:
+                self.end = self.start - relativedelta(month=-mf_anchor)
+            elif mf_type==MFRetrieve.YEAR:
+                self.end = self.start - relativedelta(year=-mf_anchor)
+            pass
+        
+        self.update()
         pass
     
-    def update(self):
+    def Next(self):
+        if self.date + self.stepper < self.end: #negative side increase
+            return False
         self.date += self.stepper
-        self.weekno = self.date.strftime('%Y-%U')
-        self.dayno = self.date.strftime('%m-%d')
-        self.unixtime = str(int(time.time()))
+        self.update()
+        return True
+
+    def update(self):
+        self.weekno   = self.date.strftime('%Y-%U')
+        self.dayno    = self.date.strftime('%m-%d')
+        self.unixtime = str(int( self.date.timestamp() ))
         pass
 
     pass
@@ -75,7 +94,7 @@ class KeysReactor():
             self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
             if self.keyL[0]==0x00: # without specific keys present
                 self.keyL = [0x00] #reset, if specific keys all released
-        elif key in self.keyL and self.keyL[0]==0:
+        elif key in self.keyL:
             self.keyL.remove(key)
         pass
 
@@ -141,7 +160,7 @@ class MFRecord:
         return self.text_line[idx]
 
     def readAll(self):
-        return zip(self.time_line, self.text_line)
+        return list(zip(self.time_line, self.text_line))
 
     pass
 

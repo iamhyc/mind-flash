@@ -22,11 +22,11 @@ class MFTextEdit(QPlainTextEdit):
         super().__init__(parent)
         self.parent = parent
         self.w_history = w_history
-        self.time_type, self.time_anchor = MFRetrieve.DAY, 0
+        self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
-        self.updateHistory(MFRetrieve.DAY, 0) #default history for today
+        self.updateHistory(0, 0) #default history for today
 
         self.keysFn = KeysReactor()
         self.registerKeys()
@@ -50,13 +50,7 @@ class MFTextEdit(QPlainTextEdit):
         self.keysFn.register([Qt.Key_Return], mf_flash_binding)
 
         self.keysFn.register([Qt.Key_Alt, Qt.Key_V],
-            lambda:self.updateHistory(MFRetrieve.WEEK,  self.time_anchor) )
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V], 
-            lambda:self.updateHistory(MFRetrieve.MONTH, self.time_anchor) )
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V], 
-            lambda:self.updateHistory(MFRetrieve.YEAR,  self.time_anchor) )
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V, Qt.Key_V, Qt.Key_V, Qt.Key_V], 
-            lambda:self.updateHistory(MFRetrieve.DAY,   self.time_anchor) )
+            lambda:self.updateHistory((self.time_type+1)%4,  0) )
         self.keysFn.register([Qt.Key_Alt, Qt.Key_K], 
             lambda:self.updateHistory(self.time_type, self.time_anchor - 1))
         self.keysFn.register([Qt.Key_Alt, Qt.Key_J], 
@@ -66,7 +60,7 @@ class MFTextEdit(QPlainTextEdit):
     def updateHistory(self, mf_type, mf_anchor):
         if mf_anchor > 0: return #no future history
         items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
-        if not items: return #not update when empty
+        if len(items)==0: return #not update when empty
 
         self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
         self.w_history.render(items)
