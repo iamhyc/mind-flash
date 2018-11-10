@@ -34,33 +34,17 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 ### TODO
 
 - [x] Add GUI, Shortcuts Binding
-
 - [x] Single Instance (now with socket)
-
 - [x] Add Index Function, and Day Splitter
-
 - [x] Implement Complex Key Binding
-
 - [x] Implement Fetch Function
-
 - [x] ~~Add rsync function, with Private Key~~ 
-
   (for now, sync `~/.mf` with your cloud service)
-
 - [ ] Fix Fetch Function Replement
-
 - [ ] Auto update function
-
 - [ ] Clipboard Images Support
-
 - [ ] Add Chinese Characters Support
-
   (point of first beta release)
-
 - [ ] Listview for History
-
 - [ ] Listview for Todolist
-
   (point of first formal release)
-
-- [ ] port to Android
