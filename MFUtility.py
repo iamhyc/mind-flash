@@ -27,18 +27,25 @@ class TextStamp():
         
         if not now:
             self.stepper = relativedelta(days=-1)
-            self.start = datetime(self.date.year, self.date.month, self.date.day)
-            self.date = self.start + relativedelta(days=1)
             if mf_type==MFRetrieve.DAY:
-                self.end = self.start + relativedelta(days=mf_anchor)
+                self.start = datetime(self.date.year, self.date.month, self.date.day)
+                self.date = self.start + relativedelta(days=1 + mf_anchor)
+                self.end, self.date = self.start
                 self.hint = self.end.strftime('%Y-%m-%d')
             elif mf_type==MFRetrieve.WEEK:
-                self.end = self.start + relativedelta(weeks=mf_anchor*7)
+                self.start = datetime(self.date.year, self.date.month, self.date.day)
+                self.start = self.start + relativedelta(weekday=SU(1))
+                self.date = self.start
+                self.end = self.start + relativedelta(weekday=SU(mf_anchor))
                 self.hint = self.end.strftime('Week %U, %Y')
             elif mf_type==MFRetrieve.MONTH:
+                self.start = datetime(self.date.year, self.date.month)
+                self.date = self.start + relativedelta(months=1)
                 self.end = self.start + relativedelta(months=mf_anchor)
                 self.hint = self.end.strftime('%B, %Y')
             elif mf_type==MFRetrieve.YEAR:
+                self.start = datetime(self.date.year)
+                self.date = self.start + relativedelta(years=1)
                 self.end = self.start + relativedelta(years=mf_anchor)
                 self.hint = self.end.strftime('Year %Y')
             pass

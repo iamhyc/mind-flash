@@ -26,7 +26,6 @@ class MFTextEdit(QPlainTextEdit):
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.styleHelper()
-        self.updateHistory(0, 0) #default history for today
 
         self.keysFn = KeysReactor()
         self.registerKeys()
@@ -117,6 +116,7 @@ class MFTextEdit(QPlainTextEdit):
             self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
+            self.updateHistory(0, 0) #default history for today
             pass
         self.setFocus() # for convinience
         pass
