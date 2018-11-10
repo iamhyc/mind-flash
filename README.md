@@ -47,12 +47,20 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 
   (for now, sync `~/.mf` with your cloud service)
 
-- [ ] Clipboard Images
+- [ ] Fix Fetch Function Replement
+
+- [ ] Auto update function
+
+- [ ] Clipboard Images Support
+
+- [ ] Add Chinese Characters Support
+
+  (point of first beta release)
 
 - [ ] Listview for History
 
 - [ ] Listview for Todolist
 
-- [ ] Add Chinese Characters Support
+  (point of first formal release)
 
 - [ ] port to Android
