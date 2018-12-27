@@ -40,7 +40,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 - [x] Implement Fetch Function
 - [x] ~~Add rsync function, with Private Key~~ 
   (for now, sync `~/.mf` with your cloud service)
-- [ ] Fix Fetch Function Replement
+- [x] Fix Fetch Function Replement
 - [ ] Auto update function
 - [ ] Clipboard Images Support
 - [ ] Add Chinese Characters Support

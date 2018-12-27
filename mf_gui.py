@@ -59,7 +59,6 @@ class MFTextEdit(QPlainTextEdit):
     def updateHistory(self, mf_type, mf_anchor):
         if mf_anchor > 0: return #no future history
         hint, items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
-        if len(items)==0: return #not update when empty
 
         self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
         self.w_history.render(hint, items)

@@ -1,7 +1,8 @@
 #!/usr/bin/python3
-import time, bisect
+import sys, time, bisect
 import lzma, json, subprocess
 from datetime import datetime
+from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
 from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
@@ -23,47 +24,47 @@ MFRetrieveMap = {
 
 class TextStamp():
     def __init__(self, mf_type=0, mf_anchor=0, now=0):
-        self.date = datetime.now()
+        __date = datetime.now()
         
         if not now:
             self.stepper = relativedelta(days=-1)
-            if mf_type==MFRetrieve.DAY:
-                self.start = datetime(self.date.year, self.date.month, self.date.day)
-                self.date = self.start + relativedelta(days=1 + mf_anchor)
-                self.end, self.date = self.start
+            if mf_type==MFRetrieve.DAY:         # from 00:00 to 00:00
+                tmp = datetime(__date.year, __date.month, __date.day)
+                self.end = tmp + relativedelta(days=mf_anchor)
+                self.start = self.end + relativedelta(days=1)
                 self.hint = self.end.strftime('%Y-%m-%d')
-            elif mf_type==MFRetrieve.WEEK:
-                self.start = datetime(self.date.year, self.date.month, self.date.day)
-                self.start = self.start + relativedelta(weekday=SU(1))
-                self.date = self.start
-                self.end = self.start + relativedelta(weekday=SU(mf_anchor))
+            elif mf_type==MFRetrieve.WEEK:      # from MON to SUN
+                tmp = datetime(__date.year, __date.month, __date.day)
+                self.end = tmp + relativedelta(weekday=MO(mf_anchor))
+                self.start = self.end + relativedelta(days=7)
                 self.hint = self.end.strftime('Week %U, %Y')
-            elif mf_type==MFRetrieve.MONTH:
-                self.start = datetime(self.date.year, self.date.month)
-                self.date = self.start + relativedelta(months=1)
-                self.end = self.start + relativedelta(months=mf_anchor)
+            elif mf_type==MFRetrieve.MONTH:     # from 1st to endth
+                tmp = datetime(__date.year, __date.month, 1)
+                self.end = tmp + relativedelta(months=mf_anchor)
+                self.start = self.end + relativedelta(months=1)
                 self.hint = self.end.strftime('%B, %Y')
-            elif mf_type==MFRetrieve.YEAR:
-                self.start = datetime(self.date.year)
-                self.date = self.start + relativedelta(years=1)
-                self.end = self.start + relativedelta(years=mf_anchor)
+            elif mf_type==MFRetrieve.YEAR:      # from Jan to Dec
+                self.end = datetime(__date.year, 1, 1) + relativedelta(years=mf_anchor)
+                self.start = self.end + relativedelta(years=1)
                 self.hint = self.end.strftime('Year %Y')
             pass
+        else:
+            self.start = __date
         
         self.update()
         pass
     
     def Next(self):
-        if self.date + self.stepper < self.end: #negative side increase
+        if self.start + self.stepper < self.end: #negative side increase
             return False
-        self.date += self.stepper
+        self.start += self.stepper
         self.update()
         return True
 
     def update(self):
-        self.weekno   = self.date.strftime('%Y-%U')
-        self.dayno    = self.date.strftime('%m-%d')
-        self.unixtime = str(int( self.date.timestamp() ))
+        self.weekno   = self.start.strftime('%Y-%U')
+        self.dayno    = self.start.strftime('%m-%d')
+        self.unixtime = str(int( self.start.timestamp() ))
         pass
 
     pass
@@ -117,13 +118,23 @@ class KeysReactor():
         pass
 
 class workSpace:
-    def __init__(self, p, *p_l):
+    def __init__(self, p, *p_l, **kargs):
         self.wrk = expandPath(path.join(p, *p_l))
-        makedirs(self.wrk, mode=0o755, exist_ok=True)
         self.pwd = getcwd()
+        if 'forceUpdate' in kargs.keys():
+            self.forceUpdate = True
+        else:
+            self.forceUpdate = False
         pass
     
     def __enter__(self):
+        if not path.isdir(self.wrk):
+            if self.forceUpdate:
+                makedirs(self.wrk, mode=0o755, exist_ok=True)
+            else:
+                return self.__exit__(*sys.exc_info())
+        else:
+            pass
         chdir(self.wrk)
         return self
 

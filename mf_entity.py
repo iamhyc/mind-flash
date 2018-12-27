@@ -30,7 +30,7 @@ class MFEntity:
         text = args[0]
         stp = TextStamp(now=1)
 
-        with workSpace(self.base_path, MF_HOSTNAME, stp.weekno) as wrk:
+        with workSpace(self.base_path, MF_HOSTNAME, stp.weekno, forceUpdate=True) as wrk:
             with MFRecord(stp.dayno) as rec:
                 rec.write(stp.unixtime, text)
                 pass
@@ -45,7 +45,6 @@ class MFEntity:
         stp = TextStamp(mf_type, mf_anchor)
         while stp.Next():
             for userDir in listDirs(self.base_path):
-                # workSpace(self.base_path, MF_HOSTNAME, stp.weekno)
                 userHint = 'Myself' if userDir==MF_HOSTNAME else userDir
                 with workSpace(self.base_path, userDir, stp.weekno) as wrk:
                     with MFRecord(stp.dayno, userHint) as rec:

@@ -2,7 +2,7 @@
 all:depends install
 
 depends:
-	sudo pip3 install termcolor python-dateutil
+	pip3 install termcolor python-dateutil
 
 install:
 	mkdir -p ~/.mf
