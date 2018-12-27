@@ -1,4 +1,5 @@
 
+import re
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtWidgets import (QTextEdit, )
@@ -6,7 +7,7 @@ from MFUtility import MFRetrieveMap
 
 mf_text_hint = """
         <div style="width:100%;font-weight:bold;padding: 1px 1px 1px 1px">
-            <div style="font-size:12px;">{}</div>
+            <div style="width:100%;font-size:12px;">{}</div>
         </div>
 """
 
@@ -18,6 +19,7 @@ mf_text_wrapper = """
     """.format(
         '{}', '{}',
         item_css="""
+            width:70px;
             display: inline-block;
             margin: 5px 5px 5px 5px;
             background-color: #8c8c8c;
@@ -34,8 +36,9 @@ mf_text_wrapper = """
 
 class MFHistory(QTextEdit):
 
-    def __init__(self, parent):
+    def __init__(self, parent, basePath):
         super().__init__(parent)
+        self.basePath = basePath
         self.styleHelper()
         pass
     
@@ -54,7 +57,10 @@ class MFHistory(QTextEdit):
         for item in items:
             itime = datetime.fromtimestamp(int(item[0]), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
             ihint = '%s&nbsp;&nbsp;@&nbsp;&nbsp;%s'%(item[2], itime)
-            itext = eval( item[1].replace('\\n', '<br>') )
+            #FIXME: fix the image style, please!
+            itext = re.sub(r'<-file://(\S+)->',r'<img height="100" src="{}\1">'.format(self.basePath), item[1])
+            itext = eval( itext.replace('\\n', '<br>') )
+
             _textBuffer.append(mf_text_wrapper.format(ihint, itext))
         self.setHtml(''.join(_textBuffer))
         pass

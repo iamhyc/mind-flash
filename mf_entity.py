@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import platform
-from os import path
+from os import path, getcwd
 from sys import argv
 from time import ctime
 from getpass import getpass
@@ -25,6 +25,19 @@ class MFEntity:
             'export': self.mf_export, # export to lzma with private key
         }
         pass
+
+    def mf_save_pixmap(self, *args):
+        pixmap = args[0]
+        stp = TextStamp(now=1)
+        ret = ''
+
+        with workSpace(self.base_path, MF_HOSTNAME, stp.weekno, 'img', forceUpdate=True) as wrk:
+            _fileName = 'pasted_%s.png'%(stp.unixtime)
+            pixmap.save(_fileName, 'PNG')
+            ret = '{}/{}/img/{}'.format(MF_HOSTNAME, stp.weekno, _fileName)
+            pass
+        
+        return ret
 
     def mf_record(self, *args):
         text = args[0]

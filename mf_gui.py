@@ -5,7 +5,7 @@ You Write, You Listen.
 '''
 import sys, signal, socket, time
 from os import path, getcwd, chdir
-from PyQt5.QtCore import Qt, QPoint, QTimer, QMargins
+from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins
 from PyQt5.QtGui import QFont, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                     QGridLayout, QPlainTextEdit, QSizePolicy)
@@ -22,6 +22,8 @@ class MFTextEdit(QPlainTextEdit):
         super().__init__(parent)
         self.parent = parent
         self.w_history = w_history
+        self.clipboard = QApplication.clipboard()
+
         self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
@@ -47,6 +49,23 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.close()
             pass
         self.keysFn.register([Qt.Key_Return], mf_flash_binding)
+
+        ### paste pixmaps ###
+        def mf_paste_pixmap():
+            if self.canPaste():
+                self.paste()
+            else:
+                pixmap = self.clipboard.mimeData().imageData()
+                if pixmap:
+                    imagePath = mf_exec.mf_save_pixmap(pixmap)
+                    mf_text = "<-file://{}->".format(imagePath)
+                    pasteText = self.toPlainText()
+                    if pasteText:
+                        mf_text = pasteText + '\n' + mf_text
+                    mf_exec.mf_record( repr(mf_text) )
+                    self.parent.close()
+            pass
+        self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
 
         self.keysFn.register([Qt.Key_Alt, Qt.Key_V],
             lambda:self.updateHistory((self.time_type+1)%4,  0) )
@@ -144,7 +163,7 @@ class MFGui(QWidget):
     def __init__(self):
         super().__init__()
 
-        w_history = MFHistory(self)
+        w_history = MFHistory(self, MF_DIR)
         w_editor = MFTextEdit(self, w_history)
 
         grid = QGridLayout()
