@@ -3,7 +3,7 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import sys, signal, socket
+import sys, signal, socket, time
 from os import path, getcwd, chdir
 from PyQt5.QtCore import Qt, QPoint, QTimer, QMargins
 from PyQt5.QtGui import QFont, QIcon, QTextOption
@@ -34,7 +34,7 @@ class MFTextEdit(QPlainTextEdit):
     def registerKeys(self):
         ### insert newline ###
         def mf_edit_binding():
-            self.setReadOnly(False)
+            self.setCursorWidth(1)
             self.insertPlainText('\n')
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_edit_binding)
@@ -80,12 +80,14 @@ class MFTextEdit(QPlainTextEdit):
         self.setFont( QFont('Noto Sans CJK SC',14) )
         # Cursor Style
         QApplication.setOverrideCursor(Qt.ArrowCursor)
-        self.setReadOnly(True)
+        self.setCursorWidth(0)
+        self.lastKeyStroke = time.time()
         QTimer.singleShot(500, self.hideCaret)
         pass
 
     def hideCaret(self):
-        self.setReadOnly(True)
+        if time.time() - self.lastKeyStroke > 1.0:
+            self.setCursorWidth(0)
         QTimer.singleShot(500, self.hideCaret)
         pass
 
@@ -122,11 +124,12 @@ class MFTextEdit(QPlainTextEdit):
 
     def keyPressEvent(self, e):
         returnFn = self.keysFn.pressed(e.key())
+        self.setCursorWidth(1)
+        self.lastKeyStroke = time.time()
 
         if returnFn:
             returnFn()
         else: #ascii keys
-            self.setReadOnly(False)
             super().keyPressEvent(e)
             pass
         pass

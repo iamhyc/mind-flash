@@ -2,7 +2,7 @@
 all:depends install
 
 depends:
-	pip3 install termcolor python-dateutil
+	pip3 install termcolor PyQt5 python-dateutil
 
 install:
 	mkdir -p ~/.mf
