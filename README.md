@@ -9,27 +9,31 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 ### Install
 
 1. Download this repository
+
 2. Prepare `python3` and `python3-pip` on your Linux system
+
 3. Execute `make` in the folder
-4. Use `msh-gui` for GUI version, and `msh` for text-based version
-5. (Optional) bind shortcuts for `msh-gui` for quick launch
+
+4. for text-based version: `msh` in your terminal
+
+   for GUI-based version: `msh-gui` in your terminal, or `Super + N`
 
 ### Usage
 
-|    Function     |                 Shortcut                 |
+| Default Shortcuts |                 Function                 |
 | :-------------: | :--------------------------------------: |
-|  Quick Launch   | <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>m</kbd> |
-|    Next Line    | <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd> |
-|    Save&Exit    |            <kbd>Return</kbd>             |
+| <kbd>Super</kbd> + <kbd>N</kbd> | Quick Launch |
+|    <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd>    | Next Line |
+|    <kbd>Return</kbd>    |            Save&Exit    |
 |                 |                                          |
-|  Popup History  |         Double <kbd>click</kbd>          |
-|  History - Week  | <kbd>Alt</kbd> + <kbd>v</kbd> |
-| History - Month  | <kbd>Alt</kbd> + <kbd>vv</kbd> |
-| History - Year | <kbd>Alt</kbd> + <kbd>vvv</kbd> |
-|  Last History   | <kbd>Alt</kbd> + <kbd>k</kbd> |
-|  Next History   | <kbd>Alt</kbd> + <kbd>j</kbd> |
+|  Double <kbd>click</kbd>  |     Popup History |
+|  <kbd>Alt</kbd> + <kbd>v</kbd>  | History - Week |
+| <kbd>Alt</kbd> + <kbd>vv</kbd> | History - Month |
+| <kbd>Alt</kbd> + <kbd>vvv</kbd> | History - Year |
+| <kbd>Alt</kbd> + <kbd>k</kbd> | Last History |
+| <kbd>Alt</kbd> + <kbd>j</kbd> | Next History |
 
-> for now, you should bind the `quick launch` shortcut by yourself
+> You could customize the key bindings in the configuration file `~/.config/mf/config.json`
 
 ### TODO
 
@@ -43,7 +47,9 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 - [x] Fix Fetch Function Replement
 - [x] Add Chinese Characters Support
 - [x] Clipboard Images Support
-  (point of first beta release)
-- [ ] Listview for History
-- [ ] Listview for Todolist
+  ~~(point of first beta release)~~
+- [ ] Remember Window Position
+- [ ] Support Configuration File (position, shortcut binding)
+- [ ] Refactor InputBox (auto adjust height, pixmap preview)
+- [ ] Refactor HistoryBox (Item Listview, Item Aggregation)
   (point of first formal release)
