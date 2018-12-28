@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import platform
-from os import path, getcwd
+from os import path
 from sys import argv
 from time import ctime
 from getpass import getpass
@@ -33,8 +33,8 @@ class MFEntity:
 
         with workSpace(self.base_path, MF_HOSTNAME, stp.weekno, 'img', forceUpdate=True) as wrk:
             _fileName = 'pasted_%s.png'%(stp.unixtime)
-            pixmap.save(_fileName, 'PNG')
-            ret = '{}/{}/img/{}'.format(MF_HOSTNAME, stp.weekno, _fileName)
+            if pixmap.save(_fileName, 'PNG'):
+                ret = '{}/{}/img/{}'.format(MF_HOSTNAME, stp.weekno, _fileName)
             pass
         
         return ret

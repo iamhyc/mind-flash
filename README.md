@@ -12,7 +12,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 
 2. Prepare `python3` and `python3-pip` on your Linux system
 
-3. Execute `make` in the folder
+3. Execute `make` in the folder (maybe need Internet Connection to download python3 libs)
 
 4. for text-based version: `msh` in your terminal
 
