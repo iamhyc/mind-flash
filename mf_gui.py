@@ -5,8 +5,8 @@ You Write, You Listen.
 '''
 import sys, signal, socket, time
 from os import path, getcwd, chdir
-from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins
-from PyQt5.QtGui import QFont, QIcon, QTextOption
+from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect
+from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                     QGridLayout, QPlainTextEdit, QSizePolicy)
 from mf_entity import MFEntity
@@ -17,6 +17,7 @@ from MFUtility import MF_RNG, KeysReactor
 MF_NAME     = 'Mind Flash'
 MF_DIR      = path.expanduser('~/.mf/')
 FONT_STYLE  = ('Noto Sans CJK SC',14)
+MIN_INPUTBOX_SIZE = (600, 70)
 
 class MFTextEdit(QPlainTextEdit):
     def __init__(self, parent, w_history):
@@ -29,6 +30,8 @@ class MFTextEdit(QPlainTextEdit):
         self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
+        self.font_style = QFont(*FONT_STYLE)
+        self.font_metric= QFontMetrics(self.font_style)
         self.styleHelper()
 
         self.keysFn = KeysReactor()
@@ -104,13 +107,13 @@ class MFTextEdit(QPlainTextEdit):
             border-top: 1px solid #CCCCCC 
         """)
         # self.setStyleSheet("border: 1px solid #CCCCCC")
-        self.setFixedSize(600, 70)
+        self.setFixedSize(*MIN_INPUTBOX_SIZE)
         self.setTabChangesFocus(True)
         self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # Font Style
-        self.setFont(QFont(*FONT_STYLE))
+        self.setFont(self.font_style)
         # Cursor Style
         QApplication.setOverrideCursor(Qt.ArrowCursor)
         self.setCursorWidth(0)
@@ -160,11 +163,7 @@ class MFTextEdit(QPlainTextEdit):
         self.setCursorWidth(1)
         self.lastKeyStroke = time.time()
 
-        if returnFn:
-            returnFn()
-        else: #ascii keys
-            super().keyPressEvent(e)
-            pass
+        returnFn() if returnFn else super().keyPressEvent(e)
         pass
 
     def keyReleaseEvent(self, e):
