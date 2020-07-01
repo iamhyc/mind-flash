@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtWidgets import (QTextEdit, )
-from MFUtility import MFRetrieveMap
 
 mf_text_hint = """
         <div style="width:100%;font-weight:bold;padding: 1px 1px 1px 1px">

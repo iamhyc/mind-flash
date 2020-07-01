@@ -8,60 +8,60 @@ from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
 from PyQt5.QtCore import Qt
 
-class MFRetrieve(Enum):
+class MF_RNG(Enum):
     DAY  = 0
     WEEK = 1
     MONTH= 2
     YEAR = 3
     pass
 
-MFRetrieveMap = {
-    0: 'DAY',
-    1: 'WEEK',
-    2: 'MONTH',
-    3: 'YEAR'
-}
-
 class TextStamp():
     def __init__(self, mf_type=0, mf_anchor=0, now=0):
-        __date = datetime.now()
+        self.start,  self.end,   self.hint     = None, None, None
+        self.weekno, self.dayno, self.unixtime = None, None, None
+        self.end = datetime.now()
+        self.stepper = relativedelta(days=-1)
         
         if not now:
-            self.stepper = relativedelta(days=-1)
-            if mf_type==MFRetrieve.DAY:         # from 00:00 to 00:00
-                tmp = datetime(__date.year, __date.month, __date.day)
-                self.end = tmp + relativedelta(days=mf_anchor)
-                self.start = self.end + relativedelta(days=1)
-                self.hint = self.end.strftime('%Y-%m-%d')
-            elif mf_type==MFRetrieve.WEEK:      # from MON to SUN
-                tmp = datetime(__date.year, __date.month, __date.day)
-                self.end = tmp + relativedelta(weekday=MO(mf_anchor))
-                self.start = self.end + relativedelta(days=7)
-                self.hint = self.end.strftime('Week %U, %Y')
-            elif mf_type==MFRetrieve.MONTH:     # from 1st to endth
-                tmp = datetime(__date.year, __date.month, 1)
-                self.end = tmp + relativedelta(months=mf_anchor)
-                self.start = self.end + relativedelta(months=1)
-                self.hint = self.end.strftime('%B, %Y')
-            elif mf_type==MFRetrieve.YEAR:      # from Jan to Dec
-                self.end = datetime(__date.year, 1, 1) + relativedelta(years=mf_anchor)
-                self.start = self.end + relativedelta(years=1)
-                self.hint = self.end.strftime('Year %Y')
-            pass
+            self.update_type(mf_type, mf_anchor)
+            self.update_hint()
         else:
-            self.start = __date
-        
-        self.update()
+            self.start = self.end
+            self.update_hint()
         pass
     
-    def Next(self):
+    def update_type(self, mf_type, mf_anchor=0):
+        if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
+            tmp = datetime(self.end.year, self.end.month, self.end.day)
+            self.end   = tmp + relativedelta(days=mf_anchor)
+            self.start = self.end + relativedelta(days=1)
+            self.hint  = self.end.strftime('%Y-%m-%d')
+        elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
+            tmp = datetime(self.end.year, self.end.month, self.end.day)
+            self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
+            self.start = self.end + relativedelta(days=7)
+            self.hint  = self.end.strftime('Week %U, %Y')
+        elif mf_type==MF_RNG.MONTH:                    # from 1st to end-th
+            tmp = datetime(self.end.year, self.end.month, 1)
+            self.end   = tmp + relativedelta(months=mf_anchor)
+            self.start = self.end + relativedelta(months=1)
+            self.hint  = self.end.strftime('%B, %Y')
+        elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
+            self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
+            self.start = self.end + relativedelta(years=1)
+            self.hint  = self.end.strftime('Year %Y')
+        else:
+            pass
+        pass
+
+    def next(self):
         if self.start + self.stepper < self.end: #negative side increase
             return False
         self.start += self.stepper
-        self.update()
+        self.update_hint()
         return True
 
-    def update(self):
+    def update_hint(self):
         self.weekno   = self.start.strftime('%Y-%U')
         self.dayno    = self.start.strftime('%m-%d')
         self.unixtime = str(int( self.start.timestamp() ))
@@ -79,7 +79,7 @@ class KeysReactor():
     keySpecsKeys = keySpecs.keys()
 
     def __init__(self):
-        self.keyL = [0x00]
+        self.key_list = [0x00]
         self.reactor = dict()
         pass
     
@@ -97,11 +97,11 @@ class KeysReactor():
     
     def pressed(self, key):
         if key in self.keySpecsKeys:
-            self.keyL[0] = self.keyL[0] | self.keySpecs[key] #append specific keys
+            self.key_list[0] = self.key_list[0] | self.keySpecs[key] #append specific keys
         else:
-            self.keyL.append(key)
+            self.key_list.append(key)
         
-        key_hash = '_'.join([str(x) for x in self.keyL])
+        key_hash = '_'.join([str(x) for x in self.key_list])
         if key_hash in self.reactor:
             return self.reactor[key_hash] #return the hook function
         else:
@@ -110,11 +110,11 @@ class KeysReactor():
     
     def released(self, key):
         if key in self.keySpecsKeys:
-            self.keyL[0] = self.keyL[0] & (~self.keySpecs[key]) #remove specific keys
-            if self.keyL[0]==0x00: # without specific keys present
-                self.keyL = [0x00] #reset, if specific keys all released
-        elif key in self.keyL:
-            self.keyL.remove(key)
+            self.key_list[0] = self.key_list[0] & (~self.keySpecs[key]) #remove specific keys
+            if self.key_list[0]==0x00: # without specific keys present
+                self.key_list = [0x00] #reset, if specific keys all released
+        elif key in self.key_list:
+            self.key_list.remove(key)
         pass
 
 class workSpace:

@@ -7,10 +7,10 @@ from getpass import getpass
 from termcolor import colored, cprint
 from MFUtility import *
 
-MF_HISTORY=path.expanduser('~/.mf/mf_history')
-MF_HOSTNAME=platform.node().split('-')[0]
-MF_CTIME=ctime()
-MF_HINT = '>_<: '
+MF_HISTORY = path.expanduser('~/.mf/mf_history')
+MF_HOSTNAME= platform.node().split('-')[0]
+MF_CTIME   = ctime()
+MF_HINT    = '>_<: '
 
 class MFEntity:
 
@@ -50,13 +50,17 @@ class MFEntity:
             pass
         pass
 
-    def mf_fetch(self, *args):
+    def mf_fetch(self, *args, **kargs):
         mf_type, mf_anchor, mf_filter = args
-        if type(mf_type)==int: mf_type = MFRetrieve(mf_type)
+        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
+        if 'stp' in kargs:
+            stp = kargs['stp']
+            stp.update_type(mf_type, mf_anchor)
+        else:
+            stp = TextStamp(mf_type, mf_anchor)
 
         items = list()
-        stp = TextStamp(mf_type, mf_anchor)
-        while stp.Next():
+        while stp.next():
             for userDir in listDirs(self.base_path):
                 userHint = 'Myself' if userDir==MF_HOSTNAME else userDir
                 with workSpace(self.base_path, userDir, stp.weekno) as wrk:
@@ -67,19 +71,19 @@ class MFEntity:
                 pass
             pass
         
-        return stp.hint, items
+        return stp, items
 
     def mf_sync(self, *args):
         print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))
         pass
 
     def mf_import(self, *args):
-        filep = args[0]
+        file_path = args[0]
         passwd = getpass()
         pass
 
     def mf_export(self, *args):
-        filep = args[0]
+        file_path = args[0]
         passwd = getpass()
         pass
 

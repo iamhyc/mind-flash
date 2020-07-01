@@ -12,10 +12,11 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import MFRetrieve, KeysReactor
+from MFUtility import MF_RNG, KeysReactor
 
-MF_NAME="Mind Flash"
-MF_DIR=path.expanduser('~/.mf/')
+MF_NAME     = 'Mind Flash'
+MF_DIR      = path.expanduser('~/.mf/')
+FONT_STYLE  = ('Noto Sans CJK SC',14)
 
 class MFTextEdit(QPlainTextEdit):
     def __init__(self, parent, w_history):
@@ -24,6 +25,7 @@ class MFTextEdit(QPlainTextEdit):
         self.w_history = w_history
         self.clipboard = QApplication.clipboard()
 
+        self.stp = None
         self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
@@ -34,14 +36,14 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def registerKeys(self):
-        ### insert newline ###
+        #NOTE: Ctrl+Return; insert newline
         def mf_edit_binding():
             self.setCursorWidth(1)
             self.insertPlainText('\n')
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_edit_binding)
 
-        ### flash recording ###
+        #NOTE: Return; flash recording
         def mf_flash_binding():
             mf_text = self.toPlainText()
             if mf_text:
@@ -50,7 +52,7 @@ class MFTextEdit(QPlainTextEdit):
             pass
         self.keysFn.register([Qt.Key_Return], mf_flash_binding)
 
-        ### paste pixmaps ###
+        #NOTE: Ctrl+V; paste pixmaps
         def mf_paste_pixmap():
             if self.canPaste():
                 self.paste()
@@ -67,20 +69,32 @@ class MFTextEdit(QPlainTextEdit):
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
 
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_V],
-            lambda:self.updateHistory((self.time_type+1)%4,  0) )
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_K], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor - 1))
-        self.keysFn.register([Qt.Key_Alt, Qt.Key_J], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor + 1))
+        ### Alt+V ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_V],
+            lambda:self.updateHistory(self.time_type+1, 0, True) if self.time_type+1<4 else self.updateHistory(0, 0)
+        )
+        ### Alt+J ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_K], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor-1)
+        )
+        ### Alt+K ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_J], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor+1)
+        )
         pass
 
-    def updateHistory(self, mf_type, mf_anchor):
+    def updateHistory(self, mf_type, mf_anchor, relative=False):
         if mf_anchor > 0: return #no future history
-        hint, items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
+        if relative: #relative to previous stp
+            self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp)
+        else:
+            self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
 
         self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
-        self.w_history.render(hint, items)
+        self.w_history.render(self.stp.hint, items)
         pass
 
     def styleHelper(self):
@@ -96,7 +110,7 @@ class MFTextEdit(QPlainTextEdit):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # Font Style
-        self.setFont( QFont('Noto Sans CJK SC',14) )
+        self.setFont(QFont(*FONT_STYLE))
         # Cursor Style
         QApplication.setOverrideCursor(Qt.ArrowCursor)
         self.setCursorWidth(0)
@@ -190,7 +204,7 @@ class MFGui(QWidget):
 
 if __name__ == '__main__':
     global mf_exec, mf_sock
-    # singleton instance using local socket
+    # singleton instance restriction using local socket
     try:
         mf_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         mf_sock.bind(('', 19216))
