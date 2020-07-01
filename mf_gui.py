@@ -138,7 +138,7 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
             self.updateHistory(0, 0) #default history for today
             pass
-        self.setFocus() # for convinience
+        self.setFocus() # for convenience
         pass
 
     def keyPressEvent(self, e):
@@ -162,6 +162,7 @@ class MFTextEdit(QPlainTextEdit):
 class MFGui(QWidget):
     def __init__(self):
         super().__init__()
+        self.setAttribute(Qt.WA_InputMethodEnabled)
 
         w_history = MFHistory(self, MF_DIR)
         w_editor = MFTextEdit(self, w_history)
