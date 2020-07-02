@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import sys, time, bisect
 import lzma, json, subprocess
 from datetime import datetime

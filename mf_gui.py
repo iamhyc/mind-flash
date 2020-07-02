@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 '''Mind Flash
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
@@ -204,7 +204,7 @@ class MFGui(QWidget):
         self.move(qr.topLeft())
 
         self.setWindowTitle(MF_NAME)
-        self.setWindowIcon( QIcon('./icons/pulse_heart.png') )
+        self.setWindowIcon( QIcon('./res/icons/pulse_heart.png') )
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.show()
         pass

@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 import re
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
