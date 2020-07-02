@@ -13,7 +13,7 @@ It's a flash over your mind. <img src="./icons/pulse_heart.png" width="24">
 2. Download this repository, and execute `make` in the repository folder;
     > It will automatically download the requirements, and install in the system (need root privilege)
 
-3. use `msh-gui` to display GUI (`msh --help` for detail usage), and `msh` for CLI.
+3. Use `msh-gui` to display GUI, and `msh` for CLI.
     > Suggest to add a global shortcut for `msh-gui`, e.g., <kbd>Super</kbd> + <kbd>N</kbd>.
 
 ### Usage
