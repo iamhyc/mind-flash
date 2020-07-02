@@ -87,6 +87,11 @@ class MFTextEdit(QPlainTextEdit):
             [Qt.Key_Alt, Qt.Key_J], 
             lambda:self.updateHistory(self.time_type, self.time_anchor+1)
         )
+        ### Ctrl+H ###
+        self.keysFn.register(
+            [Qt.Key_Control, Qt.Key_H], 
+            lambda:self.toggleHistoryWidget()
+        )
         pass
 
     def updateHistory(self, mf_type, mf_anchor, relative=False):
@@ -121,6 +126,23 @@ class MFTextEdit(QPlainTextEdit):
         QTimer.singleShot(500, self.hideCaret)
         pass
 
+    def toggleHistoryWidget(self):
+        size_half = self.w_history.height()/2
+        if self.w_history.isVisible():
+            self.w_history.setVisible(False)
+            self.parent.adjustSize()
+            self.parent.resize(self.size())
+            self.parent.move(self.parent.pos() + QPoint(0, size_half))
+            pass
+        else:
+            self.w_history.setVisible(True)
+            self.parent.adjustSize()
+            self.parent.move(self.parent.pos() - QPoint(0, size_half))
+            self.updateHistory(0, 0) #default history for today
+            pass
+        self.setFocus() # for convenience
+        pass
+
     def hideCaret(self):
         if time.time() - self.lastKeyStroke > 1.0:
             self.setCursorWidth(0)
@@ -142,20 +164,7 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def mouseDoubleClickEvent(self, e):
-        size_half = self.w_history.height()/2
-        if self.w_history.isVisible():
-            self.w_history.setVisible(False)
-            self.parent.adjustSize()
-            self.parent.resize(self.size())
-            self.parent.move(self.parent.pos() + QPoint(0, size_half))
-            pass
-        else:
-            self.w_history.setVisible(True)
-            self.parent.adjustSize()
-            self.parent.move(self.parent.pos() - QPoint(0, size_half))
-            self.updateHistory(0, 0) #default history for today
-            pass
-        self.setFocus() # for convenience
+        self.toggleHistoryWidget()
         pass
 
     def keyPressEvent(self, e):
