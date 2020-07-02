@@ -49,11 +49,10 @@ class TextStamp():
             self.hint  = self.end.strftime('%B, %Y')
         elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
             self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
-            self.start = self.end - relativedelta(years=1)
+            self.start = self.end + relativedelta(years=1)
             self.hint  = self.end.strftime('Year %Y')
         else:
             pass
-        print(self.end, self.start)
         pass
 
     def next(self):
