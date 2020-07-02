@@ -20,7 +20,7 @@ class TextStamp():
         self.start,  self.end,   self.hint     = None, None, None
         self.weekno, self.dayno, self.unixtime = None, None, None
         self.end = datetime.now()
-        self.stepper = relativedelta(days=1)
+        self.back_stepper = relativedelta(days=-1)
         
         if not now:
             self.update_type(mf_type, mf_anchor)
@@ -34,17 +34,18 @@ class TextStamp():
         if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
             tmp = datetime(self.end.year, self.end.month, self.end.day)
             self.end   = tmp + relativedelta(days=mf_anchor)
-            self.start = self.end - relativedelta(days=1)
+            self.start = self.end + relativedelta(days=1)
             self.hint  = self.end.strftime('%Y-%m-%d')
         elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
             tmp = datetime(self.end.year, self.end.month, self.end.day)
+            mf_anchor  = -1 if mf_anchor==0 else mf_anchor #get last Monday when anchor==0
             self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
-            self.start = self.end - relativedelta(days=7)
+            self.start = self.end + relativedelta(days=7)
             self.hint  = self.end.strftime('Week %U, %Y')
         elif mf_type==MF_RNG.MONTH:                    # from 1st to end-th
             tmp = datetime(self.end.year, self.end.month, 1)
             self.end   = tmp + relativedelta(months=mf_anchor)
-            self.start = self.end - relativedelta(months=1)
+            self.start = self.end + relativedelta(months=1)
             self.hint  = self.end.strftime('%B, %Y')
         elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
             self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
@@ -52,12 +53,13 @@ class TextStamp():
             self.hint  = self.end.strftime('Year %Y')
         else:
             pass
+        print(self.end, self.start)
         pass
 
     def next(self):
-        if self.start + self.stepper > self.end:
+        if self.start + self.back_stepper < self.end:
             return False
-        self.start += self.stepper
+        self.start += self.back_stepper
         self.update_hint()
         return True
 

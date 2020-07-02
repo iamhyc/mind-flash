@@ -87,14 +87,15 @@ class MFTextEdit(QPlainTextEdit):
             [Qt.Key_Alt, Qt.Key_J], 
             lambda:self.updateHistory(self.time_type, self.time_anchor+1)
         )
-        ### Ctrl+H ###
+        ### Alt+H ###
         self.keysFn.register(
-            [Qt.Key_Control, Qt.Key_H], 
+            [Qt.Key_Alt, Qt.Key_H], 
             lambda:self.toggleHistoryWidget()
         )
         pass
 
     def updateHistory(self, mf_type, mf_anchor, relative=False):
+        if not self.w_history.isVisible(): return
         if mf_anchor > 0: return #no future history
         if relative: #relative to previous stp
             self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp)
