@@ -4,7 +4,7 @@ This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
 import sys, signal, socket, time
-from os import path, getcwd, chdir
+from os import path, getcwd, chdir, remove as os_remove
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
@@ -25,6 +25,7 @@ class MFTextEdit(QPlainTextEdit):
         self.parent = parent
         self.w_history = w_history
         self.clipboard = QApplication.clipboard()
+        self.image_cache = list()
 
         self.stp = None
         self.time_type, self.time_anchor = 0, 0
@@ -49,6 +50,8 @@ class MFTextEdit(QPlainTextEdit):
         #NOTE: Return; flash recording
         def mf_flash_binding():
             mf_text = self.toPlainText()
+            for image in self.image_cache: #clear image_cache when try recording
+                os_remove(path.join(MF_DIR,image)) if image not in mf_text else None
             if mf_text:
                 mf_exec.mf_record( repr(mf_text) )
             self.parent.close()
@@ -63,6 +66,7 @@ class MFTextEdit(QPlainTextEdit):
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
                     imagePath = mf_exec.mf_save_pixmap(pixmap)
+                    self.image_cache.append(imagePath)
                     _text = "<-file://{}->".format(imagePath)
                     self.insertPlainText(_text)
             pass
@@ -183,8 +187,8 @@ class MFGui(QWidget):
         super().__init__()
         self.setAttribute(Qt.WA_InputMethodEnabled)
 
-        w_history = MFHistory(self, MF_DIR)
-        w_editor = MFTextEdit(self, w_history)
+        w_history = MFHistory(self,  MF_DIR)
+        w_editor  = MFTextEdit(self, w_history)
 
         grid = QGridLayout()
         grid.setSpacing(0)

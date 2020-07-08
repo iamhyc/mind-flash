@@ -56,7 +56,7 @@ class MFHistory(QTextEdit):
         for item in items:
             itime = datetime.fromtimestamp(int(item[0]), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
             ihint = '%s&nbsp;&nbsp;@&nbsp;&nbsp;%s'%(item[2], itime)
-            #FIXME: fix the image style, please!
+            #FIXME: fix the image style
             itext = re.sub(r'<-file://(\S+)->',r'<img height="100" src="{}\1">'.format(self.basePath), item[1])
             itext = eval( itext.replace('\\n', '<br>') )
 
