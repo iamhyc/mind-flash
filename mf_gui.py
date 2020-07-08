@@ -5,7 +5,7 @@ You Write, You Listen.
 '''
 import sys, signal, socket, time
 from os import path, getcwd, chdir, remove as os_remove
-from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect
+from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                     QGridLayout, QPlainTextEdit, QSizePolicy)
@@ -18,6 +18,7 @@ MF_NAME     = 'Mind Flash'
 MF_DIR      = path.expanduser('~/.mf/')
 FONT_STYLE  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
+INPUTBOX_RESIZE   = (0,0,0,1,2)
 
 class MFTextEdit(QPlainTextEdit):
     def __init__(self, parent, w_history):
@@ -127,6 +128,15 @@ class MFTextEdit(QPlainTextEdit):
         QTimer.singleShot(500, self.hideCaret)
         pass
 
+    def getLineCount(self):
+        _count = 0
+        _doc = self.document()
+        _it = _doc.begin()
+        while _it != _doc.end():
+            _count += _it.layout().lineCount()
+            _it = _it.next()
+        return _count
+
     def toggleHistoryWidget(self):
         size_half = self.w_history.height()/2
         if self.w_history.isVisible():
@@ -139,7 +149,7 @@ class MFTextEdit(QPlainTextEdit):
             self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
-            self.updateHistory(0, 0) #default history for today
+            self.updateHistory(0, 0) #refresh, default history for today
             pass
         self.setFocus() # for convenience
         pass
@@ -172,12 +182,17 @@ class MFTextEdit(QPlainTextEdit):
         returnFn = self.keysFn.pressed(e.key())
         self.setCursorWidth(1)
         self.lastKeyStroke = time.time()
-
         returnFn() if returnFn else super().keyPressEvent(e)
         pass
 
     def keyReleaseEvent(self, e):
         self.keysFn.released(e.key())
+        _lines = min(self.getLineCount(), len(INPUTBOX_RESIZE)-1)
+        _size  = QSize(MIN_INPUTBOX_SIZE[0], 70+35*INPUTBOX_RESIZE[_lines])
+        if _size!=self.size():
+            self.setFixedSize(MIN_INPUTBOX_SIZE[0], 70+35*INPUTBOX_RESIZE[_lines])
+            self.parent.adjustSize()
+            self.parent.resize(self.size())
         pass
     
     pass
