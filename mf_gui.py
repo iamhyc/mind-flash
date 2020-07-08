@@ -63,12 +63,8 @@ class MFTextEdit(QPlainTextEdit):
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
                     imagePath = mf_exec.mf_save_pixmap(pixmap)
-                    mf_text = "<-file://{}->".format(imagePath)
-                    pasteText = self.toPlainText()
-                    if pasteText:
-                        mf_text = pasteText + '\n' + mf_text
-                    mf_exec.mf_record( repr(mf_text) )
-                    self.parent.close()
+                    _text = "<-file://{}->".format(imagePath)
+                    self.insertPlainText(_text)
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
 
