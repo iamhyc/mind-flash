@@ -16,7 +16,7 @@ from MFUtility import MF_RNG, KeysReactor
 
 MF_NAME     = 'Mind Flash'
 MF_DIR      = path.expanduser('~/.mf/')
-FONT_STYLE  = ('Noto Sans CJK SC',14)
+INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2)
 
@@ -32,7 +32,7 @@ class MFTextEdit(QPlainTextEdit):
         self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
-        self.font_style = QFont(*FONT_STYLE)
+        self.font_style = QFont(*INPUTBOX_FONT)
         self.font_metric= QFontMetrics(self.font_style)
         self.styleHelper()
 
@@ -109,11 +109,7 @@ class MFTextEdit(QPlainTextEdit):
 
     def styleHelper(self):
         # Basic Style
-        self.setStyleSheet("""
-            border: 0px solid white;
-            border-top: 1px solid #CCCCCC 
-        """)
-        # self.setStyleSheet("border: 1px solid #CCCCCC")
+        self.setStyleSheet('border: 0px solid white;')
         self.setFixedSize(*MIN_INPUTBOX_SIZE)
         self.setTabChangesFocus(True)
         self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
@@ -200,27 +196,26 @@ class MFTextEdit(QPlainTextEdit):
 class MFGui(QWidget):
     def __init__(self):
         super().__init__()
-        self.setAttribute(Qt.WA_InputMethodEnabled)
-
         w_history = MFHistory(self,  MF_DIR)
         w_editor  = MFTextEdit(self, w_history)
-
+        # set main window layout as grid
         grid = QGridLayout()
         grid.setSpacing(0)
         grid.setContentsMargins(0,0,0,0)
         grid.addWidget(w_history, 0, 0)
-        grid.addWidget(w_editor, 1, 0)
+        grid.addWidget(w_editor,  1, 0)
         self.setLayout(grid)
         self.resize(self.sizeHint())
-
+        # move window to desktop center
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
+        # set window style
         self.setWindowTitle(MF_NAME)
         self.setWindowIcon( QIcon('./res/icons/pulse_heart.png') )
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_InputMethodEnabled)
         self.show()
         pass
 

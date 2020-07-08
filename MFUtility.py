@@ -192,7 +192,7 @@ class MFRecord:
 
     def readAll(self):
         user_hint = [self.hint] * len(self.time_line)
-        return list(zip(self.time_line, self.text_line, user_hint))
+        return list(zip(user_hint, self.time_line, self.text_line))
 
     pass
 
