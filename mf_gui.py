@@ -54,7 +54,7 @@ class MFTextEdit(QPlainTextEdit):
             for image in self.image_cache: #clear image_cache when try recording
                 os_remove(path.join(MF_DIR,image)) if image not in mf_text else None
             if mf_text:
-                mf_exec.mf_record( repr(mf_text) )
+                mf_exec.mf_record( repr(mf_text.strip()) )
             self.parent.close()
             pass
         self.keysFn.register([Qt.Key_Return], mf_flash_binding)

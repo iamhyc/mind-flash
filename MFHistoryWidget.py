@@ -6,6 +6,7 @@ from PyQt5.QtGui import (QFont, QFontMetrics, QIcon)
 from PyQt5.QtWidgets import (QWidget, QLabel, QTextEdit, QListWidget, QListWidgetItem, QGridLayout)
 
 MIN_HISTORY_SIZE = (600, 450)
+MIN_ITEM_SIZE    = (600, 150)
 HINT_FONT        = ('Noto Sans CJK SC',10,QFont.Bold)
 
 # [left-upper corner] [QLabel, 100% width, 12px, bold] (hint)
@@ -29,13 +30,12 @@ class MFHistoryItem(QListWidgetItem):
         (_user, _time, _text) = item
         _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
         hint  = '%s @ %s'%(_user, _time)
-        #TODO: elegant image display style
         #FIXME: item redering with ListWidgetItem
         # [item_css] ('background-color: #8c8c8c;')
         # [time_css] ('color: #B4B5B8; font-size: 12px;')
         # [text_css] ('color: #252526; font-size: 16px;')
-        # _text = re.sub(r'<-file://(\S+)->',r'<img height="100" src="{}\1">'.format(self.basePath), raw_text)
-        # _text = eval( _text.replace('\\n', '<br>') )
+        # re.sub(r'<-file://(\S+)->',r'\1">'; QSize( min(MIN_ITEM_SIZE[0], img.width), 150 )
+        # replace('\\n', '<br>')
         pass
     pass
 
