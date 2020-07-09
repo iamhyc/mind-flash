@@ -20,9 +20,9 @@ class MFHintLabel(QLabel):
         pass
     pass
 
-class MFHistoryItem(QListWidgetItem):
-    def __init__(self, parent, item):
-        super().__init__(parent, 0)
+class MFHistoryItem(QWidget):
+    def __init__(self, item):
+        super().__init__(None)
         self.updateItem(item)
         pass
 
@@ -94,8 +94,11 @@ class MFHistory(QWidget):
     def render(self, hint, items):
         self.w_hint_label.setText(hint)
         for item in items:
-            w_item = MFHistoryItem(self.w_history_list, item)
+            w_item = QListWidgetItem(self.w_history_list)
+            w_item_widget = MFHistoryItem(item)
+            w_item.setSizeHint(w_item_widget.sizeHint())
             self.w_history_list.addItem(w_item)
+            self.w_history_list.setItemWidget(w_item, w_item_widget)
             pass
         pass
     
