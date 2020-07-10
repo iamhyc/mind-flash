@@ -4,16 +4,18 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 ### Preview
 
-![preview-01](./previews/preview-02.gif)
+![preview-01](./previews/preview-03.png)
 
 ### Install
 
 1. Have `python3` and `python3-pip` installed;
 
 2. Download this repository, and execute `make` in the repository folder;
-    > It will automatically download the requirements, and install in the system (need root privilege)
-
+    
+> It will automatically download the requirements, and install in the system (need root privilege)
+    
 3. Use `msh-gui` to display GUI, and `msh` for CLI.
+    
     > Suggest to add a global shortcut for `msh-gui`, e.g., <kbd>Super</kbd> + <kbd>N</kbd>.
 
 ### Usage
