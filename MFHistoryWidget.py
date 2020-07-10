@@ -3,7 +3,7 @@ import re
 from os import path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from PyQt5.QtCore import (Qt, QRect, QSize,)
+from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter)
 from PyQt5.QtWidgets import (QWidget, QFrame,QLabel, QTextEdit, QListWidget, QListWidgetItem,
                             QGridLayout, QStyle, QStyleOption)
@@ -18,7 +18,9 @@ ITEM_TEXT_COLOR  = '#252526'
 LIST_BACKGROUND  = '#FFFFFF'
 ITEM_BACKGROUND  = '#ECF0F1'
 ITEM_MARGIN      = 5#px
-_filter = re.compile('<-file://(.*?)->')
+img_filter   = re.compile('<-file://(.*?)->')
+bold_filter  = re.compile('\*\*([^\*]+)\*\*')
+italic_filter= re.compile('\*(.*?)\*')
 
 class QLabelWrap(QLabel):
     def __init__(self, type, text='', pixmap=''):
@@ -52,6 +54,7 @@ class QLabelWrap(QLabel):
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+            self.setTextFormat(Qt.RichText)
             self.setStyleSheet('''
                 QLabel {
                     background-color: %r;
@@ -98,11 +101,14 @@ class MFHistoryItem(QFrame):
 
     def updateItem(self, item):
         (_user, _time, _text) = item
-        _time   = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
-        _text   = _filter.split(_text)
+        _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+        _text = bold_filter.sub(r'<b>\1</b>', _text)
+        _text = italic_filter.sub(r'<i>\1</i>', _text)
+        _text = img_filter.split(_text)
         # parse (hint, images, text)
         hint   = '%s @ %s'%(_user, _time)
         text   = eval( ''.join(_text[0:][::2]) ).strip()
+        text   = text.replace('\n', '<br>')
         images = _text[1:][::2]
         # create widgets
         hint_label = QLabelWrap('item_hint', hint)
