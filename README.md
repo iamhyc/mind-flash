@@ -12,7 +12,7 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 2. Download this repository, and execute `make` in the repository folder;
     
-> It will automatically download the requirements, and install in the system (need root privilege)
+    > It will automatically download the requirements, and install itself in system (need root privilege).
     
 3. Use `msh-gui` to display GUI, and `msh` for CLI.
     
@@ -32,8 +32,8 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 | <kbd>Alt</kbd> + <kbd>vvv</kbd> | History - Year |
 | <kbd>Alt</kbd> + <kbd>k</kbd> | Last piece of History |
 | <kbd>Alt</kbd> + <kbd>j</kbd> | Next piece of History |
+* `*italic_text*`, `**bold_text**` render support when input
+* <kbd>Ctrl</kbd> + <kbd>V</kbd> support pasting plaintext or image
 
 ### TODO
-This project is still under development.
-
-The future feature list is moved to `Issues` section on Github.
+Please refer to feature list in `Issues` section on Github.
