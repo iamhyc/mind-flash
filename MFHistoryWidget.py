@@ -221,7 +221,8 @@ class MFHistory(QWidget):
 
     def hideEvent(self, e):
         super().hideEvent(e)
-        self.w_history_list.clear()
+        if not self.isVisible():
+            self.w_history_list.clear()
         pass
 
     def render(self, hint, items):
