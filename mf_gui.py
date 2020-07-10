@@ -119,6 +119,7 @@ class MFTextEdit(QPlainTextEdit):
         self.setFont(self.font_style)
         # Cursor Style
         QApplication.setOverrideCursor(Qt.ArrowCursor)
+        self.ensureCursorVisible()
         self.setCursorWidth(0)
         self.lastKeyStroke = time.time()
         QTimer.singleShot(500, self.hideCaret)
