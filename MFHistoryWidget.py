@@ -12,8 +12,11 @@ MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
 MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
 ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
+ITEM_HINT_COLOR  = 'blue'
 ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
-ITEM_BACKGROUND  = '#8c8c8c'
+ITEM_TEXT_COLOR  = '#252526'
+LIST_BACKGROUND  = '#FFFFFF'
+ITEM_BACKGROUND  = '#ECF0F1'
 ITEM_MARGIN      = 5#px
 _filter = re.compile('<-file://(.*?)->')
 
@@ -30,17 +33,31 @@ class QLabelWrap(QLabel):
         if self.type=='mf_hint':
             self.setFont(QFont(*MF_HINT_FONT))
             self.setFixedWidth(MIN_HISTORY_SIZE[0])
-            self.setStyleSheet("QLabel { background-color : white; }");
+            self.setStyleSheet('''
+                QLabel {
+                    background-color : %r;
+                }
+            '''%(LIST_BACKGROUND))
             pass
         elif self.type=='item_hint':
             self.setFont(QFont(*ITEM_HINT_FONT))
-            self.setFixedHeight(QFontMetrics(self.font()).height())
-            self.setStyleSheet('QLabel { background-color: %r; color: #B4B5B8; }'%ITEM_BACKGROUND)
+            self.setFixedHeight( QFontMetrics(self.font()).height()+5 )
+            self.setStyleSheet('''
+                QLabel {
+                    background-color: %r;
+                    color: %r;
+                }
+            '''%(ITEM_BACKGROUND, ITEM_HINT_COLOR))
             pass
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-            self.setStyleSheet('QLabel { background-color: %r; color: #252526; }'%ITEM_BACKGROUND)
+            self.setStyleSheet('''
+                QLabel {
+                    background-color: %r;
+                    color: %r;
+                }
+            '''%(ITEM_BACKGROUND, ITEM_TEXT_COLOR))
             pass
         elif self.type=='img_label':
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -69,7 +86,12 @@ class MFHistoryItem(QFrame):
         self.setStyleSheet('''
             QFrame{
                 background-color: %r;
+                border: 1px solid black;
                 border-radius: %rpx;
+                margin: 5px;
+            }
+            QLabel{
+                border: 0px;
             }
         '''%(ITEM_BACKGROUND, ITEM_MARGIN*2))
         pass
@@ -98,7 +120,7 @@ class MFHistoryItem(QFrame):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 3)
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0])
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2)
                 pass
             pass
         else:
@@ -107,7 +129,7 @@ class MFHistoryItem(QFrame):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 1)
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3)
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1)
                 pass
             self.layout.addWidget(text_label, 1, 1, -1, -1)
             pass
@@ -125,12 +147,9 @@ class MFHistoryList(QListWidget):
             QListWidget {
                 border-bottom: 1px solid #5D6D7E;
             }
-            QListView::item {
-                margin: 5px 0 5px 0;
-            }
             QListView::item:selected {
                 border: 1px solid #6a6ea9;
-                border-radius: 5px;
+                border-radius: 10px;
             }
         ''')
         self.verticalScrollBar().setStyleSheet("""
@@ -178,7 +197,8 @@ class MFHistory(QWidget):
             QWidget {
                 border: 0px;
                 background-color: white;
-        }''')
+            }
+        ''')
         self.w_hint_label   = QLabelWrap('mf_hint')
         self.w_history_list = MFHistoryList(self)
         # set main window layout as grid
@@ -203,7 +223,7 @@ class MFHistory(QWidget):
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
             w_item_widget = MFHistoryItem(w_item, self.base_path, item)
-            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN*2) #NOTE: do not adjust width
+            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) #NOTE: do not adjust width
             w_item.setSizeHint(size_hint)
             self.w_history_list.addItem(w_item)
             self.w_history_list.setItemWidget(w_item, w_item_widget)
