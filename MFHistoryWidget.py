@@ -18,6 +18,7 @@ ITEM_TEXT_COLOR  = '#252526'
 LIST_BACKGROUND  = '#FFFFFF'
 ITEM_BACKGROUND  = '#ECF0F1'
 ITEM_MARGIN      = 5#px
+OFFSET_FIX       = 2#px
 img_filter   = re.compile('<-file://(.*?)->')
 bold_filter  = re.compile('\*\*([^\*]+)\*\*')
 italic_filter= re.compile('\*(.*?)\*')
@@ -126,7 +127,7 @@ class MFHistoryItem(QFrame):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 3)
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2)
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
             pass
         else:
@@ -135,7 +136,7 @@ class MFHistoryItem(QFrame):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 1)
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1)
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
                 pass
             self.layout.addWidget(text_label, 1, 1, -1, -1)
             pass
