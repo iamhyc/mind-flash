@@ -118,6 +118,10 @@ class KeysReactor():
             self.key_list.remove(key)
         pass
 
+    def clear(self):
+        self.key_list = [0x00]
+        pass
+
 class workSpace:
     def __init__(self, p, *p_l, **kargs):
         self.wrk = expandPath(path.join(p, *p_l))

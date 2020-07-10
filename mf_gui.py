@@ -191,6 +191,10 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.resize(self.size())
         pass
     
+    def focusOutEvent(self, e):
+        self.keysFn.clear()
+        return super().focusOutEvent(e)
+
     pass
 
 class MFGui(QWidget):

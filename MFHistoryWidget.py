@@ -1,41 +1,116 @@
 #!/usr/bin/env python3
 import re
+from os import path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from PyQt5.QtGui import (QFont, QFontMetrics, QIcon)
-from PyQt5.QtWidgets import (QWidget, QLabel, QTextEdit, QListWidget, QListWidgetItem, QGridLayout)
+from PyQt5.QtCore import (Qt, QRect, QSize,)
+from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter)
+from PyQt5.QtWidgets import (QWidget, QFrame,QLabel, QTextEdit, QListWidget, QListWidgetItem,
+                            QGridLayout, QStyle, QStyleOption)
 
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
-HINT_FONT        = ('Noto Sans CJK SC',10,QFont.Bold)
+MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
+ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
+ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
+ITEM_BACKGROUND  = '#8c8c8c'
+ITEM_MARGIN      = 5#px
+_filter = re.compile('<-file://(.*?)->')
 
-# [left-upper corner] [QLabel, 100% width, 12px, bold] (hint)
-class MFHintLabel(QLabel):
-    def __init__(self, parent, text=''):
-        super().__init__(parent)
-        self.setFont(QFont(*HINT_FONT))
-        self.setFixedWidth(MIN_HISTORY_SIZE[0])
-        self.setStyleSheet("QLabel { background-color : white; }");
-        self.setText(text)
+class QLabelWrap(QLabel):
+    def __init__(self, type, text='', pixmap=''):
+        super().__init__(text)
+        self.type = type
+        if pixmap: self.setPixmap(pixmap)
+        self.styleHelper()
+        pass
+    
+    def styleHelper(self):
+        self.setWordWrap(True)
+        if self.type=='mf_hint':
+            self.setFont(QFont(*MF_HINT_FONT))
+            self.setFixedWidth(MIN_HISTORY_SIZE[0])
+            self.setStyleSheet("QLabel { background-color : white; }");
+            pass
+        elif self.type=='item_hint':
+            self.setFont(QFont(*ITEM_HINT_FONT))
+            self.setFixedHeight(QFontMetrics(self.font()).height())
+            self.setStyleSheet('QLabel { background-color: %r; color: #B4B5B8; }'%ITEM_BACKGROUND)
+            pass
+        elif self.type=='item_text':
+            self.setFont(QFont(*ITEM_TEXT_FONT))
+            self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+            self.setStyleSheet('QLabel { background-color: %r; color: #252526; }'%ITEM_BACKGROUND)
+            pass
+        elif self.type=='img_label':
+            self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            pass
+        else:
+            raise Exception
+            pass
         pass
     pass
 
-class MFHistoryItem(QWidget):
-    def __init__(self, item):
+class MFHistoryItem(QFrame):
+    def __init__(self, w_item, base_path, item):
         super().__init__(None)
+        self.w_item = w_item
+        self.base_path = base_path
+        self.styleHelper()
         self.updateItem(item)
+        pass
+
+    def styleHelper(self):
+        self.layout = QGridLayout()
+        self.setLayout(self.layout)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0,0,0,0)
+        self.setFixedWidth(MIN_ITEM_SIZE[0])
+        self.setStyleSheet('''
+            QFrame{
+                background-color: %r;
+                border-radius: %rpx;
+            }
+        '''%(ITEM_BACKGROUND, ITEM_MARGIN*2))
         pass
 
     def updateItem(self, item):
         (_user, _time, _text) = item
-        _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
-        hint  = '%s @ %s'%(_user, _time)
-        #FIXME: item redering with ListWidgetItem
-        # [item_css] ('background-color: #8c8c8c;')
-        # [time_css] ('color: #B4B5B8; font-size: 12px;')
-        # [text_css] ('color: #252526; font-size: 16px;')
-        # re.sub(r'<-file://(\S+)->',r'\1">'; QSize( min(MIN_ITEM_SIZE[0], img.width), 150 )
-        # replace('\\n', '<br>')
+        _time   = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+        _text   = _filter.split(_text)
+        # parse (hint, images, text)
+        hint   = '%s @ %s'%(_user, _time)
+        text   = eval( ''.join(_text[0:][::2]) ).strip()
+        images = _text[1:][::2]
+        # create widgets
+        hint_label = QLabelWrap('item_hint', hint)
+        if text:
+            text_label = QLabelWrap('item_text', text)
+        image_pixmaps = [QPixmap(path.join(self.base_path, image)) for image in images]
+        # adjust gridlayout
+        self.layout.addWidget(hint_label, 0, 0, 1, 3)
+        if not images: #text only
+            self.layout.addWidget(text_label, 1, 0, 1, 3)
+            pass
+        elif not text: #images only
+            CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
+            for (i,pixmap) in enumerate(image_pixmaps):
+                cropped_pixmap = pixmap.copy( CropRect(pixmap) )
+                image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
+                self.layout.addWidget(image_label, i+1, 0, 1, 3)
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0])
+                pass
+            pass
+        else:
+            CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
+            for (i,pixmap) in enumerate(image_pixmaps):
+                cropped_pixmap = pixmap.copy( CropRect(pixmap) )
+                image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
+                self.layout.addWidget(image_label, i+1, 0, 1, 1)
+                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3)
+                pass
+            self.layout.addWidget(text_label, 1, 1, -1, -1)
+            pass
         pass
     pass
 
@@ -46,34 +121,65 @@ class MFHistoryList(QListWidget):
         pass
 
     def styleHelper(self):
-        self.setStyleSheet(
-            '''
+        self.setStyleSheet('''
             QListWidget {
                 border-bottom: 1px solid #5D6D7E;
             }
+            QListView::item {
+                margin: 5px 0 5px 0;
+            }
+            QListView::item:selected {
+                border: 1px solid #6a6ea9;
+                border-radius: 5px;
+            }
+        ''')
+        self.verticalScrollBar().setStyleSheet("""
             QScrollBar:vertical {
                 border: none;
-                background: rgba(0,0,0,0);
-                width: 10px;
-                margin: 5px 0px 5px 0px;
+                background:white;
+                width:3px;
+                margin: 0px 0px 0px 0px;
             }
-            '''
-        )
-        self.setContentsMargins(5,5,5,5)
+            QScrollBar::handle:vertical {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop:1 rgb(32, 47, 130));
+                min-height: 0px;
+            }
+            QScrollBar::add-line:vertical {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
+                height: 0px;
+                subcontrol-position: bottom;
+                subcontrol-origin: margin;
+            }
+            QScrollBar::sub-line:vertical {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
+                height: 0 px;
+                subcontrol-position: top;
+                subcontrol-origin: margin;
+            }
+        """)
+        self.setSpacing(0)
+        self.setContentsMargins(0,0,0,0)
         self.setFixedWidth(MIN_HISTORY_SIZE[0])
         pass
     pass
 
 class MFHistory(QWidget):
-    def __init__(self, parent, basePath):
+    def __init__(self, parent, base_path):
         super().__init__(parent)
-        self.basePath = basePath
+        self.base_path = base_path
         self.styleHelper()
         pass
     
     def styleHelper(self):
-        self.setStyleSheet('background-color: white; border: 1px solid white;')
-        self.w_hint_label   = MFHintLabel(self)
+        self.setStyleSheet('''
+            QWidget {
+                border: 0px;
+                background-color: white;
+        }''')
+        self.w_hint_label   = QLabelWrap('mf_hint')
         self.w_history_list = MFHistoryList(self)
         # set main window layout as grid
         grid = QGridLayout()
@@ -92,11 +198,13 @@ class MFHistory(QWidget):
         pass
 
     def render(self, hint, items):
+        self.w_history_list.clear()
         self.w_hint_label.setText(hint)
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
-            w_item_widget = MFHistoryItem(item)
-            w_item.setSizeHint(w_item_widget.sizeHint())
+            w_item_widget = MFHistoryItem(w_item, self.base_path, item)
+            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN*2) #NOTE: do not adjust width
+            w_item.setSizeHint(size_hint)
             self.w_history_list.addItem(w_item)
             self.w_history_list.setItemWidget(w_item, w_item_widget)
             pass
