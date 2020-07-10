@@ -101,6 +101,7 @@ class MFHistoryItem(QFrame):
         pass
 
     def updateItem(self, item):
+        self.item = item
         (_user, _time, _text) = item
         _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
         _text = bold_filter.sub(r'<b>\1</b>', _text)
@@ -146,6 +147,8 @@ class MFHistoryItem(QFrame):
 class MFHistoryList(QListWidget):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
+        self.itemDoubleClicked.connect(self.itemDoubleClickEvent)
         self.styleHelper()
         pass
 
@@ -190,22 +193,25 @@ class MFHistoryList(QListWidget):
         self.setContentsMargins(0,0,0,0)
         self.setFixedWidth(MIN_HISTORY_SIZE[0])
         pass
+
+    def itemDoubleClickEvent(self, item):
+        raw_item = self.itemWidget(item).item
+        self.parent.parent.w_editor.insertPlainText( eval(raw_item[2]) )
+        #TODO: remove original record
+        self.removeItemWidget(item)
+        self.takeItem(self.row(item))
+        pass
     pass
 
 class MFHistory(QWidget):
     def __init__(self, parent, base_path):
         super().__init__(parent)
+        self.parent = parent
         self.base_path = base_path
         self.styleHelper()
         pass
     
     def styleHelper(self):
-        self.setStyleSheet('''
-            QWidget {
-                border: 0px;
-                background-color: white;
-            }
-        ''')
         self.w_hint_label   = QLabelWrap('mf_hint')
         self.w_history_list = MFHistoryList(self)
         # set main window layout as grid
@@ -217,6 +223,12 @@ class MFHistory(QWidget):
         self.setLayout(grid)
         self.setFixedSize(*MIN_HISTORY_SIZE)
         self.setVisible(False)
+        self.setStyleSheet('''
+            QWidget {
+                border: 0px;
+                background-color: white;
+            }
+        ''')
         pass
 
     def hideEvent(self, e):

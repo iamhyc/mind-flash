@@ -36,6 +36,7 @@ class MFTextEdit(QPlainTextEdit):
         self.font_metric= QFontMetrics(self.font_style)
         self.styleHelper()
 
+        self.textChanged.connect(self.textChangedEvent)
         self.keysFn = KeysReactor()
         self.registerKeys()
         pass
@@ -184,6 +185,9 @@ class MFTextEdit(QPlainTextEdit):
 
     def keyReleaseEvent(self, e):
         self.keysFn.released(e.key())
+        pass
+    
+    def textChangedEvent(self):
         _lines = min(self.getLineCount(), len(INPUTBOX_RESIZE)-1)
         _size  = QSize(MIN_INPUTBOX_SIZE[0], 70+35*INPUTBOX_RESIZE[_lines])
         if _size!=self.size():
@@ -191,7 +195,7 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.adjustSize()
             self.parent.resize(self.size())
         pass
-    
+
     def focusOutEvent(self, e):
         self.keysFn.clear()
         return super().focusOutEvent(e)
@@ -201,14 +205,14 @@ class MFTextEdit(QPlainTextEdit):
 class MFGui(QWidget):
     def __init__(self):
         super().__init__()
-        w_history = MFHistory(self,  MF_DIR)
-        w_editor  = MFTextEdit(self, w_history)
+        self.w_history = MFHistory(self,  MF_DIR)
+        self.w_editor  = MFTextEdit(self, self.w_history)
         # set main window layout as grid
         grid = QGridLayout()
         grid.setSpacing(0)
         grid.setContentsMargins(0,0,0,0)
-        grid.addWidget(w_history, 0, 0)
-        grid.addWidget(w_editor,  1, 0)
+        grid.addWidget(self.w_history, 0, 0)
+        grid.addWidget(self.w_editor,  1, 0)
         self.setLayout(grid)
         self.resize(self.sizeHint())
         # move window to desktop center
