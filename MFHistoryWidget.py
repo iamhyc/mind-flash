@@ -165,7 +165,7 @@ class MFHistoryList(QListWidget):
         self.verticalScrollBar().setStyleSheet("""
             QScrollBar:vertical {
                 border: none;
-                background:white;
+                background:palette(base);
                 width:3px;
                 margin: 0px 0px 0px 0px;
             }

@@ -205,6 +205,8 @@ class MFTextEdit(QPlainTextEdit):
 class MFGui(QWidget):
     def __init__(self):
         super().__init__()
+        self.mf_exec   = mf_exec
+        self.w_todo    = MFTodoWidget(self, MF_DIR)
         self.w_history = MFHistory(self,  MF_DIR)
         self.w_editor  = MFTextEdit(self, self.w_history)
         # set main window layout as grid
