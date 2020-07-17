@@ -16,3 +16,4 @@ install:
 	sudo cp -rf ./* /opt/mind-flash
 	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
+	

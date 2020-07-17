@@ -18,7 +18,7 @@ class MFTodoWidget(QListWidget):
 
     def styleHelper(self):
         self.setFixedSize(*MIN_TODO_SIZE)
-        self.setVisible(False)
+        self.setVisible(True)
         self.setStyleSheet('''
             QListWidget {
                 border: 0px;

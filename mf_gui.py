@@ -138,13 +138,13 @@ class MFTextEdit(QPlainTextEdit):
     def toggleHistoryWidget(self):
         size_half = self.w_history.height()/2
         if self.w_history.isVisible():
-            self.w_history.setVisible(False)
+            self.w_history.setVisible(False); self.w_todo.setVisible(True);
             self.parent.adjustSize()
             self.parent.resize(self.size())
             self.parent.move(self.parent.pos() + QPoint(0, size_half))
             pass
         else:
-            self.w_history.setVisible(True)
+            self.w_todo.setVisible(False); self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
             self.updateHistory(0, 0) #refresh, default history for today
@@ -168,7 +168,6 @@ class MFTextEdit(QPlainTextEdit):
             # print(self.parent.pos() - self.init_pos)
             pass
         elif e.buttons() & Qt.RightButton:
-            #TODO: toggle history widget, remember to cache the dump content
             pass
         pass
 
