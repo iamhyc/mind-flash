@@ -23,7 +23,7 @@ img_filter   = re.compile('<-file://(.*?)->')
 bold_filter  = re.compile('\*\*([^\*]+)\*\*')
 italic_filter= re.compile('\*(.*?)\*')
 
-class QLabelWrap(QLabel):
+class QLabelWrapper(QLabel):
     def __init__(self, type, text='', pixmap=''):
         super().__init__(text)
         self.type = type
@@ -38,17 +38,18 @@ class QLabelWrap(QLabel):
             self.setFixedWidth(MIN_HISTORY_SIZE[0])
             self.setStyleSheet('''
                 QLabel {
-                    background-color : %r;
+                    background-color : %s;
                 }
             '''%(LIST_BACKGROUND))
+            # self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         elif self.type=='item_hint':
             self.setFont(QFont(*ITEM_HINT_FONT))
             self.setFixedHeight( QFontMetrics(self.font()).height()+5 )
             self.setStyleSheet('''
                 QLabel {
-                    background-color: %r;
-                    color: %r;
+                    background-color: %s;
+                    color: %s;
                 }
             '''%(ITEM_BACKGROUND, ITEM_HINT_COLOR))
             pass
@@ -113,9 +114,9 @@ class MFHistoryItem(QFrame):
         text   = text.replace('\n', '<br>')
         images = _text[1:][::2]
         # create widgets
-        hint_label = QLabelWrap('item_hint', hint)
+        hint_label = QLabelWrapper('item_hint', hint)
         if text:
-            text_label = QLabelWrap('item_text', text)
+            text_label = QLabelWrapper('item_text', text)
         image_pixmaps = [QPixmap(path.join(self.base_path, image)) for image in images]
         # adjust gridlayout
         self.layout.addWidget(hint_label, 0, 0, 1, 3)
@@ -126,16 +127,16 @@ class MFHistoryItem(QFrame):
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
+                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 3)
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
             pass
-        else:
+        else:          #mixture
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrap('img_label', pixmap=cropped_pixmap)
+                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
                 self.layout.addWidget(image_label, i+1, 0, 1, 1)
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
                 pass
@@ -197,6 +198,7 @@ class MFHistoryList(QListWidget):
     def itemDoubleClickEvent(self, item):
         raw_item = self.itemWidget(item).item
         self.parent.parent.w_editor.insertPlainText( eval(raw_item[2]) )
+        self.parent.parent.w_editor.setFocus()
         #TODO: remove original record
         self.removeItemWidget(item)
         self.takeItem(self.row(item))
@@ -212,7 +214,7 @@ class MFHistory(QWidget):
         pass
     
     def styleHelper(self):
-        self.w_hint_label   = QLabelWrap('mf_hint')
+        self.w_hint_label   = QLabelWrapper('mf_hint')
         self.w_history_list = MFHistoryList(self)
         # set main window layout as grid
         grid = QGridLayout()

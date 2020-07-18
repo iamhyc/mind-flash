@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import platform
 from os import path
 from sys import argv
 from time import ctime
@@ -7,8 +6,6 @@ from getpass import getpass
 from termcolor import colored, cprint
 from MFUtility import *
 
-MF_HISTORY = path.expanduser('~/.mf/mf_history')
-MF_HOSTNAME= platform.node().split('-')[0]
 MF_CTIME   = ctime()
 MF_HINT    = '>_<: '
 

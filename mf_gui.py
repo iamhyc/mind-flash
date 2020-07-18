@@ -75,6 +75,18 @@ class MFTextEdit(QPlainTextEdit):
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
 
+        #NOTE: Alt+Q; add to todo list
+        def mf_add_todo():
+            todo_text = self.toPlainText()
+            if todo_text:
+                self.clear()
+                self.w_todo.todos.append( ['+', todo_text] )
+                self.w_todo.saveTodoList()
+                self.w_todo.renderTodos()
+                pass
+            pass
+        self.keysFn.register([Qt.Key_Alt, Qt.Key_Q], mf_add_todo)
+
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
@@ -230,6 +242,7 @@ class MFGui(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_InputMethodEnabled)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.w_editor.setFocus()
         self.show()
         pass
 

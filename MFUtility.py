@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys, time, bisect
+import sys, time, bisect, platform
 import lzma, json, subprocess
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
@@ -7,6 +7,9 @@ from dateutil.relativedelta import relativedelta
 from enum import Enum
 from os import path, getcwd, chdir, listdir, makedirs
 from PyQt5.QtCore import Qt
+
+MF_HOSTNAME= platform.node().split('-')[0]
+MF_HISTORY = path.expanduser('~/.mf/{}'.format(MF_HOSTNAME))
 
 class MF_RNG(Enum):
     DAY  = 0
