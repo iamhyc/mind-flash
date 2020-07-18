@@ -5,7 +5,7 @@ from PyQt5.QtGui import (QColor, QFont, QFontMetrics)
 from PyQt5.QtWidgets import (QListWidget, QListWidgetItem)
 from MFUtility import MF_HOSTNAME
 
-MIN_TODO_SIZE       = (600, 70)
+MIN_TODO_SIZE       = (600, 20)
 TODO_ITEM_FONT      = ('Noto Sans CJK SC',12)
 TODO_TITLE_FONT     = ('Noto Sans CJK SC',8,QFont.Bold)
 TODO_TITLE_FONT_ALT = ('Noto Sans CJK SC',8,-1,True)
@@ -41,6 +41,9 @@ class TodoItemWrapper(QListWidgetItem):
             pass
         else:
             pass
+        
+        size_hint = QSize( 0, QFontMetrics(self.font()).height() )
+        self.setSizeHint(size_hint)
         pass
     pass
 
@@ -56,7 +59,6 @@ class MFTodoWidget(QListWidget):
         self.styleHelper()
         pass
 
-    #FIXME: fix height hint, and minimum height
     def alterBackground(self):
         if self.count() > 1:
             background_color = TODO_BACKGROUND
@@ -78,6 +80,7 @@ class MFTodoWidget(QListWidget):
     def styleHelper(self):
         # self.setFixedSize(*MIN_TODO_SIZE)
         self.setMinimumSize(*MIN_TODO_SIZE)
+        self.setMaximumHeight(70)
         self.setVisible(True)
         self.verticalScrollBar().setStyleSheet("""
             QScrollBar:vertical {
@@ -117,7 +120,8 @@ class MFTodoWidget(QListWidget):
             self.addItem( TodoItemWrapper(self, _todo_item) )
 
         self.alterBackground()
-        self.resize(self.size())
+        _height = sum( [self.sizeHintForRow(i) for i in range(self.count())] )
+        self.setFixedHeight( min(self.sizeHint().height(),70))
         pass
 
     def saveTodoList(self, all_done=False):
@@ -166,6 +170,10 @@ class MFTodoWidget(QListWidget):
             pass
         return super().mousePressEvent(e)
     
+    def sizeHint(self):
+        height = sum( [self.sizeHintForRow(i) for i in range(self.count())] )
+        return QSize(600, height)
+
     def safe_close(self):
         all_status = [x[0]=='-' for x in self.todos]
         all_done   = not (False in all_status)

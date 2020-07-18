@@ -8,7 +8,7 @@ from os import path, getcwd, chdir, remove as os_remove
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
-                    QGridLayout, QPlainTextEdit, QSizePolicy)
+                    QLayout, QGridLayout, QPlainTextEdit, QSizePolicy)
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
@@ -229,6 +229,7 @@ class MFGui(QWidget):
         self.grid.setContentsMargins(0,0,0,0)
         self.grid.addWidget(self.w_todo, 0, 0)
         self.grid.addWidget(self.w_editor,  1, 0)
+        self.grid.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(self.grid)
         self.resize(self.sizeHint())
         # move window to desktop center
