@@ -60,6 +60,8 @@ class MFTodoWidget(QListWidget):
     def alterBackground(self):
         if self.count() > 1:
             background_color = TODO_BACKGROUND
+            self.item(0).setFont( QFont(*TODO_TITLE_FONT) )
+            self.item(0).setForeground(QColor('black'))
         else:
             background_color = TODO_BACKGROUND_ALT
             self.item(0).setFont( QFont(*TODO_TITLE_FONT_ALT) )
