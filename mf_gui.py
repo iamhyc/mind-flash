@@ -21,10 +21,11 @@ MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2)
 
 class MFTextEdit(QPlainTextEdit):
-    def __init__(self, parent, w_history):
+    def __init__(self, parent, w_history, w_todo):
         super().__init__(parent)
         self.parent = parent
         self.w_history = w_history
+        self.w_todo = w_todo
         self.clipboard = QApplication.clipboard()
         self.image_cache = list()
 
@@ -138,12 +139,14 @@ class MFTextEdit(QPlainTextEdit):
     def toggleHistoryWidget(self):
         size_half = self.w_history.height()/2
         if self.w_history.isVisible():
-            self.w_history.setVisible(False); self.w_todo.setVisible(True);
+            self.parent.grid.replaceWidget(self.w_history, self.w_todo)
+            self.w_history.setVisible(False); self.w_todo.setVisible(True)
             self.parent.adjustSize()
             self.parent.resize(self.size())
             self.parent.move(self.parent.pos() + QPoint(0, size_half))
             pass
         else:
+            self.parent.grid.replaceWidget(self.w_todo, self.w_history)
             self.w_todo.setVisible(False); self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
@@ -207,14 +210,14 @@ class MFGui(QWidget):
         self.mf_exec   = mf_exec
         self.w_todo    = MFTodoWidget(self, MF_DIR)
         self.w_history = MFHistory(self,  MF_DIR)
-        self.w_editor  = MFTextEdit(self, self.w_history)
+        self.w_editor  = MFTextEdit(self, self.w_history, self.w_todo)
         # set main window layout as grid
-        grid = QGridLayout()
-        grid.setSpacing(0)
-        grid.setContentsMargins(0,0,0,0)
-        grid.addWidget(self.w_history, 0, 0)
-        grid.addWidget(self.w_editor,  1, 0)
-        self.setLayout(grid)
+        self.grid = QGridLayout()
+        self.grid.setSpacing(0)
+        self.grid.setContentsMargins(0,0,0,0)
+        self.grid.addWidget(self.w_todo, 0, 0)
+        self.grid.addWidget(self.w_editor,  1, 0)
+        self.setLayout(self.grid)
         self.resize(self.sizeHint())
         # move window to desktop center
         qr = self.frameGeometry()
@@ -226,6 +229,7 @@ class MFGui(QWidget):
         self.setWindowIcon( QIcon('./res/icons/pulse_heart.png') )
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_InputMethodEnabled)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.show()
         pass
 
@@ -247,6 +251,7 @@ if __name__ == '__main__':
     mf_exec = MFEntity(MF_DIR)
     # init MF GUI
     app = QApplication(sys.argv)
+    app.setStyle('Fusion')
     mf = MFGui()
     sys.exit(app.exec_())
     pass
