@@ -18,4 +18,7 @@ install:
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
 
 build:
-	python3 setup.py build
+	pyinstaller mf_gui.py -wy --onefile
+
+clean-dist:
+	rm -rf build dist
