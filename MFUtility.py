@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import locale
 import sys, time, bisect, platform
-import lzma, json, subprocess
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta

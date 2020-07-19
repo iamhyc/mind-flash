@@ -3,7 +3,7 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import sys, signal, socket, time, random
+import sys, signal, socket, time
 from os import path, getcwd, chdir, remove as os_remove
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
