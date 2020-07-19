@@ -50,4 +50,4 @@ The latest packages are available on [release page](https://github.com/iamhyc/mi
 * (not support item deletion now)
 
 ## License
-Please refer to feature list in `Issues` section on Github.
+This project is licensed under [GPLv3](LICENSE).
