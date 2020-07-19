@@ -149,7 +149,7 @@ class MFTextEdit(QPlainTextEdit):
         return _count
 
     def toggleHistoryWidget(self):
-        size_half = self.w_history.height()/2
+        size_half = int( self.w_history.height()/2 )
         if self.w_history.isVisible():
             self.parent.grid.replaceWidget(self.w_history, self.w_todo)
             self.w_history.setVisible(False); self.w_todo.setVisible(True)

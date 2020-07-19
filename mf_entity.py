@@ -13,7 +13,7 @@ class MFEntity:
 
     def __init__(self, base_path):
         self.base_path = base_path
-        Path(self.base_path, MF_HOSTNAME).mkdir(exist_ok=True)
+        Path(self.base_path, MF_HOSTNAME).mkdir(parents=True, exist_ok=True)
         self.MF_ACTION={
             'dump': self.act_dump,
             'record': self.mf_record,
