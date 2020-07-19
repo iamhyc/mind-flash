@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import locale
 import sys, time, bisect, platform
 import lzma, json, subprocess
 from datetime import datetime
@@ -10,6 +11,7 @@ from PyQt5.QtCore import Qt
 
 MF_HOSTNAME= platform.node().split('-')[0]
 MF_HISTORY = path.expanduser('~/.mf/{}'.format(MF_HOSTNAME))
+# locale.setlocale(locale.LC_ALL, "en_GB.utf8")
 
 class MF_RNG(Enum):
     DAY  = 0
@@ -38,7 +40,7 @@ class TextStamp():
             tmp = datetime(self.end.year, self.end.month, self.end.day)
             self.end   = tmp + relativedelta(days=mf_anchor)
             self.start = self.end + relativedelta(days=1)
-            self.hint  = self.end.strftime('%Y-%m-%d')
+            self.hint  = self.end.strftime('%Y-%m-%d (%a)')
         elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
             tmp = datetime(self.end.year, self.end.month, self.end.day)
             mf_anchor  = -1 if mf_anchor==0 else mf_anchor #get last Monday when anchor==0

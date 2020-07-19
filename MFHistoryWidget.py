@@ -239,7 +239,7 @@ class MFHistory(QWidget):
             self.w_history_list.clear()
         pass
 
-    def render(self, hint, items):
+    def renderHistory(self, hint, items):
         self.w_history_list.clear()
         self.w_hint_label.setText(hint)
         for item in items:

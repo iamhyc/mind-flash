@@ -118,7 +118,7 @@ class MFTextEdit(QPlainTextEdit):
             self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
 
         self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
-        self.w_history.render(self.stp.hint, items)
+        self.w_history.renderHistory(self.stp.hint, items)
         pass
 
     def styleHelper(self):
