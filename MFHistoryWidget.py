@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import re
-from os import path
+from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtCore import (Qt, QRect, QSize)
@@ -117,7 +117,7 @@ class MFHistoryItem(QFrame):
         hint_label = QLabelWrapper('item_hint', hint)
         if text:
             text_label = QLabelWrapper('item_text', text)
-        image_pixmaps = [QPixmap(path.join(self.base_path, image)) for image in images]
+        image_pixmaps = [QPixmap( str(Path(self.base_path, image)) ) for image in images]
         # adjust gridlayout
         self.layout.addWidget(hint_label, 0, 0, 1, 3)
         if not images: #text only

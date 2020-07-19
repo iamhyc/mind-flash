@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from os import path
+from pathlib import Path
 from sys import argv
 from time import ctime
 # from getpass import getpass
@@ -13,6 +13,7 @@ class MFEntity:
 
     def __init__(self, base_path):
         self.base_path = base_path
+        Path(self.base_path, MF_HOSTNAME).mkdir(exist_ok=True)
         self.MF_ACTION={
             'dump': self.act_dump,
             'record': self.mf_record,
@@ -58,8 +59,8 @@ class MFEntity:
 
         items = list()
         while stp.next():
-            for userDir in listDirs(self.base_path):
-                userHint = 'Myself' if userDir==MF_HOSTNAME else userDir
+            for userDir in Path(self.base_path).iterdir():
+                userHint = 'Myself' if userDir.stem==MF_HOSTNAME else userDir.stem
                 with workSpace(self.base_path, userDir, stp.weekno) as wrk:
                     with MFRecord(stp.dayno, userHint) as rec:
                         items += rec.readAll()
@@ -74,18 +75,18 @@ class MFEntity:
         print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))
         pass
 
-    # def mf_import(self, *args):
-    #     file_path = args[0]
-    #     passwd = getpass()
-    #     pass
+    def mf_import(self, *args):
+        file_path = args[0]
+        # passwd = getpass()
+        pass
 
-    # def mf_export(self, *args):
-    #     file_path = args[0]
-    #     passwd = getpass()
-    #     pass
+    def mf_export(self, *args):
+        file_path = args[0]
+        # passwd = getpass()
+        pass
 
     def act_dump(self, *args):
-        fd = open(path.join(self.base_path, 'mf_history'), 'r+')
+        fd = Path(self.base_path, 'mf_history').open('r+')
         print(fd.read(), end='')
         pass
 
@@ -121,7 +122,7 @@ def Y_T(text): return text #return colored(text, 'yellow')
 '''===================== Main Function ====================='''
 if __name__ == '__main__':
     try:
-        e = MFEntity(path.expanduser('~/.mf/'))
+        e = MFEntity( Path('~/.mf/').expanduser() )
         if len(argv)>1:     # interact with parameters
             e.act(argv[1], argv[2:])
         else:

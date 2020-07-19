@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 import locale
-import sys, time, bisect, platform
+import sys, bisect, platform
+from os import chdir
+from pathlib import Path
+from enum import Enum
+from PyQt5.QtCore import Qt
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
-from enum import Enum
-from os import path, getcwd, chdir, listdir, makedirs
-from PyQt5.QtCore import Qt
 
 MF_HOSTNAME= platform.node().split('-')[0]
-MF_HISTORY = path.expanduser('~/.mf/{}'.format(MF_HOSTNAME))
+MF_HISTORY = Path( '~/.mf/{}'.format(MF_HOSTNAME) ).expanduser()
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
 
 class MF_RNG(Enum):
@@ -128,8 +129,8 @@ class KeysReactor():
 
 class workSpace:
     def __init__(self, p, *p_l, **kargs):
-        self.wrk = expandPath(path.join(p, *p_l))
-        self.pwd = getcwd()
+        self.wrk = Path(p, *p_l).expanduser().resolve()
+        self.pwd = Path.cwd()
         if 'forceUpdate' in kargs.keys():
             self.forceUpdate = True
         else:
@@ -137,9 +138,9 @@ class workSpace:
         pass
     
     def __enter__(self):
-        if not path.isdir(self.wrk):
+        if not Path(self.wrk).is_dir():
             if self.forceUpdate:
-                makedirs(self.wrk, mode=0o755, exist_ok=True)
+                Path(self.wrk).mkdir(mode=0o755, exist_ok=True)
             else:
                 return self.__exit__(*sys.exc_info())
         else:
@@ -161,7 +162,7 @@ class MFRecord:
         pass
 
     def __enter__(self):
-        if path.exists(self.file):
+        if Path(self.file).exists():
             fd = open(self.file, 'r')
             lines = fd.readlines()
             fd.close()
@@ -207,9 +208,3 @@ class MFRecord:
 def isPrefix(sList, fList):
     sList, fList = list(sList), list(fList)
     return sList==fList[:len(sList)]
-
-def listDirs(path_name):
-    return [x for x in filter(lambda x:not path.isdir(x), listdir(path_name))]
-
-def expandPath(path_name):
-    return path.abspath(path.expanduser(path_name))
