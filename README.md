@@ -2,23 +2,31 @@
 
 It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
-### Preview
+
 
 ![preview-01](./previews/preview-03.png)
 
-### Install
 
-1. Have `python3` and `python3-pip` installed;
+
+## Install
+
+The latest packages are available on [release page](https://github.com/iamhyc/mind-flash/releases).
+
+**Manual build:**
+
+1. Have `python3` and `python3-pip` (latest version) installed;
 
 2. Download this repository, and execute `make` in the repository folder;
-    
+   
     > It will automatically download the requirements, and install itself in system (need root privilege).
     
 3. Use `msh-gui` to display GUI, and `msh` for CLI.
-    
-    > Suggest to add a global shortcut for `msh-gui`, e.g., <kbd>Super</kbd> + <kbd>N</kbd>.
+   
+    > The default shortcut binding for gnome/dde is: <kbd>Super</kbd> + <kbd>N</kbd>.
 
-### Usage
+## Usage
+
+**Basic usage:**
 
 | Default Shortcuts |                 Function                 |
 | :-------------: | :--------------------------------------: |
@@ -35,5 +43,11 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 * `*italic_text*`, `**bold_text**` render support when input
 * <kbd>Ctrl</kbd> + <kbd>V</kbd> support pasting plaintext or image
 
-### TODO
+**Todolist usage**:
+
+* <kbd>Alt</kbd> + <kbd>Q</kbd> to add current text to todolist
+* Right click on item to toggle completion status
+* (not support item deletion now)
+
+## License
 Please refer to feature list in `Issues` section on Github.
