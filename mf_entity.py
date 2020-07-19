@@ -3,7 +3,7 @@ from os import path
 from sys import argv
 from time import ctime
 from getpass import getpass
-from termcolor import colored, cprint
+# from termcolor import colored, cprint
 from MFUtility import *
 
 MF_CTIME   = ctime()
@@ -111,12 +111,12 @@ class MFEntity:
     pass
 
 '''=================== Utility Function ==================='''
-def R_T(text): return colored(text, 'red')
-def G_T(text): return colored(text, 'green')
-def B_T(text): return colored(text, 'blue')
-def C_T(text): return colored(text, 'cyan')
-def M_T(text): return colored(text, 'magenta')
-def Y_T(text): return colored(text, 'yellow')
+def R_T(text): return text #return colored(text, 'red')
+def G_T(text): return text #return colored(text, 'green')
+def B_T(text): return text #return colored(text, 'blue')
+def C_T(text): return text #return colored(text, 'cyan')
+def M_T(text): return text #return colored(text, 'magenta')
+def Y_T(text): return text #return colored(text, 'yellow')
 
 '''===================== Main Function ====================='''
 if __name__ == '__main__':

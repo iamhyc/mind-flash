@@ -4,7 +4,7 @@ PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info[:][1])')
 all:depends install
 
 depends:
-	pip3 install termcolor PyQt5 python-dateutil --user
+	pip3 install PyQt5 python-dateutil --user
 
 install:
 	mkdir -p ~/.mf
