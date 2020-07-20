@@ -156,7 +156,8 @@ class MFHistoryList(QListWidget):
     def styleHelper(self):
         self.setStyleSheet('''
             QListWidget {
-                border-bottom: 1px solid #5D6D7E;
+                border: 1px solid #5D6D7E;
+                border-top: 0px;
             }
             QListView::item:selected {
                 border: 1px solid #6a6ea9;
@@ -227,7 +228,8 @@ class MFHistory(QWidget):
         self.setVisible(False)
         self.setStyleSheet('''
             QWidget {
-                border: 0px;
+                border: 1px solid #5D6D7E;
+                border-bottom: 0px solid white;
                 background-color: white;
             }
         ''')

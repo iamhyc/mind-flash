@@ -41,6 +41,29 @@ class MFTextEdit(QPlainTextEdit):
         self.keysFn = KeysReactor()
         self.registerKeys()
         pass
+    
+    def styleHelper(self):
+        # Basic Style
+        self.setStyleSheet("""
+            QPlainTextEdit {
+                border: 1px solid #D7DBDD;
+                background: rgba(255,255,255, 0.95)
+            }
+        """)
+        self.setFixedSize(*MIN_INPUTBOX_SIZE)
+        self.setTabChangesFocus(True)
+        self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # Font Style
+        self.setFont(self.font_style)
+        # Cursor Style
+        QApplication.setOverrideCursor(Qt.ArrowCursor)
+        self.ensureCursorVisible()
+        self.setCursorWidth(0)
+        self.lastKeyStroke = time.time()
+        QTimer.singleShot(500, self.hideCaret)
+        pass
 
     def registerKeys(self):
         #NOTE: Ctrl+Return; insert newline
@@ -119,24 +142,6 @@ class MFTextEdit(QPlainTextEdit):
 
         self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
         self.w_history.renderHistory(self.stp.hint, items)
-        pass
-
-    def styleHelper(self):
-        # Basic Style
-        self.setStyleSheet('border: 0px solid white;')
-        self.setFixedSize(*MIN_INPUTBOX_SIZE)
-        self.setTabChangesFocus(True)
-        self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        # Font Style
-        self.setFont(self.font_style)
-        # Cursor Style
-        QApplication.setOverrideCursor(Qt.ArrowCursor)
-        self.ensureCursorVisible()
-        self.setCursorWidth(0)
-        self.lastKeyStroke = time.time()
-        QTimer.singleShot(500, self.hideCaret)
         pass
 
     def getLineCount(self):
