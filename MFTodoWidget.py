@@ -80,7 +80,7 @@ class MFTodoWidget(QListWidget):
     def styleHelper(self):
         # self.setFixedSize(*MIN_TODO_SIZE)
         self.setMinimumSize(*MIN_TODO_SIZE)
-        self.setMaximumHeight(70)
+        self.setMaximumHeight(105)
         self.setVisible(True)
         self.verticalScrollBar().setStyleSheet("""
             QScrollBar:vertical {
@@ -121,7 +121,7 @@ class MFTodoWidget(QListWidget):
 
         self.alterBackground()
         _height = sum( [self.sizeHintForRow(i) for i in range(self.count())] )
-        self.setFixedHeight( min(self.sizeHint().height(),70))
+        self.setFixedHeight( min(self.sizeHint().height(),105))
         pass
 
     def saveTodoList(self, all_done=False):
