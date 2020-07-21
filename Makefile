@@ -1,5 +1,5 @@
 
-PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info[:][1])')
+PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info.minor)')
 
 all:depends install
 
