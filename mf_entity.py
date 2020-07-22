@@ -65,10 +65,9 @@ class MFEntity:
                     with MFRecord(stp.dayno, userHint) as rec:
                         items += rec.readAll()
                     pass
-                items.sort(key=lambda x:x[0])
                 pass
+            items.sort(key=lambda x:x[1])
             pass
-        print(items)
         return stp, items
 
     def mf_sync(self, *args):
