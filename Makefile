@@ -1,4 +1,5 @@
 
+PLATFORM=$(shell python3 -c 'import sys; print(sys.platform)')
 PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info.minor)')
 
 all:depends install
@@ -17,8 +18,17 @@ install:
 	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
 
-build:
-	pyinstaller mf_gui.py -wy --onefile
+build-dist:
+	@if [ "$(PLATFORM)" = "win32" ]; then \
+		rm -rf build dist; \
+		pyinstaller mf_gui.py -wy; \
+		cp third-party/* ./dist/; \
+		cd dist; zip -r msh-tray.zip ./*; cd ..; \
+	elif [ "$(PLATFORM)" = "linux" ]; then \
+		echo "Not done for linux platform..."; \
+	else \
+		echo "Not supporting platform: $(PLATFORM)."; \
+	fi
 
 clean-dist:
 	rm -rf build dist

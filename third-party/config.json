@@ -1,0 +1,25 @@
+{
+    "configs": [
+        {
+            "name": "Mind Flash",
+            "path": "mf_gui",
+            "cmd": "mf_gui.exe",
+            "working_directory": "",
+            "addition_env_path": "",
+            "use_builtin_console": false,
+            "is_gui": true,
+            "enabled": true,
+            "require_admin": false,
+            "icon": "",
+            "hotkey": {
+                "restart": "Win+N"
+            },
+            "exclusion_id": 1
+        }
+    ],
+    "global": true,
+    "require_admin": false,
+    "icon": "icons\\pulse_heart_lighting.ico",
+    "icon_size": 256,
+    "lang": "auto"
+}
