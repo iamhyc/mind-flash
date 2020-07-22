@@ -75,7 +75,7 @@ class MFTextEdit(QPlainTextEdit):
 
         #NOTE: Return; flash recording
         def mf_flash_binding():
-            mf_text = self.toPlainText().encode('utf-8').decode()
+            mf_text = self.toPlainText().encode('utf-8').decode('utf-8')
             for image in self.image_cache: #clear image_cache when try recording
                 os_remove(path.join(MF_DIR,image)) if image not in mf_text else None
             if mf_text:
@@ -100,7 +100,7 @@ class MFTextEdit(QPlainTextEdit):
 
         #NOTE: Alt+Q; add to todo list
         def mf_add_todo():
-            todo_text = self.toPlainText().encode('utf-8').decode()
+            todo_text = self.toPlainText().encode('utf-8').decode('utf-8')
             if todo_text:
                 self.clear()
                 self.w_todo.todos.append( ['+', todo_text] )
