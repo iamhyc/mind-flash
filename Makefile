@@ -1,4 +1,4 @@
-
+VERSION=0.9
 PLATFORM=$(shell python3 -c 'import sys; print(sys.platform)')
 PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info.minor)')
 
@@ -23,7 +23,7 @@ build-dist:
 		rm -rf build dist; \
 		pyinstaller mf_gui.py -wy; \
 		cp -r third-party/* ./dist/; \
-		cd dist; zip -r msh-tray.zip ./*; cd ..; \
+		cd dist; zip -r msh-tray-$(VERSION).zip ./*; cd ..; \
 	elif [ "$(PLATFORM)" = "linux" ]; then \
 		echo "Not done for linux platform..."; \
 	else \
