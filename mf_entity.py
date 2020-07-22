@@ -68,7 +68,7 @@ class MFEntity:
                 items.sort(key=lambda x:x[0])
                 pass
             pass
-        
+        print(items)
         return stp, items
 
     def mf_sync(self, *args):
@@ -86,7 +86,7 @@ class MFEntity:
         pass
 
     def act_dump(self, *args):
-        fd = Path(self.base_path, 'mf_history').open('r+')
+        fd = Path(self.base_path, 'mf_history').open('r+', encoding='utf-8')
         print(fd.read(), end='')
         pass
 

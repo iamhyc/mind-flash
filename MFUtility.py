@@ -163,7 +163,7 @@ class MFRecord:
 
     def __enter__(self):
         if Path(self.file).exists():
-            fd = open(self.file, 'r')
+            fd = open(self.file, 'r', encoding='utf-8')
             lines = fd.readlines()
             fd.close()
 
@@ -179,7 +179,7 @@ class MFRecord:
     def __exit__(self, exc_type, exc_value, exc_tb):
         if exc_value: raise
         if self.updated:
-            fd = open(self.file, 'w')
+            fd = open(self.file, 'w', encoding='utf-8')
             for tt in zip(self.time_line, self.text_line):
                 fd.write(tt[0])
                 fd.write(tt[1])
@@ -201,7 +201,7 @@ class MFRecord:
 
     def readAll(self):
         user_hint = [self.hint] * len(self.time_line)
-        return list(zip(user_hint, self.time_line, self.text_line))
+        return list( zip(user_hint, self.time_line, self.text_line) )
 
     pass
 

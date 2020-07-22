@@ -129,12 +129,12 @@ class MFTodoWidget(QListWidget):
             _record = '\n'.join(['- '+x[1] for x in self.todos])
             _record = 'Completed Todo List:\n' + _record
             self.parent.mf_exec.mf_record( repr(_record) ) #record todo list
-            open(str(self.todo_file), 'w').close() #erase todo file
+            open(str(self.todo_file), 'w', encoding='utf-8').close() #erase todo file
             QTimer.singleShot(300, self.safe_close) #deferred exit
             pass
         else:
             #format: ('+/-', 'text')
-            with open(str(self.todo_file), 'w') as fout:
+            with open(str(self.todo_file), 'w', encoding='utf-8') as fout:
                 _tmp = [' '.join(x) for x in self.todos]
                 fout.write( '\n'.join(_tmp) )
                 pass
@@ -142,7 +142,7 @@ class MFTodoWidget(QListWidget):
 
     def loadTodoList(self):
         #format: ('+/-', 'text')
-        with open(str(self.todo_file), 'r') as fin:
+        with open(str(self.todo_file), 'r', encoding='utf-8') as fin:
             raw_text  = fin.read().strip()
             raw_todos = raw_text.splitlines()
             return [x.split(maxsplit=1) for x in raw_todos]
