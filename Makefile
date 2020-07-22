@@ -22,7 +22,7 @@ build-dist:
 	@if [ "$(PLATFORM)" = "win32" ]; then \
 		rm -rf build dist; \
 		pyinstaller mf_gui.py -wy; \
-		cp third-party/* ./dist/; \
+		cp -r third-party/* ./dist/; \
 		cd dist; zip -r msh-tray.zip ./*; cd ..; \
 	elif [ "$(PLATFORM)" = "linux" ]; then \
 		echo "Not done for linux platform..."; \
