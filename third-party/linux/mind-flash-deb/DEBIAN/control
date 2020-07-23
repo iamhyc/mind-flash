@@ -1,7 +1,7 @@
 Package: mind-flash
-Version: 0.9.0
+Version: 0.9.1
 Homepage: https://github.com/iamhyc/mind-flash
 Maintainer: iamhyc <sudofree@163.com>
 Architecture: all
-Depends: python3-pyqt5, python3-dateutil
+Depends: python3-pyqt5, python3-dateutil, wmctrl
 Description: Quick Notepad: It's a flash over your mind.

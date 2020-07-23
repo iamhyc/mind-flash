@@ -1,3 +1,9 @@
+mind-flash (0.9.1) unstable; urgency=low
+
+  * fix custom keybindings with gsettings
+
+ -- iamhyc <sudofree@163.com>  Thu, 23 July 2020 23:59:59 +0000
+
 mind-flash (0.9.0) unstable; urgency=low
 
   * beta release
