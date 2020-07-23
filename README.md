@@ -10,7 +10,9 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 ## Install
 
-The latest packages are available on [release page](https://github.com/iamhyc/mind-flash/releases).
+The latest *multi-platform* binary packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
+- [Download Linux Deb Package](https://github.com/iamhyc/mind-flash/releases/download/mind-flash-linux-all.deb)
+- [Download Windows Tray Version](https://github.com/iamhyc/mind-flash/releases/download/mind-flash-win32-tray.zip)
 
 **Manual build:**
 
