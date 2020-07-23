@@ -1,0 +1,3 @@
+#!/bin/sh
+rm /usr/bin/msh-gui
+rm /usr/bin/msh

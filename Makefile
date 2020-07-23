@@ -18,17 +18,23 @@ install:
 	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
 
-build-dist:
+build-dist:clean-dist
 	@if [ "$(PLATFORM)" = "win32" ]; then \
 		rm -rf build dist; \
 		pyinstaller mf_gui.py -wy; \
-		cp -r third-party/* ./dist/; \
+		cp -r third-party/win32/* ./dist/; \
 		cd dist; zip -r msh-tray-$(VERSION).zip ./*; cd ..; \
 	elif [ "$(PLATFORM)" = "linux" ]; then \
-		echo "Not done for linux platform..."; \
+		mkdir -p build/opt/mind-flash; mkdir dist; \
+		cp -r third-party/linux/mind-flash-deb/* ./build/; \
+		cp -r res *.py ./build/opt/mind-flash; \
+		dpkg-deb --build build dist/mind-flash.deb; \
 	else \
 		echo "Not supporting platform: $(PLATFORM)."; \
 	fi
 
 clean-dist:
-	rm -rf build dist
+	@rm -rf build dist
+
+clean:clean-dist
+	@rm -f *.spec

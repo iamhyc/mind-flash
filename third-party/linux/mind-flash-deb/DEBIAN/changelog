@@ -1,0 +1,13 @@
+mind-flash (0.9.0) unstable; urgency=low
+
+  * beta release
+  * add a simple todolist
+
+ -- iamhyc <sudofree@163.com>  Thu, 23 July 2020 23:59:59 +0000
+
+mind-flash (0.1.0) unstable; urgency=low
+
+  * initial release
+  * now support pixmap paste and preview
+
+ -- iamhyc <sudofree@163.com>  Thu, 23 July 2020 23:59:59 +0000
