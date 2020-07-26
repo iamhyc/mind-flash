@@ -8,7 +8,8 @@ from os import path, getcwd, chdir, remove as os_remove
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
-                    QLayout, QGridLayout, QPlainTextEdit, QSizePolicy)
+                    QLayout, QGridLayout, QPlainTextEdit, QSizePolicy,
+                    QGraphicsDropShadowEffect)
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
@@ -248,6 +249,10 @@ class MFGui(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_InputMethodEnabled)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setContentsMargins(5,5,5,5)
+        self.setGraphicsEffect(
+            QGraphicsDropShadowEffect(blurRadius=5, xOffset=3, yOffset=3)
+        )
         self.w_editor.setFocus()
         self.show()
         pass
