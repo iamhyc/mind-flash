@@ -12,6 +12,8 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 The latest *multi-platform* packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
 
+> For Linux user, please run `msh-userfix` after installation for *fcitx* and *custom keybindings* fix.
+
 **Manual build:**
 
 1. Have `python3` and `python3-pip` (latest version) installed;
@@ -23,6 +25,8 @@ The latest *multi-platform* packages are available on [release page](https://git
 3. Use `msh-gui` to display GUI, and `msh` for CLI.
    
     > The default shortcut binding for gnome/dde is: <kbd>Super</kbd> + <kbd>N</kbd>.
+    
+4. (Optional) Build platform-dependent distribution package by run `make build-dist`, and the package will be generated in `./dist` folder.
 
 ## Usage
 

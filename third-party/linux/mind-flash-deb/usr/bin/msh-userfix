@@ -1,7 +1,12 @@
 #!/bin/bash
 OSNAME=`lsb_release -is`
+PYTHON_MINOR=`python3 -c "import sys; print(sys.version_info.minor)"`
 GNOME_ENTRY=org.gnome.settings-daemon.plugins.media-keys
 GNOME_PATH=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/
+
+cp -f /usr/lib/x86_64-linux-gnu/qt5/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so \
+$HOME/.local/lib/python3.$PYTHON_MINOR/site-packages/PyQt5/Qt/plugins/platforminputcontexts/
+chmod +x $HOME/.local/lib/python3.$PYTHON_MINOR/site-packages/PyQt5/Qt/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so
 
 if [[ "$OSNAME" == "Ubuntu" ]]; then
     echo "Fix custom keybindings 'Win+N' for Ubuntu (gsettins)."
