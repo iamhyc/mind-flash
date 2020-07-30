@@ -10,7 +10,7 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 ## Install
 
-The latest *multi-platform* binary packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
+The latest *multi-platform* packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
 
 **Manual build:**
 
