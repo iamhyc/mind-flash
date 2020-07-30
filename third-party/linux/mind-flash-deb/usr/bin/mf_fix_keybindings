@@ -1,0 +1,26 @@
+#!/bin/bash
+OSNAME=`lsb_release -is`
+GNOME_ENTRY=org.gnome.settings-daemon.plugins.media-keys
+GNOME_PATH=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/
+
+if [[ "$OSNAME" == "Ubuntu" ]]; then
+    echo "Fix custom keybindings 'Win+N' for Ubuntu (gsettins)."
+    gsettings set $GNOME_ENTRY custom-keybindings "['$GNOME_PATH']"
+    gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH name "mind-flash"
+    gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH command "/usr/bin/msh-gui"
+    gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH binding "<Super>n"
+elif [[ "$OSNAME" == "Deepin" ]]; then
+    # Reference: https://bbs.deepin.org/archiver/?tid-148930.html
+    echo "Fix custom keybindings 'Win+N' for Deepin (dbus)."
+    # 1) remove default Super+N for window minimizing
+    dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.DeleteShortcutKeystroke string:"minimize" int16:3 string:"<Super>N"
+    # 2) remove existing conflict keybindings
+    id=`dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.LookupConflictingShortcut string:"<Super>N" | grep -o '\w*-\w*-\w*-\w*-\w*'`
+    if [[ ! -z id ]]; then
+        dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.DeleteCustomShortcut string:"$id" 2>/dev/null
+    fi
+    # 3) add keybindings
+    dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.AddCustomShortcut string:"Mind Flash" string:"/usr/bin/msh-gui" string:"<Super>N" 2>/dev/null
+else
+    echo "Not tested for $OSNAME."
+fi

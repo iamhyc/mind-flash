@@ -1,4 +1,4 @@
-VERSION=0.9
+VERSION=0.9.2
 PLATFORM=$(shell python3 -c 'import sys; print(sys.platform)')
 PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info.minor)')
 
@@ -18,6 +18,7 @@ install:
 	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
 
+# sudo apt remove mind-flash -y && make build-dist && sudo dpkg -i dist/mind-flash.deb
 build-dist:clean-dist
 	@if [ "$(PLATFORM)" = "win32" ]; then \
 		rm -rf build dist; \

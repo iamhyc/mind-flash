@@ -1,3 +1,9 @@
+mind-flash (0.9.2) unstable; urgency=low
+
+  * add user triggered mf_fix_keybindings script
+
+ -- iamhyc <sudofree@163.com>  Thu, 30 July 2020 23:59:59 +0000
+
 mind-flash (0.9.1) unstable; urgency=low
 
   * fix custom keybindings with gsettings

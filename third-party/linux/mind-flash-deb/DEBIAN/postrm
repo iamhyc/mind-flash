@@ -1,16 +1,3 @@
 #!/bin/bash
 rm -f /usr/bin/msh-gui
 rm -f /usr/bin/msh
-
-# OSNAME=`lsb_release -is`
-# GNOME_ENTRY=org.gnome.settings-daemon.plugins.media-keys
-
-# if [[ "$OSNAME" == "Ubuntu" ]]; then
-#     echo "Remove custom keybindings 'Win+N' for Ubuntu."
-#     gsettings set $GNOME_ENTRY custom-keybindings "[]"
-# elif [[ "$OSNAME" == "Deepin" ]]; then
-#     # Reference: https://bbs.deepin.org/archiver/?tid-148930.html
-#     echo "Remove custom keybindings 'Win+N' for Deepin."
-#     id=`dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.LookupConflictingShortcut string:"<Super>N" | grep -o '\w*-\w*-\w*-\w*-\w*'`
-#     dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.DeleteCustomShortcut string:"$id"
-# fi
