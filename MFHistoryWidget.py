@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtCore import (Qt, QRect, QSize)
-from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter)
+from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QWidget, QFrame,QLabel, QTextEdit, QListWidget, QListWidgetItem,
                             QGridLayout, QStyle, QStyleOption)
 
@@ -18,6 +18,7 @@ ITEM_TEXT_COLOR  = '#252526'
 LIST_BACKGROUND  = '#FFFFFF'
 ITEM_BACKGROUND  = '#ECF0F1'
 ITEM_MARGIN      = 5#px
+ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
 img_filter   = re.compile('<-file://(.*?)->')
 bold_filter  = re.compile('\*\*([^\*]+)\*\*')
@@ -83,6 +84,7 @@ class MFHistoryItem(QFrame):
         pass
 
     def styleHelper(self):
+        self.size_height = 0
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.layout.setSpacing(0)
@@ -98,8 +100,23 @@ class MFHistoryItem(QFrame):
             QLabel{
                 border: 0px;
             }
-        '''%(ITEM_BACKGROUND, ITEM_MARGIN*2))
+        '''%(ITEM_BACKGROUND, ITEM_RADIUS))
         pass
+
+    def getSizeHint(self, label_ref, pos):
+        _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
+        _text = _doc.toPlainText()
+        fm    = QFontMetrics(label_ref.font())
+        fm_rect = QRect(0,0,590,100)
+        _size = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size()
+        print(_size.height(), _text)
+        return _size
+
+    def wrapWidget(self, ref, pos):
+        self.layout.addWidget(ref, *pos)
+        size_hint = self.getSizeHint(ref, pos)
+        self.size_height += size_hint.height()
+        return ref
 
     def updateItem(self, item):
         self.item = item
@@ -111,6 +128,7 @@ class MFHistoryItem(QFrame):
         # parse (hint, images, text)
         hint   = '%s @ %s'%(_user, _time)
         text   = eval( ''.join(_text[0:][::2]) ).strip()
+        text  +='\n' #NOTE: for QFontMetrics.boundingRect correction
         text   = text.replace('\n', '<br>')
         images = _text[1:][::2]
         # create widgets
@@ -119,16 +137,16 @@ class MFHistoryItem(QFrame):
             text_label = QLabelWrapper('item_text', text)
         image_pixmaps = [QPixmap( str(Path(self.base_path, image)) ) for image in images]
         # adjust gridlayout
-        self.layout.addWidget(hint_label, 0, 0, 1, 3)
+        self.wrapWidget(hint_label, [0,0, 1,3])
         if not images: #text only
-            self.layout.addWidget(text_label, 1, 0, 1, 3)
+            self.wrapWidget(text_label, [1,0, 1,3])
             pass
         elif not text: #images only
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
-                self.layout.addWidget(image_label, i+1, 0, 1, 3)
+                self.wrapWidget(image_label, [i+1,0, 1,3])
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
             pass
@@ -137,12 +155,15 @@ class MFHistoryItem(QFrame):
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
                 image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
-                self.layout.addWidget(image_label, i+1, 0, 1, 1)
+                self.wrapWidget(image_label, [i+1,0, 1,1])
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
                 pass
-            self.layout.addWidget(text_label, 1, 1, -1, -1)
+            self.wrapWidget(text_label, [1,1, -1,-1])
             pass
         pass
+
+    def sizeHint(self):
+        return QSize(-1, self.size_height)
     pass
 
 class MFHistoryList(QListWidget):
@@ -247,7 +268,7 @@ class MFHistory(QWidget):
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
             w_item_widget = MFHistoryItem(w_item, self.base_path, item)
-            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) #NOTE: do not adjust width
+            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
             w_item.setSizeHint(size_hint)
             self.w_history_list.addItem(w_item)
             self.w_history_list.setItemWidget(w_item, w_item_widget)
