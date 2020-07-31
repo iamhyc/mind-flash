@@ -34,7 +34,7 @@ class TextStamp():
             self.start = self.end
             self.update_hint()
         pass
-    
+
     def update_type(self, mf_type, mf_anchor=0):
         if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
             tmp = datetime(self.end.year, self.end.month, self.end.day)
@@ -43,7 +43,7 @@ class TextStamp():
             self.hint  = self.end.strftime('%Y-%m-%d (%a)')
         elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
             tmp = datetime(self.end.year, self.end.month, self.end.day)
-            mf_anchor  = -1 if mf_anchor==0 else mf_anchor #get last Monday when anchor==0
+            mf_anchor  = -1 if mf_anchor==0 else mf_anchor #FIXME: get last Monday when anchor==0
             self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
             self.start = self.end + relativedelta(days=7)
             self.hint  = self.end.strftime('Week %U, %Y')

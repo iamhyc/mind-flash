@@ -106,10 +106,14 @@ class MFHistoryItem(QFrame):
     def getSizeHint(self, label_ref, pos):
         _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
         _text = _doc.toPlainText()
-        fm    = QFontMetrics(label_ref.font())
-        fm_rect = QRect(0,0,590,100)
-        _size = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size()
-        print(_size.height(), _text)
+        _size = QSize(590,0)
+        if _text:
+            fm    = QFontMetrics(label_ref.font())
+            fm_rect = QRect(0,0,590,100)
+            _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
+            _size  += QSize(0,_height)
+        elif label_ref.pixmap():
+            _size  += QSize(0, MIN_ITEM_SIZE[1])
         return _size
 
     def wrapWidget(self, ref, pos):
@@ -128,7 +132,7 @@ class MFHistoryItem(QFrame):
         # parse (hint, images, text)
         hint   = '%s @ %s'%(_user, _time)
         text   = eval( ''.join(_text[0:][::2]) ).strip()
-        text  +='\n' #NOTE: for QFontMetrics.boundingRect correction
+        text   = text+'\n' if text else '' #NOTE: for QFontMetrics.boundingRect correction
         text   = text.replace('\n', '<br>')
         images = _text[1:][::2]
         # create widgets

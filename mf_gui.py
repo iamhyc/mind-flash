@@ -118,13 +118,13 @@ class MFTextEdit(QPlainTextEdit):
         )
         ### Alt+J ###
         self.keysFn.register(
-            [Qt.Key_Alt, Qt.Key_K], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor-1)
+            [Qt.Key_Alt, Qt.Key_J], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor+1)
         )
         ### Alt+K ###
         self.keysFn.register(
-            [Qt.Key_Alt, Qt.Key_J], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor+1)
+            [Qt.Key_Alt, Qt.Key_K], 
+            lambda:self.updateHistory(self.time_type, self.time_anchor-1)
         )
         ### Alt+H ###
         self.keysFn.register(
