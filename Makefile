@@ -14,7 +14,7 @@ install:
 	~/.local/lib/python3.$(PYTHON_MINOR)/site-packages/PyQt5/Qt/plugins/platforminputcontexts/
 	chmod +x ~/.local/lib/python3.$(PYTHON_MINOR)/site-packages/PyQt5/Qt/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so
 	sudo mkdir -p /opt/mind-flash
-	sudo cp -rf ./* /opt/mind-flash
+	sudo cp -rf res *.py /opt/mind-flash
 	sudo ln -sf /opt/mind-flash/mf_gui.py /usr/bin/msh-gui
 	sudo ln -sf /opt/mind-flash/mf_entity.py /usr/bin/msh
 
