@@ -51,8 +51,7 @@ The latest *multi-platform* packages are available on [release page](https://git
 
 * <kbd>Alt</kbd> + <kbd>Q</kbd> to add current text to todolist
 * **Right Click** on item to toggle completion status
-* **Double Click** on item to remove it
-* (not support item deletion now)
+* **Double Click** on item to remove the item
 
 ## License
 This project is licensed under [GPLv3](LICENSE).
