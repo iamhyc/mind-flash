@@ -56,6 +56,7 @@ class MFTodoWidget(QListWidget):
             self.todo_file = Path( self.base_path,'todo' )
         else:
             self.todo_file = Path( self.base_path,MF_HOSTNAME,'todo' )
+        self.todo_count = 1 # default with title height
         self.todo_file.touch()
         self.todos     = self.loadTodoList()
         self.renderTodos()
@@ -115,16 +116,17 @@ class MFTodoWidget(QListWidget):
         pass
 
     def renderTodos(self):
-        self.clear()
-        
+        #Reference: https://stackoverflow.com/questions/41517945/how-to-scroll-qlistwidget-to-selected-item
+        self.clear(); self.todo_count = 1
         self.addItem( TodoItemWrapper(self, ['title','TODO LIST']) )
-        for _todo in self.todos:
+        for _todo in sorted(self.todos, key=lambda x:x[0]):
+            self.todo_count += 1 if _todo[0]=='+' else 0
             _todo_item = (_todo[0], _todo[1])
             self.addItem( TodoItemWrapper(self, _todo_item) )
 
         self.alterBackground()
-        _height = sum( [self.sizeHintForRow(i) for i in range(self.count())] )
-        self.setFixedHeight( min(self.sizeHint().height(),105))
+        # _height = sum( [self.sizeHintForRow(i) for i in range(self.todo_count)] ) #self.count()
+        # self.setFixedHeight( min(_height,105) )
         pass
 
     def saveTodoList(self, all_done=False):
@@ -153,12 +155,15 @@ class MFTodoWidget(QListWidget):
         pass
 
     def toggleItemStatus(self, item):
-        _index = self.row(item)-1
-        if _index<0: return False
+        item_text = item.text().split(maxsplit=1)[1]
+        try:
+            index = list(zip(*self.todos))[1].index(item_text)
+        except Exception:
+            return False
         # toggle the item
         _status = item.font().strikeOut()
-        self.todos[_index][0] = '+' if _status else '-' #update todo_list
-        item.updateItem(self.todos[_index])  #update todo_item
+        self.todos[index][0] = '+' if _status else '-' #update todo_list
+        item.updateItem(self.todos[index])  #update todo_item
         # check all items
         all_status = [x[0]=='-' for x in self.todos]
         all_done   = not (False in all_status)
@@ -174,7 +179,7 @@ class MFTodoWidget(QListWidget):
         return super().mousePressEvent(e)
     
     def sizeHint(self):
-        height = sum( [self.sizeHintForRow(i) for i in range(self.count())] )
+        height = sum( [self.sizeHintForRow(i) for i in range(self.todo_count)] ) #self.count()
         return QSize(600, height)
 
     def safe_close(self):
