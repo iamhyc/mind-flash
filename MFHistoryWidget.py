@@ -81,7 +81,10 @@ class QLabelWrapper(QLabel):
                 _clipboard.setPixmap(self.alt)
             else:
                 _clipboard.setPixmap(self.pixmap())
-            os.system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
+            try:
+                os.system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
+            except Exception:
+                pass
             pass
         return super().mousePressEvent(ev)
 
