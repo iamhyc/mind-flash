@@ -38,7 +38,7 @@ The latest *multi-platform* packages are available on [release page](https://git
 |    <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd>    | Next Line |
 |    <kbd>Return</kbd>    |            Save&Exit    |
 |                 |                                          |
-|  Double <kbd>click</kbd>  |     Popup History |
+|  Double <kbd>click</kbd> OR <kbd>Alt</kbd>+<kbd>H</kbd>  |     Popup History |
 |  <kbd>Alt</kbd> + <kbd>v</kbd>  | History - Week |
 | <kbd>Alt</kbd> + <kbd>vv</kbd> | History - Month |
 | <kbd>Alt</kbd> + <kbd>vvv</kbd> | History - Year |
@@ -50,7 +50,8 @@ The latest *multi-platform* packages are available on [release page](https://git
 **Todolist usage**:
 
 * <kbd>Alt</kbd> + <kbd>Q</kbd> to add current text to todolist
-* Right click on item to toggle completion status
+* **Right Click** on item to toggle completion status
+* **Double Click** on item to remove it
 * (not support item deletion now)
 
 ## License
