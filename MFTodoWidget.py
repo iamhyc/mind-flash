@@ -28,12 +28,12 @@ class TodoItemWrapper(QListWidgetItem):
             self.setFont(QFont(*TODO_TITLE_FONT))
             self.setText(text)
             pass
-        elif stat=='+':
+        elif stat=='+': #https://www.compart.com/en/unicode/U+25A1
             self.setFont(QFont(*TODO_ITEM_FONT))
-            _prefix = b'\xE2\x96\xA2'.decode('utf-8')
+            _prefix = b'\xE2\x96\xA1'.decode('utf-8')
             self.setText('{}  {}'.format(_prefix, text))
             pass
-        elif stat=='-':
+        elif stat=='-': #https://www.compart.com/en/unicode/U+25A0
             _font = QFont(*TODO_ITEM_FONT); _font.setStrikeOut(True)
             self.setFont(_font)
             _prefix = b'\xE2\x96\xA0'.decode('utf-8')
@@ -48,11 +48,14 @@ class TodoItemWrapper(QListWidgetItem):
     pass
 
 class MFTodoWidget(QListWidget):
-    def __init__(self, parent, base_path):
+    def __init__(self, parent, base_path, sync):
         super().__init__(parent)
         self.parent    = parent
         self.base_path = base_path
-        self.todo_file = Path( self.base_path,MF_HOSTNAME,'todo' )
+        if sync:
+            self.todo_file = Path( self.base_path,'todo' )
+        else:
+            self.todo_file = Path( self.base_path,MF_HOSTNAME,'todo' )
         self.todo_file.touch()
         self.todos     = self.loadTodoList()
         self.renderTodos()
