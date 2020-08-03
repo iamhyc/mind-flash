@@ -154,7 +154,19 @@ class MFTodoWidget(QListWidget):
             pass
         pass
 
-    def toggleItemStatus(self, item):
+    def removeTodoItem(self, item):
+        item_text = item.text().split(maxsplit=1)[1]
+        try:
+            index = list(zip(*self.todos))[1].index(item_text)
+        except Exception:
+            return False
+        
+        self.todos.pop(index)
+        self.takeItem(self.row(item))
+        self.renderTodos()
+        pass
+
+    def toggleTodoItem(self, item):
         item_text = item.text().split(maxsplit=1)[1]
         try:
             index = list(zip(*self.todos))[1].index(item_text)
@@ -169,11 +181,22 @@ class MFTodoWidget(QListWidget):
         all_done   = not (False in all_status)
         return all_done
 
+    def mouseDoubleClickEvent(self, e):
+        if e.buttons() & Qt.LeftButton:
+            _item = self.itemAt(e.pos())
+            if _item:
+                self.removeTodoItem(_item)
+                self.saveTodoList()
+                # if self.count()<=1:
+                #     QTimer.singleShot(300, self.safe_close) #deferred exit
+            pass
+        return super().mouseDoubleClickEvent(e)
+
     def mousePressEvent(self, e):
         if e.buttons() & Qt.RightButton:
             _item = self.itemAt(e.pos())
             if _item:
-                all_done = self.toggleItemStatus(_item)
+                all_done = self.toggleTodoItem(_item)
                 self.saveTodoList(all_done)
             pass
         return super().mousePressEvent(e)
