@@ -1,3 +1,13 @@
+mind-flash (0.9.4) unstable; urgency=low
+
+  * fix relative fetch function
+  * miscs: update unaccomplished todo symbol; add sync-or-not flag for todo
+  * update: display sorted todos
+  * add delete todo function
+  * add copy pixmap function 
+
+ -- iamhyc <sudofree@163.com>  Thu, 30 July 2020 23:59:59 +0000
+
 mind-flash (0.9.3) unstable; urgency=low
 
   * fix history item height
