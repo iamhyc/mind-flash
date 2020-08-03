@@ -35,6 +35,21 @@ class TextStamp():
             self.update_hint()
         pass
 
+    def diff_time(self, mf_type):
+        _diff = relativedelta(self.end, datetime.now())
+        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
+        if mf_type==MF_RNG.DAY:
+            return _diff.days
+        elif mf_type==MF_RNG.WEEK:
+            return _diff.weeks
+        elif mf_type==MF_RNG.MONTH:
+            return _diff.months
+        elif mf_type==MF_RNG.YEAR:
+            return _diff.years
+        else:
+            return _diff
+        pass
+
     def update_type(self, mf_type, mf_anchor=0):
         if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
             tmp = datetime(self.end.year, self.end.month, self.end.day)

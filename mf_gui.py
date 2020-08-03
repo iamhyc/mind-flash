@@ -138,10 +138,11 @@ class MFTextEdit(QPlainTextEdit):
         if mf_anchor > 0: return #no future history
         if relative: #relative to previous stp
             self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp)
+            self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
         else:
             self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None)
+            self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
 
-        self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update 
         self.w_history.renderHistory(self.stp.hint, items)
         pass
 
