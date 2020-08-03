@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-import re
+import re, os
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
-from PyQt5.QtWidgets import (QWidget, QFrame,QLabel, QTextEdit, QListWidget, QListWidgetItem,
-                            QGridLayout, QStyle, QStyleOption)
+from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
+                            QListWidget, QListWidgetItem, QGridLayout)
 
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
@@ -25,9 +25,10 @@ bold_filter  = re.compile('\*\*([^\*]+)\*\*')
 italic_filter= re.compile('\*(.*?)\*')
 
 class QLabelWrapper(QLabel):
-    def __init__(self, type, text='', pixmap=''):
+    def __init__(self, type, text='', pixmap='', alt=''):
         super().__init__(text)
         self.type = type
+        self.alt  = alt
         if pixmap: self.setPixmap(pixmap)
         self.styleHelper()
         pass
@@ -72,6 +73,18 @@ class QLabelWrapper(QLabel):
             raise Exception
             pass
         pass
+
+    def mousePressEvent(self, ev):
+        if ev.buttons() & Qt.RightButton and self.type=='img_label':
+            _clipboard = QApplication.clipboard()
+            if self.alt:
+                _clipboard.setPixmap(self.alt)
+            else:
+                _clipboard.setPixmap(self.pixmap())
+            os.system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
+            pass
+        return super().mousePressEvent(ev)
+
     pass
 
 class MFHistoryItem(QFrame):
@@ -149,7 +162,7 @@ class MFHistoryItem(QFrame):
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
+                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=pixmap)
                 self.wrapWidget(image_label, [i+1,0, 1,3])
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
@@ -158,7 +171,7 @@ class MFHistoryItem(QFrame):
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap)
+                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=pixmap)
                 self.wrapWidget(image_label, [i+1,0, 1,1])
                 image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
                 pass
