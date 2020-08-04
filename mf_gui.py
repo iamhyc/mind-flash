@@ -48,7 +48,7 @@ class MFTextEdit(QPlainTextEdit):
         self.setStyleSheet("""
             QPlainTextEdit {
                 border: 1px solid #D7DBDD;
-                background: rgba(255,255,255, 0.95)
+                background: rgba(255,255,255, 0.85)
             }
         """)
         self.setFixedSize(*MIN_INPUTBOX_SIZE)
