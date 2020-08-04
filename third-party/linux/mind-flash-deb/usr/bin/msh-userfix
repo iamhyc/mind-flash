@@ -9,9 +9,9 @@ $HOME/.local/lib/python3.$PYTHON_MINOR/site-packages/PyQt5/Qt/plugins/platformin
 chmod +x $HOME/.local/lib/python3.$PYTHON_MINOR/site-packages/PyQt5/Qt/plugins/platforminputcontexts/libfcitxplatforminputcontextplugin.so
 
 if [[ "$OSNAME" == "Ubuntu" ]]; then
-    echo "Fix custom keybindings 'Win+N' for Ubuntu (gsettins)."
+    echo "Fix custom keybindings 'Win+N' for Ubuntu (gsettings)."
     gsettings set $GNOME_ENTRY custom-keybindings "['$GNOME_PATH']"
-    gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH name "mind-flash"
+    gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH name "Mind Flash"
     gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH command "/usr/bin/msh-gui"
     gsettings set $GNOME_ENTRY.custom-keybindings:$GNOME_PATH binding "<Super>n"
 elif [[ "$OSNAME" == "Deepin" ]]; then
@@ -27,5 +27,5 @@ elif [[ "$OSNAME" == "Deepin" ]]; then
     # 3) add keybindings
     dbus-send --session --dest=com.deepin.daemon.Keybinding --type=method_call --print-reply /com/deepin/daemon/Keybinding com.deepin.daemon.Keybinding.AddCustomShortcut string:"Mind Flash" string:"/usr/bin/msh-gui" string:"<Super>N" 2>/dev/null
 else
-    echo "Not tested for $OSNAME."
+    echo "Not supporting for $OSNAME. Please add keybindings by yourself."
 fi

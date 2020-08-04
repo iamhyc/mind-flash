@@ -24,12 +24,12 @@ build-dist:clean-dist
 		rm -rf build dist; \
 		pyinstaller mf_gui.py -wy; \
 		cp -r third-party/win32/* ./dist/; \
-		cd dist; zip -r msh-tray-$(VERSION).zip ./*; cd ..; \
+		cd dist; zip -r msh-tray-win32-$(VERSION).zip ./*; cd ..; \
 	elif [ "$(PLATFORM)" = "linux" ]; then \
 		mkdir -p build/opt/mind-flash; mkdir dist; \
 		cp -r third-party/linux/mind-flash-deb/* ./build/; \
 		cp -r res *.py ./build/opt/mind-flash; \
-		dpkg-deb --build build dist/mind-flash.deb; \
+		dpkg-deb --build build dist/mind-flash-linux-all.deb; \
 	else \
 		echo "Not supporting platform: $(PLATFORM)."; \
 	fi
