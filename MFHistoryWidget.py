@@ -123,7 +123,7 @@ class MFHistoryItem(QFrame):
         _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
         _text = _doc.toPlainText()
         _size = QSize(590,0)
-        if _text:
+        if _text: #FIXME: sizeHint with 'mixed' layout
             fm    = QFontMetrics(label_ref.font())
             fm_rect = QRect(0,0,590,100)
             _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()

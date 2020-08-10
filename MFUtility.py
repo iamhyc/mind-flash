@@ -99,9 +99,13 @@ class KeysReactor():
     }
     keySpecsKeys = keySpecs.keys()
 
-    def __init__(self):
+    def __init__(self, parent=None):
         self.key_list = [0x00]
         self.reactor = dict()
+
+        if parent:
+            #TODO: register press/release events on parent 
+            pass
         pass
     
     def register(self, keys, hookfn):
@@ -141,6 +145,29 @@ class KeysReactor():
     def clear(self):
         self.key_list = [0x00]
         pass
+
+class MouseReactor(object):
+    def __init__(self, parent):
+        left_clicked,    right_clicked    =  0,  0
+        left_clicked_ts, right_clicked_ts = -1, -1
+        if parent:
+            pass
+        pass
+
+    #TODO: first time, extract the item; second time, remove the item.
+    def LeftDoubleClickEvent(self, e):
+        pass
+
+    def RightClickEvent(self, e):
+        pass
+
+    def LeftLongPressEvent(self, e):
+        pass
+
+    def RightLongPressEvent(self, e):
+        pass
+
+    pass
 
 class workSpace:
     def __init__(self, p, *p_l, **kargs):
