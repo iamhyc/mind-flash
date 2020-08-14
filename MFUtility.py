@@ -119,7 +119,7 @@ class KeysReactor():
         for tmp_key in keys:
             if tmp_key in self.keySpecsKeys: # for specific keys
                 key_hash[0] = key_hash[0] | self.keySpecs[tmp_key]
-            else:                          # for general keys
+            else:                            # for general keys
                 key_hash.append(tmp_key)
             pass
         key_hash = '_'.join([str(x) for x in key_hash])
@@ -187,25 +187,23 @@ class KeysReactor():
     pass
 
 class MouseReactor(object):
+
+    MOVEWINDOW_EVENT  = 0x01
+    LEFTCLICK_EVENT   = 0x02
+    RIGHTCLICK_EVENT  = 0x04
+    DOUBLECLICK_EVENT = 0x08
+    LEFTLONGPRESS_EVENT  = 0x10
+    RIGHTLONGPRESS_EVENT = 0X20
+
     def __init__(self, parent):
         left_clicked,    right_clicked    =  0,  0
         left_clicked_ts, right_clicked_ts = -1, -1
-        if parent:
-            pass
         pass
 
-    #TODO: first time, extract the item; second time, remove the item.
-    def LeftDoubleClickEvent(self, e):
-        pass
-
-    def RightClickEvent(self, e):
-        pass
-
-    def LeftLongPressEvent(self, e):
-        pass
-
-    def RightLongPressEvent(self, e):
-        pass
+    #def LeftDoubleClickEvent(self, e):
+    #def RightClickEvent(self, e):
+    #def LeftLongPressEvent(self, e):
+    #def RightLongPressEvent(self, e):
 
     pass
 
