@@ -1,3 +1,9 @@
+mind-flash (0.9.5) unstable; urgency=low
+
+  * 
+
+ -- iamhyc <sudofree@163.com>  Thu, 15 Aug 2020 23:59:59 +0000
+
 mind-flash (0.9.4) unstable; urgency=low
 
   * fix relative fetch function

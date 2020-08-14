@@ -213,6 +213,10 @@ class MFTextEdit(QPlainTextEdit):
             self.parent.resize(self.size())
         pass
 
+    def focusInEvent(self, e):
+        self.keysFn.clear()
+        return super().focusInEvent(e)
+
     def focusOutEvent(self, e):
         self.keysFn.clear()
         return super().focusOutEvent(e)
