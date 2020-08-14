@@ -101,11 +101,17 @@ class KeysReactor():
 
     def __init__(self, parent=None):
         self.key_list = [0x00]
-        self.reactor = dict()
+        self.reactor  = dict()
+        self.press_hook_pre    = None
+        self.press_hook_post   = None
+        self.release_hook_pre  = None
+        self.release_hook_post = None
 
         if parent:
-            #TODO: register press/release events on parent 
-            pass
+            self.parent = parent
+            self.super = super(type(parent), parent)
+            parent.keyPressEvent   = lambda e: self.pressed(e.key(), e)
+            parent.keyReleaseEvent = lambda e: self.released(e.key(), e)
         pass
     
     def register(self, keys, hookfn):
@@ -120,31 +126,65 @@ class KeysReactor():
         self.reactor[key_hash] = hookfn
         pass
     
-    def pressed(self, key):
+    def pressed(self, key, e=None):
+        #NOTE: pre hook
+        if self.press_hook_pre:
+            self.press_hook_pre(e)
+
+        #NOTE: press keys
         if key in self.keySpecsKeys:
             self.key_list[0] = self.key_list[0] | self.keySpecs[key] #append specific keys
         else:
             self.key_list.append(key)
-        
         key_hash = '_'.join([str(x) for x in self.key_list])
         if key_hash in self.reactor:
-            return self.reactor[key_hash] #return the hook function
+            ret = self.reactor[key_hash]() #unused ret code
         else:
-            return None
+            self.super.keyPressEvent(e)
+        
+        #NOTE: post hook
+        if self.press_hook_post:
+            self.press_hook_post(e)
         pass
     
-    def released(self, key):
-        if key in self.keySpecsKeys:
+    def released(self, key, e=None):
+        #NOTE: pre hook
+        if self.release_hook_pre:
+            self.release_hook_pre(e)
+        
+        #NOTE: remove keys
+        if key in self.keySpecsKeys:    # remove a special key
             self.key_list[0] = self.key_list[0] & (~self.keySpecs[key]) #remove specific keys
-            if self.key_list[0]==0x00: # without specific keys present
-                self.key_list = [0x00] #reset, if specific keys all released
-        elif key in self.key_list:
+        elif key in self.key_list:      # remove a common key
             self.key_list.remove(key)
+        self.super.keyReleaseEvent(e)
+        if self.key_list[0]==0x00: #reset, if not specific keys presented
+            self.key_list = [0x00]
+
+        #NOTE: post hook
+        if self.release_hook_post:
+            self.release_hook_post(e)
         pass
 
     def clear(self):
         self.key_list = [0x00]
         pass
+
+    def setKeyPressHook(self, press_hook, post=True):
+        if post:
+            self.press_hook_post = press_hook
+        else:
+            self.press_hook_pre  = press_hook
+        pass
+
+    def setKeyReleaseHook(self, release_hook, post=True):
+        if post:
+            self.release_hook_post = release_hook
+        else:
+            self.release_hook_pre  = release_hook
+        pass
+
+    pass
 
 class MouseReactor(object):
     def __init__(self, parent):

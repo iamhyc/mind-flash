@@ -39,7 +39,8 @@ class MFTextEdit(QPlainTextEdit):
         self.styleHelper()
 
         self.textChanged.connect(self.textChangedEvent)
-        self.keysFn = KeysReactor()
+        self.keysFn = KeysReactor(self)
+        self.keysFn.setKeyPressHook(self.showCaret)
         self.registerKeys()
         pass
     
@@ -48,7 +49,7 @@ class MFTextEdit(QPlainTextEdit):
         self.setStyleSheet("""
             QPlainTextEdit {
                 border: 1px solid #D7DBDD;
-                background: rgba(255,255,255, 0.85)
+                background: rgba(255,255,255, 0.86)
             }
         """)
         self.setFixedSize(*MIN_INPUTBOX_SIZE)
@@ -146,15 +147,6 @@ class MFTextEdit(QPlainTextEdit):
         self.w_history.renderHistory(self.stp.hint, items)
         pass
 
-    def getLineCount(self):
-        _count = 0
-        _doc = self.document()
-        _it = _doc.begin()
-        while _it != _doc.end():
-            _count += _it.layout().lineCount()
-            _it = _it.next()
-        return _count
-
     def toggleHistoryWidget(self):
         size_half = int( self.w_history.height()/2 )
         if self.w_history.isVisible():
@@ -180,6 +172,20 @@ class MFTextEdit(QPlainTextEdit):
         QTimer.singleShot(500, self.hideCaret)
         pass
 
+    def showCaret(self, e):
+        self.setCursorWidth(1)
+        self.lastKeyStroke = time.time()
+        pass
+
+    def getLineCount(self):
+        _count = 0
+        _doc = self.document()
+        _it = _doc.begin()
+        while _it != _doc.end():
+            _count += _it.layout().lineCount()
+            _it = _it.next()
+        return _count
+
     def mousePressEvent(self, e):
         self.press_pos = e.pos()
         pass
@@ -195,17 +201,6 @@ class MFTextEdit(QPlainTextEdit):
 
     def mouseDoubleClickEvent(self, e):
         self.toggleHistoryWidget()
-        pass
-
-    def keyPressEvent(self, e):
-        returnFn = self.keysFn.pressed(e.key())
-        self.setCursorWidth(1)
-        self.lastKeyStroke = time.time()
-        returnFn() if returnFn else super().keyPressEvent(e)
-        pass
-
-    def keyReleaseEvent(self, e):
-        self.keysFn.released(e.key())
         pass
     
     def textChangedEvent(self):
