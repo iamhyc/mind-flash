@@ -284,7 +284,3 @@ class MFRecord:
         return list( zip(user_hint, self.time_line, self.text_line) )
 
     pass
-
-def isPrefix(sList, fList):
-    sList, fList = list(sList), list(fList)
-    return sList==fList[:len(sList)]
