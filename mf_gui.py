@@ -62,15 +62,14 @@ class MFTextEdit(QPlainTextEdit):
         # Cursor Style
         QApplication.setOverrideCursor(Qt.ArrowCursor)
         self.ensureCursorVisible()
-        self.setCursorWidth(0)
-        self.lastKeyStroke = time.time()
-        QTimer.singleShot(500, self.hideCaret)
+        self.lastKeyStroke = time.time() - 1.0
+        self.hideCaret()
         pass
 
     def registerKeys(self):
         #NOTE: Ctrl+Return; insert newline
         def mf_edit_binding():
-            self.setCursorWidth(1)
+            self.showCaret()
             self.insertPlainText('\n')
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_edit_binding)
@@ -168,11 +167,13 @@ class MFTextEdit(QPlainTextEdit):
 
     def hideCaret(self):
         if time.time() - self.lastKeyStroke > 1.0:
+            # QApplication.setCursorFlashTime(0)
             self.setCursorWidth(0)
         QTimer.singleShot(500, self.hideCaret)
         pass
 
-    def showCaret(self, e):
+    def showCaret(self, e=None):
+        # QApplication.setCursorFlashTime(1000)
         self.setCursorWidth(1)
         self.lastKeyStroke = time.time()
         pass
