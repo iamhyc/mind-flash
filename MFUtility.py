@@ -22,6 +22,7 @@ class MF_RNG(Enum):
 
 class TextStamp():
     def __init__(self, mf_type=0, mf_anchor=0, now=0):
+        self.mf_type = mf_type
         self.start,  self.end,   self.hint     = None, None, None
         self.weekno, self.dayno, self.unixtime = None, None, None
         self.end = datetime.now()
@@ -61,18 +62,19 @@ class TextStamp():
             mf_anchor  = -1 if mf_anchor==0 else mf_anchor #FIXME: get last Monday when anchor==0
             self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
             self.start = self.end + relativedelta(days=7)
-            self.hint  = self.end.strftime('Week %U, %Y')
+            self.hint  = self.end.strftime('Week %U (%b), %Y')
         elif mf_type==MF_RNG.MONTH:                    # from 1st to end-th
             tmp = datetime(self.end.year, self.end.month, 1)
             self.end   = tmp + relativedelta(months=mf_anchor)
             self.start = self.end + relativedelta(months=1)
-            self.hint  = self.end.strftime('%B, %Y')
+            self.hint  = self.end.strftime('%b, %Y')
         elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
             self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
             self.start = self.end + relativedelta(years=1)
             self.hint  = self.end.strftime('Year %Y')
         else:
-            pass
+            return
+        self.mf_type = mf_type
         pass
 
     def next(self):

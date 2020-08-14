@@ -3,10 +3,18 @@ import re, os
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
+from MFUtility import MF_RNG
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
+
+COLOR_SPRING   = '#018749'
+COLOR_SUMMER   = '#CC0000'
+COLOR_AUTUMN   = '#9F2D20'
+COLOR_WINTER   = '#1E90FF'
+COLOR_MIDNIGHT = '#191970'
+COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
@@ -282,9 +290,34 @@ class MFHistory(QWidget):
             self.w_history_list.clear()
         pass
 
-    def renderHistory(self, hint, items):
+    def setHintLabel(self, stp):
+        _hint = stp.hint
+        if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
+            _month = stp.end.month
+            if _month in range(2,5):
+                _color = COLOR_SPRING
+            elif _month in range(5,8):
+                _color = COLOR_SUMMER
+            elif _month in range(8,11):
+                _color = COLOR_AUTUMN
+            else:
+                _color = COLOR_WINTER
+            self.w_hint_label.setStyleSheet("QLabel { color:%s }"%_color)
+            pass
+        elif stp.mf_type==MF_RNG.DAY:
+            _color = COLOR_WEEKDAY[ stp.end.weekday() ]
+            _hint  = stp.end.strftime('%Y-%m-%d <a style="color:{}">(%a)</a>'.format(_color))
+            pass
+        else:
+            self.w_hint_label.setStyleSheet("QLabel { color:black }")
+            pass
+        self.w_hint_label.setText(_hint)
+        pass
+
+    def renderHistory(self, stp, items):
         self.w_history_list.clear()
-        self.w_hint_label.setText(hint)
+        self.setHintLabel(stp)
+        
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
             w_item_widget = MFHistoryItem(w_item, self.base_path, item)
