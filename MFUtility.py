@@ -158,7 +158,7 @@ class KeysReactor():
         elif key in self.key_list:      # remove a common key
             self.key_list.remove(key)
         self.super.keyReleaseEvent(e)
-        if self.key_list[0]==0x00: #reset, if not specific keys presented
+        if self.key_list[0]==0x00: #reset, if no specific keys presented
             self.key_list = [0x00]
 
         #NOTE: post hook
