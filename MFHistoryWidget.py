@@ -13,14 +13,14 @@ COLOR_SPRING   = '#018749'
 COLOR_SUMMER   = '#CC0000'
 COLOR_AUTUMN   = '#9F2D20'
 COLOR_WINTER   = '#1E90FF'
-COLOR_MIDNIGHT = '#191970'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
+COLOR_DAYTIME  = ['#B0C4DE', '#8BB271', '#F9F9F9', '#191970'] #midnight, morning, afternoon, night
 
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
 MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
 ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
-ITEM_HINT_COLOR  = 'blue'
+ITEM_HINT_COLOR  = 'silver'
 ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
 ITEM_TEXT_COLOR  = '#252526'
 LIST_BACKGROUND  = '#FFFFFF'
@@ -54,14 +54,21 @@ class QLabelWrapper(QLabel):
             # self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         elif self.type=='item_hint':
+            _user,_date,_time = self.text().split()
+            _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 - 1 ] #for 24Hr timing
+            _user_color = 'silver' if _user=='Myself' else 'black'
+            _date_color = 'silver'
+            self.setText('''<a style="color:{user_color}">{user}</a>
+                        <a style="color:{date_color}">@ {date}</a>
+                        <a style="color:{time_color}">{time}</a>
+                        '''.format(
+                            user_color=_user_color, user=_user,
+                            date_color=_date_color, date=_date,
+                            time_color=_time_color, time=_time
+                        ))
             self.setFont(QFont(*ITEM_HINT_FONT))
+            self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
             self.setFixedHeight( QFontMetrics(self.font()).height()+5 )
-            self.setStyleSheet('''
-                QLabel {
-                    background-color: %s;
-                    color: %s;
-                }
-            '''%(ITEM_BACKGROUND, ITEM_HINT_COLOR))
             pass
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
@@ -149,12 +156,12 @@ class MFHistoryItem(QFrame):
     def updateItem(self, item):
         self.item = item
         (_user, _time, _text) = item
-        _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+        _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%m-%d %H:%M') #%Y-%m-%d %H:%M:%S
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
         _text = img_filter.split(_text)
         # parse (hint, images, text)
-        hint   = '%s @ %s'%(_user, _time)
+        hint   = ' '.join([_user, _time])
         text   = eval( ''.join(_text[0:][::2]) ).strip()
         text   = text+'\n' if text else '' #NOTE: for QFontMetrics.boundingRect correction
         text   = text.replace('\n', '<br>')
