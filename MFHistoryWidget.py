@@ -20,7 +20,8 @@ MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
 MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
 ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
-ITEM_HINT_COLOR  = 'silver'
+ITEM_USER_COLOR  = 'silver'
+ITEM_DATE_COLOR  = '#2b1216'
 ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
 ITEM_TEXT_COLOR  = '#252526'
 LIST_BACKGROUND  = '#FFFEF9' #xuebai
@@ -61,13 +62,13 @@ class QLabelWrapper(QLabel):
 
             _user,_date,_time = self.text().split()
             _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 ] #for 24Hr timing
-            _user_color = 'black' if _user=='Myself' else 'silver'
             self.setText('''
-                        <a style="color:{user_color}">{date}</a>
+                        <a style="color:{date_color}">{date}</a>
                         <a style="color:{time_color}">{time}</a>
                         <a style="color:{user_color}">@ {user}</a>
                         '''.format(
-                            user_color=_user_color, user=_user, date=_date,
+                            user_color=ITEM_USER_COLOR, user=_user,
+                            date_color=ITEM_DATE_COLOR, date=_date,
                             time_color=_time_color, time=_time
                         ))
             pass
