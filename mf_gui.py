@@ -169,13 +169,15 @@ class MFTextEdit(QPlainTextEdit):
         if time.time() - self.lastKeyStroke > 1.0:
             # QApplication.setCursorFlashTime(0)
             self.setCursorWidth(0)
-        QTimer.singleShot(500, self.hideCaret)
+        self.setFocus()
+        QTimer.singleShot(250, self.hideCaret)
         pass
 
     def showCaret(self, e=None):
         # QApplication.setCursorFlashTime(1000)
         self.setCursorWidth(1)
-        self.lastKeyStroke = time.time()
+        if not self.keysFn.hasSpecsKeys():
+            self.lastKeyStroke = time.time()
         pass
 
     def getLineCount(self):
@@ -254,8 +256,12 @@ class MFGui(QWidget):
         self.setGraphicsEffect(
             QGraphicsDropShadowEffect(blurRadius=5, xOffset=3, yOffset=3)
         )
-        self.w_editor.setFocus()
+        self.setFocus()
         self.show()
+        pass
+
+    def setFocus(self):
+        self.w_editor.setFocus()
         pass
 
     pass

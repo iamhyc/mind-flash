@@ -168,6 +168,9 @@ class KeysReactor():
             self.release_hook_post(e)
         pass
 
+    def hasSpecsKeys(self):
+        return self.key_list[0] != 0x00
+
     def clear(self):
         self.key_list = [0x00]
         pass
