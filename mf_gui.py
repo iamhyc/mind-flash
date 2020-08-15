@@ -49,9 +49,9 @@ class MFTextEdit(QPlainTextEdit):
         self.setStyleSheet("""
             QPlainTextEdit {
                 border: 1px solid #D7DBDD;
-                background: rgba(255,255,255, 0.86)
+                background: rgba(255,254,249, 0.88)
             }
-        """)
+        """) #background color: #xuebai 
         self.setFixedSize(*MIN_INPUTBOX_SIZE)
         self.setTabChangesFocus(True)
         self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)

@@ -14,8 +14,8 @@ COLOR_SUMMER   = '#CC0000'
 COLOR_AUTUMN   = '#9F2D20'
 COLOR_WINTER   = '#1E90FF'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
-COLOR_DAYTIME  = ['#B0C4DE', '#8BB271', '#F9F9F9', '#191970'] #midnight, morning, afternoon, night
-
+COLOR_DAYTIME  = ['#856d72', '#83cbac', '#f1939c', '#93b5cf'] #00-06, 06-12, 12-18, 18-24
+# color reference: http://zhongguose.com/, https://nipponcolors.com/
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
 MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
@@ -23,8 +23,9 @@ ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
 ITEM_HINT_COLOR  = 'silver'
 ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
 ITEM_TEXT_COLOR  = '#252526'
-LIST_BACKGROUND  = '#FFFFFF'
-ITEM_BACKGROUND  = '#ECF0F1'
+LIST_BACKGROUND  = '#FFFEF9' #xuebai
+ITEM_BACKGROUND  = '#EEF7F2'
+ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
@@ -55,20 +56,18 @@ class QLabelWrapper(QLabel):
             pass
         elif self.type=='item_hint':
             _user,_date,_time = self.text().split()
-            _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 - 1 ] #for 24Hr timing
-            _user_color = 'silver' if _user=='Myself' else 'black'
-            _date_color = 'silver'
-            self.setText('''<a style="color:{user_color}">{user}</a>
-                        <a style="color:{date_color}">@ {date}</a>
+            _user = _user.ljust(8).replace(' ', '&nbsp;')
+            _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 ] #for 24Hr timing
+            _user_color = 'black' if _user=='Myself' else 'silver'
+            self.setText('''<a style="color:{user_color}">{user}@ {date}</a>
                         <a style="color:{time_color}">{time}</a>
                         '''.format(
-                            user_color=_user_color, user=_user,
-                            date_color=_date_color, date=_date,
+                            user_color=_user_color, user=_user, date=_date,
                             time_color=_time_color, time=_time
                         ))
             self.setFont(QFont(*ITEM_HINT_FONT))
             self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
-            self.setFixedHeight( QFontMetrics(self.font()).height()+5 )
+            self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
             pass
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
@@ -123,15 +122,15 @@ class MFHistoryItem(QFrame):
         self.setFixedWidth(MIN_ITEM_SIZE[0])
         self.setStyleSheet('''
             QFrame{
-                background-color: %r;
-                border: 1px solid black;
-                border-radius: %rpx;
+                background-color: %s;
+                border: 1px solid %s;
+                border-radius: %dpx;
                 margin: 5px;
             }
             QLabel{
                 border: 0px;
             }
-        '''%(ITEM_BACKGROUND, ITEM_RADIUS))
+        '''%(ITEM_BACKGROUND, ITEM_BORDERCOLOR, ITEM_RADIUS))
         pass
 
     def getSizeHint(self, label_ref, pos):
@@ -286,9 +285,9 @@ class MFHistory(QWidget):
             QWidget {
                 border: 1px solid #5D6D7E;
                 border-bottom: 0px solid white;
-                background-color: white;
+                background-color: %s;
             }
-        ''')
+        '''%(LIST_BACKGROUND))
         pass
 
     def hideEvent(self, e):
