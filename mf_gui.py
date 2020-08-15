@@ -240,6 +240,9 @@ class MFGui(QWidget):
         self.grid.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(self.grid)
         self.resize(self.sizeHint())
+        # register global shortcuts
+        self.keysFn = KeysReactor(self)
+        self.keysFn.register([Qt.Key_Control, Qt.Key_W], lambda:self.close())
         # move window to desktop center
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
