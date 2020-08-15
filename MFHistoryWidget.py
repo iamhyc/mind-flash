@@ -75,6 +75,7 @@ class QLabelWrapper(QLabel):
             self.setFont(QFont(*ITEM_TEXT_FONT))
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
             self.setTextFormat(Qt.RichText)
+            self.setTextInteractionFlags(Qt.TextSelectableByMouse)
             self.setStyleSheet('''
                 QLabel {
                     background-color: %r;
@@ -260,6 +261,7 @@ class MFHistoryList(QListWidget):
         #TODO: remove original record
         self.removeItemWidget(item)
         self.takeItem(self.row(item))
+        self.parent.setFocus()
         pass
     pass
 
@@ -336,4 +338,7 @@ class MFHistory(QWidget):
             pass
         pass
     
+    def setFocus(self):
+        self.parent.setFocus()
+
     pass

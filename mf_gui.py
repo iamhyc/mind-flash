@@ -169,7 +169,6 @@ class MFTextEdit(QPlainTextEdit):
         if time.time() - self.lastKeyStroke > 1.0:
             # QApplication.setCursorFlashTime(0)
             self.setCursorWidth(0)
-        self.setFocus()
         QTimer.singleShot(250, self.hideCaret)
         pass
 

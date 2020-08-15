@@ -189,6 +189,7 @@ class MFTodoWidget(QListWidget):
                 self.saveTodoList()
                 # if self.count()<=1:
                 #     QTimer.singleShot(300, self.safe_close) #deferred exit
+                self.parent.setFocus()
             pass
         return super().mouseDoubleClickEvent(e)
 
@@ -198,6 +199,7 @@ class MFTodoWidget(QListWidget):
             if _item:
                 all_done = self.toggleTodoItem(_item)
                 self.saveTodoList(all_done)
+                self.parent.setFocus()
             pass
         return super().mousePressEvent(e)
     
