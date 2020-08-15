@@ -55,19 +55,21 @@ class QLabelWrapper(QLabel):
             # self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         elif self.type=='item_hint':
+            self.setFont(QFont(*ITEM_HINT_FONT))
+            self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
+            self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
+
             _user,_date,_time = self.text().split()
-            _user = _user.ljust(8).replace(' ', '&nbsp;')
             _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 ] #for 24Hr timing
             _user_color = 'black' if _user=='Myself' else 'silver'
-            self.setText('''<a style="color:{user_color}">{user}@ {date}</a>
+            self.setText('''
+                        <a style="color:{user_color}">{date}</a>
                         <a style="color:{time_color}">{time}</a>
+                        <a style="color:{user_color}">@ {user}</a>
                         '''.format(
                             user_color=_user_color, user=_user, date=_date,
                             time_color=_time_color, time=_time
                         ))
-            self.setFont(QFont(*ITEM_HINT_FONT))
-            self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
-            self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
             pass
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
