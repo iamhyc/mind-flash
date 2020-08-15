@@ -243,6 +243,7 @@ class MFGui(QWidget):
         # register global shortcuts
         self.keysFn = KeysReactor(self)
         self.keysFn.register([Qt.Key_Control, Qt.Key_W], lambda:self.close())
+        self.keysFn.register([Qt.Key_Escape],            lambda:self.close())
         # move window to desktop center
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
