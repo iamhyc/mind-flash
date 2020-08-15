@@ -51,11 +51,17 @@ class MFEntity:
     def mf_fetch(self, *args, **kargs):
         mf_type, mf_anchor, mf_filter = args
         mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
+
         if 'stp' in kargs:
             stp = kargs['stp']
             stp.update_type(mf_type, mf_anchor)
         else:
             stp = TextStamp(mf_type, mf_anchor)
+
+        if 'locate_flag' in kargs and kargs['locate_flag']:
+            locate_flag = True
+        else:
+            locate_flag = False
 
         items = list()
         while stp.next():
@@ -63,10 +69,23 @@ class MFEntity:
                 userHint = 'Myself' if userDir.stem==MF_HOSTNAME else userDir.stem
                 with workSpace(self.base_path, userDir, stp.weekno) as wrk:
                     with MFRecord(stp.dayno, userHint) as rec:
-                        items += rec.readAll()
+                        these_items = rec.readAll()
+                        if locate_flag:
+                            # uri: <userDir>/<weekno>/<stp.dayno>:<line_number>
+                            for _idx,_item in enumerate(these_items):
+                                _uri = '{userDir}/{weekno}/{dayno}:{index}'.format(
+                                        userDir=userDir, weekno=stp.weekno,dayno=stp.dayno,index=3*_idx+1)
+                                items.append( (_uri, _item) )
+                            pass
+                        else:
+                            items += these_items
                     pass
                 pass
-            items.sort(key=lambda x:x[1])
+            
+            if locate_flag:
+                items.sort(key=lambda x:x[1][1])
+            else:
+                items.sort(key=lambda x:x[1])
             pass
         return stp, items
 

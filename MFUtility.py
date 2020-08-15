@@ -111,7 +111,7 @@ class KeysReactor():
 
         if parent:
             self.parent = parent
-            self.super = super(type(parent), parent)
+            self.super  = super(type(parent), parent)
             parent.keyPressEvent   = lambda e: self.pressed(e.key(), e)
             parent.keyReleaseEvent = lambda e: self.released(e.key(), e)
         pass

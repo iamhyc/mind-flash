@@ -114,7 +114,9 @@ class MFHistoryItem(QFrame):
         self.w_item = w_item
         self.base_path = base_path
         self.styleHelper()
-        self.updateItem(item)
+        self.uri, self.item = item[0], item[1]
+        self.double_clicked = 0
+        self.updateItem()
         pass
 
     def styleHelper(self):
@@ -156,9 +158,8 @@ class MFHistoryItem(QFrame):
         self.size_height += size_hint.height()
         return ref
 
-    def updateItem(self, item):
-        self.item = item
-        (_user, _time, _text) = item
+    def updateItem(self):
+        (_user, _time, _text) = self.item
         _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%m-%d %H:%M') #%Y-%m-%d %H:%M:%S
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
@@ -256,13 +257,20 @@ class MFHistoryList(QListWidget):
         pass
 
     def itemDoubleClickEvent(self, item):
-        raw_item = self.itemWidget(item).item
-        self.parent.parent.w_editor.insertPlainText( eval(raw_item[2]) )
-        self.parent.parent.w_editor.setFocus()
-        #TODO: remove original record
-        self.removeItemWidget(item)
-        self.takeItem(self.row(item))
-        self.parent.setFocus()
+        item_widget = self.itemWidget(item)
+        raw_item = item_widget.item
+
+        if item_widget.double_clicked==0:
+            item_widget.double_clicked = 1
+            self.parent.parent.w_editor.insertPlainText( eval(raw_item[2])+'\n' )
+            self.parent.parent.w_editor.setFocus()
+            pass
+        else:
+            #TODO: remove original record via item_widget.uri
+            self.removeItemWidget(item)
+            self.takeItem(self.row(item))
+            self.parent.setFocus()
+            pass
         pass
     pass
 
