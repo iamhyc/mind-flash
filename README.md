@@ -36,9 +36,10 @@ The latest *multi-platform* packages are available on [release page](https://git
 | :-------------: | :--------------------------------------: |
 | <kbd>Super</kbd> + <kbd>N</kbd> | Quick Launch |
 |    <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd>    | Next Line |
-|    <kbd>Return</kbd>    |            Save&Exit    |
-|                 |                                          |
-|  Double <kbd>click</kbd> OR <kbd>Alt</kbd>+<kbd>H</kbd>  |     Popup History |
+|    <kbd>Return</kbd>    |          Save & Exit    |
+| <kbd>Escape</kbd> OR <kbd>Ctrl</kbd>+<kbd>W</kbd> | (global) Close Window |
+| | |
+|  Double <kbd>click</kbd> OR <kbd>Alt</kbd>+<kbd>H</kbd>  |    Pop-up History |
 |  <kbd>Alt</kbd> + <kbd>v</kbd>  | History - Week |
 | <kbd>Alt</kbd> + <kbd>vv</kbd> | History - Month |
 | <kbd>Alt</kbd> + <kbd>vvv</kbd> | History - Year |
