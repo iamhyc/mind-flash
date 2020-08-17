@@ -76,7 +76,7 @@ class QLabelWrapper(QLabel):
             self.setFont(QFont(*ITEM_TEXT_FONT))
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
             self.setTextFormat(Qt.RichText)
-            self.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            self.setTextInteractionFlags(Qt.TextBrowserInteraction)
             self.setStyleSheet('''
                 QLabel {
                     background-color: %r;
