@@ -73,8 +73,8 @@ class MFEntity:
                         if locate_flag:
                             # uri: <userDir>/<weekno>/<stp.dayno>:<line_number>
                             for _idx,_item in enumerate(these_items):
-                                _uri = '{userDir}/{weekno}/{dayno}:{index}'.format(
-                                        userDir=userDir, weekno=stp.weekno,dayno=stp.dayno,index=3*_idx)
+                                _uri = '{path}:{index}'.format(
+                                        path=str(Path(userDir, stp.weekno, stp.dayno)), index=3*_idx)
                                 items.append( (_uri, _item) )
                             pass
                         else:
