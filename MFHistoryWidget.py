@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from MFUtility import MF_RNG
+from MFPreviewWidget import MFImagePreviewer
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
@@ -93,7 +94,7 @@ class QLabelWrapper(QLabel):
         pass
 
     def mousePressEvent(self, ev):
-        if ev.buttons() & Qt.RightButton and self.type=='img_label':
+        if self.type=='img_label' and ev.buttons() & Qt.RightButton:
             _clipboard = QApplication.clipboard()
             if self.alt:
                 _clipboard.setPixmap(self.alt)
@@ -103,6 +104,10 @@ class QLabelWrapper(QLabel):
                 os.system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
             except Exception:
                 pass
+            pass
+        elif self.type=='img_label' and ev.buttons() & Qt.LeftButton:
+            _pixmap = self.alt if self.alt else self.pixmap()
+            w_preview = MFImagePreviewer(self, _pixmap)
             pass
         return super().mousePressEvent(ev)
 
