@@ -125,7 +125,7 @@ class MFHistoryItem(QFrame):
         pass
 
     def styleHelper(self):
-        self.size_height = 0
+        self.size_height = QSize(0, 0) #two column, (image_height, text_height)
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.layout.setSpacing(0)
@@ -144,23 +144,21 @@ class MFHistoryItem(QFrame):
         '''%(ITEM_BACKGROUND, ITEM_BORDERCOLOR, ITEM_RADIUS))
         pass
 
-    def getSizeHint(self, label_ref, pos):
+    def getHeightHint(self, label_ref, pos):
         _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
         _text = _doc.toPlainText()
-        _size = QSize(590,0)
-        if _text: #FIXME: sizeHint with 'mixed' layout
+        if _text:
             fm    = QFontMetrics(label_ref.font())
             fm_rect = QRect(0,0,590,100)
             _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
-            _size  += QSize(0,_height)
+            size   = QSize(0, _height)
         elif label_ref.pixmap():
-            _size  += QSize(0, MIN_ITEM_SIZE[1])
-        return _size
+            size   = QSize(MIN_ITEM_SIZE[1], 0)
+        return size
 
     def wrapWidget(self, ref, pos):
         self.layout.addWidget(ref, *pos)
-        size_hint = self.getSizeHint(ref, pos)
-        self.size_height += size_hint.height()
+        self.size_height += self.getHeightHint(ref, pos)
         return ref
 
     def updateItem(self):
@@ -207,7 +205,8 @@ class MFHistoryItem(QFrame):
         pass
 
     def sizeHint(self):
-        return QSize(-1, self.size_height)
+        _height = max( self.size_height.height(), self.size_height.width() )
+        return QSize(-1, _height)
     pass
 
 class MFHistoryList(QListWidget):
