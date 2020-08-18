@@ -169,21 +169,21 @@ class MFHistoryItem(QFrame):
         _text = img_filter.split(_text)
         # parse (hint, images, text)
         hint   = ' '.join([_user, _time])
-        text   = eval( ''.join(_text[0:][::2]) ).strip()
-        text   = text+'\n' if text else '' #NOTE: for QFontMetrics.boundingRect correction
-        text   = text.replace('\n', '<br>')
-        images = _text[1:][::2]
+        self.item_images = _text[1:][::2]
+        _text  = eval( ''.join(_text[0:][::2]) ).strip()
+        _text  = _text+'\n' if _text else '' #NOTE: for QFontMetrics.boundingRect correction
+        self.item_text   = _text.replace('\n', '<br>')
         # create widgets
         hint_label = QLabelWrapper('item_hint', hint)
-        if text:
-            text_label = QLabelWrapper('item_text', text)
-        image_pixmaps = [QPixmap( str(Path(self.base_path, image)) ) for image in images]
+        if self.item_text:
+            text_label = QLabelWrapper('item_text', self.item_text)
+        image_pixmaps = [QPixmap( str(Path(self.base_path, image)) ) for image in self.item_images]
         # adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
-        if not images: #text only
+        if not self.item_images: #text only
             self.wrapWidget(text_label, [1,0, 1,3])
             pass
-        elif not text: #images only
+        elif not self.item_text: #images only
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(image_pixmaps):
                 cropped_pixmap = pixmap.copy( CropRect(pixmap) )
@@ -261,19 +261,31 @@ class MFHistoryList(QListWidget):
         pass
 
     def itemDoubleClickEvent(self, item):
-        item_widget = self.itemWidget(item)
-        raw_item = item_widget.item
+        w_item = self.itemWidget(item)
+        raw_item, uri = w_item.item, w_item.uri
 
-        if item_widget.double_clicked==0:
-            item_widget.double_clicked = 1
+        if w_item.double_clicked==0:
+            w_item.double_clicked = 1
             self.parent.parent.w_editor.insertPlainText( eval(raw_item[2])+'\n' )
             self.parent.parent.w_editor.setFocus()
             pass
         else:
-            #TODO: remove original record via item_widget.uri
             self.removeItemWidget(item)
             self.takeItem(self.row(item))
             self.parent.setFocus()
+            #NOTE: remove original record
+            for image in w_item.item_images:
+                try:
+                    Path(w_item.base_path, image).unlink() #unlink(True) in Python3.8+
+                except:
+                    pass
+            _uri, _idx = w_item.uri.rsplit(':', 1)
+            _idx = int(_idx)
+            with open(_uri, 'r+') as f:
+                _tmp = f.readlines()
+                _tmp = _tmp[:_idx] + _tmp[_idx+3:]
+                f.seek(0); f.writelines(_tmp); f.truncate()
+                pass
             pass
         pass
     pass
