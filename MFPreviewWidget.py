@@ -18,7 +18,12 @@ class MFImagePreviewer(QWidget):
     def __init__(self, parent=None, pixmap=None):
         super().__init__(parent, Qt.Dialog)
         self.parent = parent
+        self.min_width = 100#px
+        self.max_width = pixmap.width() * 3
+        _width = min(pixmap.width(), QDesktopWidget().availableGeometry().width())
+        pixmap = pixmap.scaledToWidth(_width)
         self.pixmap = pixmap
+        self.now_width = pixmap.width()
         #
         self.grid = QGridLayout()
         self.grid.setSpacing(0)
@@ -72,6 +77,14 @@ class MFImagePreviewer(QWidget):
             pass
         pass
     
+    def wheelEvent(self, e):
+        num_scroll = int( e.angleDelta().y() / 8 / 15 )
+        self.now_width += 50*num_scroll
+        self.now_width = max(min(self.now_width, self.max_width), self.min_width)
+        _pixmap = self.pixmap.scaledToWidth(self.now_width)
+        self.label.setPixmap(_pixmap)
+        pass
+
     def focusOutEvent(self, e):
         self.close()
         pass
