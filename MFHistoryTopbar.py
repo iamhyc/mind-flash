@@ -2,8 +2,8 @@
 from pathlib import Path
 from MFUtility import MF_RNG
 from PyQt5.QtCore import (Qt, QSize)
-from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap)
-from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QGridLayout)
+from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
+from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout)
 
 COLOR_SPRING   = '#018749'
 COLOR_SUMMER   = '#CC0000'
@@ -11,9 +11,9 @@ COLOR_AUTUMN   = '#9F2D20'
 COLOR_WINTER   = '#1E90FF'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 
-MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
-MIN_HISTORY_SIZE = (600, 450)
-LIST_BACKGROUND  = '#FFFEF9' #xuebai
+MF_HINT_FONT      = ('Noto Sans CJK SC',10,QFont.Bold)
+MIN_TOPBAR_SIZE   = (600, 40)
+TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 
 class HintLabel(QLabel):
     def __init__(self, text=''):
@@ -24,15 +24,13 @@ class HintLabel(QLabel):
     def styleHelper(self):
         self.setWordWrap(True)
         self.setFont(QFont(*MF_HINT_FONT))
-        self.setFixedWidth(MIN_HISTORY_SIZE[0])
-        self.setFont(QFont(*MF_HINT_FONT))
-        self.setFixedWidth(MIN_HISTORY_SIZE[0])
+        self.setFixedSize(*MIN_TOPBAR_SIZE)
         self.setStyleSheet('''
             QLabel {
                 background-color : %s;
             }
-        '''%(LIST_BACKGROUND))
-        # self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        '''%(TOPBAR_BACKGROUND))
+        # self.setAlignment(Qt.AlignHCenter | Qt.AlignCenter)
         pass
 
     def setDateHint(self, stp):
@@ -71,6 +69,23 @@ class ToolBar(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.styleHelper()
+        pass
+
+    def styleHelper(self):
+        layout = QBoxLayout(QBoxLayout.LeftToRight)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0,0,0,0)
+        layout.addWidget( SearchIcon(self), 0, Qt.AlignJustify )
+        layout.addSpacing(600-32-32)
+        layout.addWidget( ExportIcon(self), 0, Qt.AlignJustify )
+        self.setLayout(layout)
+        self.setFixedSize(*MIN_TOPBAR_SIZE)
+        self.setStyleSheet('''
+            QWidget {
+                background-color : %s;
+            }
+        '''%('TOPBAR_BACKGROUND'))
         pass
     pass
 
@@ -90,4 +105,22 @@ class TopbarManager:
         self.parent.adjustSize()
         pass
 
+    pass
+
+class SearchIcon(QLabel):
+    def __init__(self, parent):
+        super().__init__('')
+        self.parent = parent
+        search_icon = QIcon('./res/svg/search.svg').pixmap(QSize(32,32))
+        self.setPixmap(search_icon)
+        pass
+    pass
+
+class ExportIcon(QLabel):
+    def __init__(self, parent):
+        super().__init__('')
+        self.parent = parent
+        search_icon = QIcon('./res/svg/open-files.svg').pixmap(QSize(32,32))
+        self.setPixmap(search_icon)
+        pass
     pass
