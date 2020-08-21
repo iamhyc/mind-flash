@@ -21,7 +21,7 @@ class MFImagePreviewer(QWidget):
         self.min_width = 100#px
         self.max_width = pixmap.width() * 3
         _width = min(pixmap.width(), QDesktopWidget().availableGeometry().width())
-        pixmap = pixmap.scaledToWidth(_width)
+        pixmap = pixmap.scaledToWidth(_width, Qt.SmoothTransformation)
         self.pixmap = pixmap
         self.now_width = pixmap.width()
         #
