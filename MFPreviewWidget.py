@@ -81,7 +81,7 @@ class MFImagePreviewer(QWidget):
         num_scroll = int( e.angleDelta().y() / 8 / 15 )
         self.now_width += 50*num_scroll
         self.now_width = max(min(self.now_width, self.max_width), self.min_width)
-        _pixmap = self.pixmap.scaledToWidth(self.now_width)
+        _pixmap = self.pixmap.scaledToWidth(self.now_width, Qt.SmoothTransformation)
         self.label.setPixmap(_pixmap)
         pass
 
