@@ -6,21 +6,16 @@ from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from MFUtility import MF_RNG, PixmapManager
 from MFPreviewWidget import MFImagePreviewer
+from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
 
-COLOR_SPRING   = '#018749'
-COLOR_SUMMER   = '#CC0000'
-COLOR_AUTUMN   = '#9F2D20'
-COLOR_WINTER   = '#1E90FF'
-COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 COLOR_DAYTIME  = ['#856d72', '#83cbac', '#f1939c', '#93b5cf'] #00-06, 06-12, 12-18, 18-24
 # color reference: http://zhongguose.com/, https://nipponcolors.com/
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
-MF_HINT_FONT     = ('Noto Sans CJK SC',10,QFont.Bold)
 ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
 ITEM_USER_COLOR  = 'silver'
 ITEM_DATE_COLOR  = '#2b1216'
@@ -47,17 +42,7 @@ class QLabelWrapper(QLabel):
     
     def styleHelper(self):
         self.setWordWrap(True)
-        if self.type=='mf_hint':
-            self.setFont(QFont(*MF_HINT_FONT))
-            self.setFixedWidth(MIN_HISTORY_SIZE[0])
-            self.setStyleSheet('''
-                QLabel {
-                    background-color : %s;
-                }
-            '''%(LIST_BACKGROUND))
-            # self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            pass
-        elif self.type=='item_hint':
+        if self.type=='item_hint':
             self.setFont(QFont(*ITEM_HINT_FONT))
             self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
             self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
@@ -300,15 +285,15 @@ class MFHistory(QWidget):
         pass
     
     def styleHelper(self):
-        self.w_hint_label   = QLabelWrapper('mf_hint')
-        self.w_history_list = MFHistoryList(self, self.base_path)
         # set main window layout as grid
-        grid = QGridLayout()
-        grid.setSpacing(0)
-        grid.setContentsMargins(0,0,0,0)
-        grid.addWidget(self.w_hint_label,   0, 0)
-        grid.addWidget(self.w_history_list, 1, 0)
-        self.setLayout(grid)
+        self.grid = QGridLayout()
+        self.grid.setSpacing(0)
+        self.grid.setContentsMargins(0,0,0,0)
+        # add widget into main layout
+        self.topbar = TopbarManager(self) #placed at (0,0)
+        self.w_history_list = MFHistoryList(self, self.base_path)
+        self.grid.addWidget(self.w_history_list, 1, 0)
+        self.setLayout(self.grid)
         self.setFixedSize(*MIN_HISTORY_SIZE)
         self.setVisible(False)
         self.setStyleSheet('''
@@ -326,33 +311,9 @@ class MFHistory(QWidget):
             self.w_history_list.clear()
         pass
 
-    def setHintLabel(self, stp):
-        _hint = stp.hint
-        if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
-            _month = stp.end.month
-            if _month in range(2,5):
-                _color = COLOR_SPRING
-            elif _month in range(5,8):
-                _color = COLOR_SUMMER
-            elif _month in range(8,11):
-                _color = COLOR_AUTUMN
-            else:
-                _color = COLOR_WINTER
-            self.w_hint_label.setStyleSheet("QLabel { color:%s }"%_color)
-            pass
-        elif stp.mf_type==MF_RNG.DAY:
-            _color = COLOR_WEEKDAY[ stp.end.weekday() ]
-            _hint  = stp.end.strftime('%Y-%m-%d <a style="color:{}">(%a)</a>'.format(_color))
-            pass
-        else:
-            self.w_hint_label.setStyleSheet("QLabel { color:black }")
-            pass
-        self.w_hint_label.setText(_hint)
-        pass
-
     def renderHistory(self, stp, items):
         self.w_history_list.clear()
-        self.setHintLabel(stp)
+        self.topbar.hint_label.setDateHint(stp)
         
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
