@@ -4,7 +4,9 @@ This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
 import sys, signal, socket, time
-from os import path, getcwd, chdir, remove as os_remove
+import re
+from os import chdir
+from pathlib import Path
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
 from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
@@ -13,13 +15,15 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import MF_RNG, KeysReactor
+from MFUtility import MF_RNG, KeysReactor, PixmapManager
 
 MF_NAME     = 'Mind Flash'
-MF_DIR      = path.expanduser('~/.mf/')
+MF_DIR      = Path('~/.mf/').expanduser()
 INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2)
+
+pxm = PixmapManager(MF_DIR)
 
 class MFTextEdit(QPlainTextEdit):
     def __init__(self, parent, w_history, w_todo):
@@ -28,7 +32,6 @@ class MFTextEdit(QPlainTextEdit):
         self.w_history = w_history
         self.w_todo = w_todo
         self.clipboard = QApplication.clipboard()
-        self.image_cache = list()
 
         self.stp = None
         self.time_type, self.time_anchor = 0, 0
@@ -77,8 +80,7 @@ class MFTextEdit(QPlainTextEdit):
         #NOTE: Return; flash recording
         def mf_flash_binding():
             mf_text = self.toPlainText().encode('utf-8').decode('utf-8')
-            for image in self.image_cache: #clear image_cache when try recording
-                os_remove(path.join(MF_DIR,image)) if image not in mf_text else None
+            self.saveImageCache()
             if mf_text:
                 mf_exec.mf_record( repr(mf_text.strip()) )
             self.parent.close()
@@ -92,10 +94,10 @@ class MFTextEdit(QPlainTextEdit):
             else:
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
-                    imagePath = mf_exec.mf_save_pixmap(pixmap)
-                    self.image_cache.append(imagePath)
-                    _text = "<-file://{}->".format(imagePath)
+                    fake_path = pxm.savePixmap(pixmap)
+                    _text = "<-file://{}->".format(fake_path)
                     self.insertPlainText(_text)
+                pass
             pass
         self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
 
@@ -172,6 +174,14 @@ class MFTextEdit(QPlainTextEdit):
         self.setFocus() # for convenience
         pass
 
+    def saveImageCache(self):
+        img_filter = re.compile('<-file://(.*?)->')
+        _text = img_filter.split(self.toPlainText())
+        image_path = _text[1:][::2]
+        for _path in image_path:
+            pxm.save(_path)
+        pass
+
     def hideCaret(self):
         if time.time() - self.lastKeyStroke > 1.0:
             # QApplication.setCursorFlashTime(0)
@@ -179,10 +189,10 @@ class MFTextEdit(QPlainTextEdit):
         QTimer.singleShot(250, self.hideCaret)
         pass
 
-    def showCaret(self, e=None):
+    def showCaret(self, e=None, force=False):
         # QApplication.setCursorFlashTime(1000)
         self.setCursorWidth(1)
-        if not self.keysFn.hasSpecsKeys():
+        if force or not self.keysFn.hasSpecsKeys():
             self.lastKeyStroke = time.time()
         pass
 
@@ -274,7 +284,7 @@ class MFGui(QWidget):
         self.keysFn.register([Qt.Key_Control, Qt.Key_W], lambda:self.close())
         self.keysFn.register([Qt.Key_Escape],            lambda:self.close())
         ### Ctrl+L ###
-        self.keysFn.register([Qt.Key_Control, Qt.Key_L], lambda:self.w_editor.setFocus())
+        self.keysFn.register([Qt.Key_Control, Qt.Key_L], lambda:self.setFocus())
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
@@ -298,6 +308,7 @@ class MFGui(QWidget):
         pass
 
     def setFocus(self):
+        self.w_editor.showCaret(force=True)
         self.w_editor.setFocus()
         pass
 
@@ -314,7 +325,7 @@ if __name__ == '__main__':
     # ignore interrupt signal
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     # change workspace root
-    chdir(path.dirname(path.realpath(__file__)))
+    chdir( Path(__file__).resolve().parent )
     # init MF Entity
     mf_exec = MFEntity(MF_DIR)
     # init MF GUI

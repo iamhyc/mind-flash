@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import locale
 import sys, bisect, platform
+import tempfile, shutil
 from os import chdir
 from pathlib import Path
 from enum import Enum
@@ -10,7 +11,6 @@ from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
 
 MF_HOSTNAME= platform.node().split('-')[0]
-MF_HISTORY = Path( '~/.mf/{}'.format(MF_HOSTNAME) ).expanduser()
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
 
 class MF_RNG(Enum):
@@ -298,3 +298,42 @@ class MFRecord:
         return list( zip(user_hint, self.time_line, self.text_line) )
 
     pass
+
+class PixmapManager:
+    def __init__(self, base_path):
+        self.temp = tempfile.gettempdir()
+        self.home = base_path
+        pass
+
+    def savePixmap(self, pixmap):
+        _stp  = TextStamp(now=1)
+        _file = 'pasted_%s'%_stp.unixtime
+        _path = str( Path(self.temp, _file) )
+        pixmap.save(_path, 'PNG')
+        _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'img', _file)
+        return _fake_path
+
+    def save(self, real_path):
+        temp_path = Path(self.temp, Path(real_path).name)
+        home_path = Path(self.home, real_path)
+        if temp_path.is_file():
+            Path(home_path.parent).mkdir(mode=0o755, exist_ok=True)
+            shutil.copy2( str(temp_path), str(home_path) )
+            return True
+        else:
+            return False
+        pass
+    
+    def remove(self, real_path):
+        # temp_path = Path(self.temp, Path(real_path).name)
+        # home_path = Path(self.home, real_path)
+        # try:
+        #     shutil.move( str(home_path), str(temp_path) )
+        #     return True
+        # except:
+        #     return False
+        #FIXME: need to keep track of reference, so not delete for now
+        return False
+
+    pass
+    

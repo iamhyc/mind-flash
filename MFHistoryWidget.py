@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import re, os
+import re
+from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import MF_RNG
+from MFUtility import MF_RNG, PixmapManager
 from MFPreviewWidget import MFImagePreviewer
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
@@ -101,7 +102,7 @@ class QLabelWrapper(QLabel):
             else:
                 _clipboard.setPixmap(self.pixmap())
             try:
-                os.system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
+                os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
             except Exception:
                 pass
             pass
@@ -210,9 +211,10 @@ class MFHistoryItem(QFrame):
     pass
 
 class MFHistoryList(QListWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, base_path):
         super().__init__(parent)
         self.parent = parent
+        self.pxm    = PixmapManager(base_path)
         self.itemDoubleClicked.connect(self.itemDoubleClickEvent)
         self.styleHelper()
         pass
@@ -273,12 +275,11 @@ class MFHistoryList(QListWidget):
             self.removeItemWidget(item)
             self.takeItem(self.row(item))
             self.parent.setFocus()
-            #NOTE: remove original record
+            # remove the images temporarily
             for image in w_item.item_images:
-                try:
-                    Path(w_item.base_path, image).unlink() #unlink(True) in Python3.8+
-                except:
-                    pass
+                self.pxm.remove(image)
+                pass
+            # remove the record
             _uri, _idx = w_item.uri.rsplit(':', 1)
             _idx = int(_idx)
             with open(_uri, 'r+') as f:
@@ -300,7 +301,7 @@ class MFHistory(QWidget):
     
     def styleHelper(self):
         self.w_hint_label   = QLabelWrapper('mf_hint')
-        self.w_history_list = MFHistoryList(self)
+        self.w_history_list = MFHistoryList(self, self.base_path)
         # set main window layout as grid
         grid = QGridLayout()
         grid.setSpacing(0)
