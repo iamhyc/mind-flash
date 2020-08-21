@@ -101,7 +101,8 @@ class KeysReactor():
     }
     keySpecsKeys = keySpecs.keys()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, name='Default'):
+        self.name = name
         self.key_list = [0x00]
         self.reactor  = dict()
         self.press_hook_pre    = None
@@ -115,6 +116,14 @@ class KeysReactor():
             parent.keyPressEvent   = lambda e: self.pressed(e.key(), e)
             parent.keyReleaseEvent = lambda e: self.released(e.key(), e)
         pass
+    
+    def __str__(self):
+        ret = []
+        ret.append('Ctrl')  if self.key_list[0]&0x01 else None
+        ret.append('Alt')   if self.key_list[0]&0x02 else None
+        ret.append('Shift') if self.key_list[0]&0x04 else None
+        ret += [str(x) for x in self.key_list[1:]]
+        return '[%s] %s'%(self.name, '+'.join(ret))
     
     def register(self, keys, hookfn):
         key_hash = [0x00]

@@ -39,7 +39,7 @@ class MFTextEdit(QPlainTextEdit):
         self.styleHelper()
 
         self.textChanged.connect(self.textChangedEvent)
-        self.keysFn = KeysReactor(self)
+        self.keysFn = KeysReactor(self, 'MFTextEdit')
         self.keysFn.setKeyPressHook(self.showCaret)
         self.registerKeys()
         pass
@@ -114,17 +114,17 @@ class MFTextEdit(QPlainTextEdit):
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
-            lambda:self.updateHistory(self.time_type+1, 0, True) if self.time_type+1<4 else self.updateHistory(0, 0)
+            lambda:self.updateHistory(+1, None, True)
         )
         ### Alt+J ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_J], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor+1)
+            lambda:self.updateHistory(0, +1)
         )
         ### Alt+K ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_K], 
-            lambda:self.updateHistory(self.time_type, self.time_anchor-1)
+            lambda:self.updateHistory(0, -1)
         )
         ### Alt+H ###
         self.keysFn.register(
@@ -133,9 +133,16 @@ class MFTextEdit(QPlainTextEdit):
         )
         pass
 
-    def updateHistory(self, mf_type, mf_anchor, relative=False):
+    def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.w_history.isVisible(): return
+        #
+        mf_type   = (self.time_type+type_delta)     if type_delta else 0
+        mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta else 0
+        if mf_type >= 4: #reset to today
+            mf_type, mf_anchor = 0, 0
+            relative = False
         if mf_anchor > 0: return #no future history
+        #
         if relative: #relative to previous stp
             self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
             self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
@@ -241,10 +248,8 @@ class MFGui(QWidget):
         self.setLayout(self.grid)
         self.resize(self.sizeHint())
         # register global shortcuts
-        self.keysFn = KeysReactor(self)
-        self.keysFn.register([Qt.Key_Control, Qt.Key_W], lambda:self.close())
-        self.keysFn.register([Qt.Key_Escape],            lambda:self.close())
-        self.keysFn.register([Qt.Key_Control, Qt.Key_L], lambda:self.w_editor.setFocus())
+        self.keysFn = KeysReactor(self, 'MFGui')
+        self.registerGlobalKeys()
         # move window to desktop center
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -262,6 +267,34 @@ class MFGui(QWidget):
         )
         self.setFocus()
         self.show()
+        pass
+
+    def registerGlobalKeys(self):
+        ### Ctrl+W / Escape ###
+        self.keysFn.register([Qt.Key_Control, Qt.Key_W], lambda:self.close())
+        self.keysFn.register([Qt.Key_Escape],            lambda:self.close())
+        ### Ctrl+L ###
+        self.keysFn.register([Qt.Key_Control, Qt.Key_L], lambda:self.w_editor.setFocus())
+        ### Alt+V ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_V],
+            lambda:self.w_editor.updateHistory(+1, None, True)
+        )
+        ### Alt+J ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_J], 
+            lambda:self.w_editor.updateHistory(0, +1)
+        )
+        ### Alt+K ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_K], 
+            lambda:self.w_editor.updateHistory(0, -1)
+        )
+        ### Alt+H ###
+        self.keysFn.register(
+            [Qt.Key_Alt, Qt.Key_H], 
+            lambda:self.w_editor.toggleHistoryWidget()
+        )
         pass
 
     def setFocus(self):
