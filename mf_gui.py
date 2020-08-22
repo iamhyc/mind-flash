@@ -138,8 +138,8 @@ class MFTextEdit(QPlainTextEdit):
     def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.w_history.isVisible(): return
         #
-        mf_type   = (self.time_type+type_delta)     if type_delta else 0
-        mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta else 0
+        mf_type   = (self.time_type+type_delta)     if type_delta is not None else 0
+        mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta is not None else 0
         if mf_type >= 4: #reset to today
             mf_type, mf_anchor = 0, 0
             relative = False
