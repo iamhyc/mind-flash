@@ -21,7 +21,7 @@ MF_NAME     = 'Mind Flash'
 MF_DIR      = Path('~/.mf/').expanduser()
 INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
-INPUTBOX_RESIZE   = (0,0,0,1,2)
+INPUTBOX_RESIZE   = (0,0,0,1,2,3)
 
 pxm = PixmapManager(MF_DIR)
 
