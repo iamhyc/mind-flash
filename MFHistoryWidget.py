@@ -265,10 +265,10 @@ class MFHistoryList(QListWidget):
                 self.pxm.remove(image)
                 pass
             # remove the record
-            _uri, _idx = w_item.uri.rsplit(':', 1)
-            _idx = int(_idx)
+            _uri, _id = w_item.uri.rsplit(':', 1)
             with open(_uri, 'r+') as f:
                 _tmp = f.readlines()
+                _idx = _tmp.index(_id)
                 _tmp = _tmp[:_idx] + _tmp[_idx+3:]
                 f.seek(0); f.writelines(_tmp); f.truncate()
                 pass

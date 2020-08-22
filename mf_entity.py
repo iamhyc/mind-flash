@@ -59,10 +59,10 @@ class MFEntity:
                     with MFRecord(stp.dayno, userHint) as rec:
                         these_items = rec.readAll()
                         if locate_flag:
-                            # uri: <userDir>/<weekno>/<stp.dayno>:<line_number>
-                            for _idx,_item in enumerate(these_items):
-                                _uri = '{path}:{index}'.format(
-                                        path=str(Path(userDir, stp.weekno, stp.dayno)), index=3*_idx)
+                            # uri: <userDir>/<weekno>/<stp.dayno>:<unixtime_line>
+                            for _item in these_items:
+                                _uri = '{path}:{id}'.format(
+                                        path=str(Path(userDir, stp.weekno, stp.dayno)), id=_item[1])
                                 items.append( (_uri, _item) )
                             pass
                         else:
