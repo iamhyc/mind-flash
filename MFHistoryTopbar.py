@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from MFUtility import MF_RNG
+from MFUtility import MF_RNG, KeysReactor
 from PyQt5.QtCore import (Qt, QSize, QEvent)
 from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
@@ -12,6 +12,7 @@ COLOR_WINTER   = '#1E90FF'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 
 MF_HINT_FONT      = ('Noto Sans CJK SC',10,QFont.Bold)
+INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
 MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (70, 40)
 TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
@@ -59,12 +60,20 @@ class InputBox(QPlainTextEdit):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.keysFn = KeysReactor(self)
+        self.registerKeys()
         self.styleHelper()
         pass
 
     def styleHelper(self):
+        self.setFont( QFont(*INPUTBOX_FONT) )
+        self.setPlaceholderText("Press ENTER to search ...")
         self.setFixedSize(*MIN_TOPBAR_SIZE)
         self.setVisible(False)
+        pass
+
+    def registerKeys(self):
+        self.keysFn.register([Qt.Key_Return], lambda:self.clear())
         pass
     pass
 
@@ -72,6 +81,7 @@ class ToolBarIcon(QLabel):
     def __init__(self, parent, type, pos=0):
         super().__init__('', parent)
         self.parent = parent
+        self.topbar = parent.parent
         self.type = type
         self.pos = pos
         self.styleHelper()
@@ -100,11 +110,13 @@ class ToolBarIcon(QLabel):
 
     def mousePressEvent(self, e):
         if self.type == 'search':
+            self.topbar.switch( self.topbar.input_box )
+            self.topbar.input_box.setFocus()
             pass
         elif self.type == 'export':
             pass
         elif self.type == 'collapse':
-            self.parent.parent.parent.parent.w_editor.toggleHistoryWidget()
+            self.topbar.parent.parent.w_editor.toggleHistoryWidget()
             pass
         else:
             pass
