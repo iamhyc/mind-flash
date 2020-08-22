@@ -290,8 +290,9 @@ class MFHistory(QWidget):
         self.grid.setSpacing(0)
         self.grid.setContentsMargins(0,0,0,0)
         # add widget into main layout
-        self.topbar = TopbarManager(self) #placed at (0,0)
+        self.w_topbar = TopbarManager(self)
         self.w_history_list = MFHistoryList(self, self.base_path)
+        self.grid.addWidget(self.w_topbar,       0, 0)
         self.grid.addWidget(self.w_history_list, 1, 0)
         self.setLayout(self.grid)
         self.setFixedSize(*MIN_HISTORY_SIZE)
@@ -313,7 +314,7 @@ class MFHistory(QWidget):
 
     def renderHistory(self, stp, items):
         self.w_history_list.clear()
-        self.topbar.hint_label.setDateHint(stp)
+        self.w_topbar.hint_label.setDateHint(stp)
         
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)

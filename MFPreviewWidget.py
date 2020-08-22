@@ -53,8 +53,6 @@ class MFImagePreviewer(QWidget):
         self.setWindowTitle('Image Previewer')
         self.setWindowFlags( Qt.Dialog | Qt.FramelessWindowHint )
         # self.setWindowIcon( QIcon('./res/icons/pulse_heart.png') )
-        # self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        # self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setStyleSheet('''
             QWidget {
                 background: rgba(255,254,249, 1.00);
