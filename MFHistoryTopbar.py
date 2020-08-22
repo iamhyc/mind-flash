@@ -57,9 +57,9 @@ class HintLabel(QLabel):
             self.setText(self.hint)
         pass
 
-    def setProgressHint(self, percentage):
+    def setProgressHint(self, percentage, hint=''):
         percentage = max(min(percentage, 1.0), 0.0)
-        self.setText('Export Progress: %.2f'%(percentage*100))
+        self.setText('Progress: %.2f'%(percentage*100))
         pass
 
     def getLock(self, owner):

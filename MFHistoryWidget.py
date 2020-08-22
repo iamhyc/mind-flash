@@ -331,7 +331,15 @@ class MFHistory(QWidget):
     
     def dumpHistory(self, disp):
         disp.getLock(self)
-        #TODO: dump current history
+        _total = self.w_history_list.count()
+        for i in range(_total):
+            w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
+            raw_item, uri = w_item.item, w_item.uri
+            #TODO: dump current history
+            QThread.msleep(100)
+            disp.setProgressHint( (i+1)/_total )
+            pass
+        QThread.msleep(1000)
         disp.releaseLock(self)
         pass
     
