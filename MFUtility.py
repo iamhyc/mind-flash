@@ -5,7 +5,7 @@ import tempfile, shutil
 from os import chdir
 from pathlib import Path
 from enum import Enum
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (Qt, QObject, QThread, pyqtSignal)
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
@@ -334,6 +334,24 @@ class PixmapManager:
         #     return False
         #FIXME: need to keep track of reference, so not delete for now
         return False
-
     pass
-    
+
+class Worker(QObject):
+    def __init__(self, func, args=None):
+        super().__init__(None)
+        self.func = func
+        self.args = args
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.started.connect(self.run)
+        pass
+
+    def start(self):
+        self.thread.start()
+
+    def run(self):
+        if self.args:
+            self.func(*self.args)
+        else:
+            self.func()
+    pass

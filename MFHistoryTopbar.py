@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from MFUtility import MF_RNG, KeysReactor
-from PyQt5.QtCore import (Qt, QSize, QEvent)
+from MFUtility import MF_RNG, KeysReactor, Worker
+from PyQt5.QtCore import (Qt, QSize, QEvent, QThread)
 from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
 
@@ -14,13 +14,16 @@ COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', '
 MF_HINT_FONT      = ('Noto Sans CJK SC',10,QFont.Bold)
 INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
 MIN_TOPBAR_SIZE   = (600, 40)
-MIN_TOOLICON_SIZE = (70, 40)
+MIN_TOOLICON_SIZE = (72, 40)
+TOOLICON_NUM      = 2
 TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 
 class HintLabel(QLabel):
     def __init__(self, parent, text=''):
         super().__init__(text, parent)
         self.parent = parent
+        self.hint = text
+        self.lock = None
         self.styleHelper()
         pass
 
@@ -43,17 +46,36 @@ class HintLabel(QLabel):
                 _color = COLOR_AUTUMN
             else:
                 _color = COLOR_WINTER
-            self.setStyleSheet("QLabel { color:%s }"%_color)
-            pass
+            self.hint = '<a style="color:%s">%s</a>'%(_color, _hint)
         elif stp.mf_type==MF_RNG.DAY:
             _color = COLOR_WEEKDAY[ stp.end.weekday() ]
-            _hint  = stp.end.strftime('%Y-%m-%d <a style="color:{}">(%a)</a>'.format(_color))
-            pass
+            self.hint = stp.end.strftime('%Y-%m-%d <a style="color:{}">(%a)</a>'.format(_color))
         else:
-            self.setStyleSheet("QLabel { color:black }")
-            pass
-        self.setText(_hint)
+            self.hint = '<a style="color:black">%s</a>'%(_hint)
+        
+        if self.lock is None:
+            self.setText(self.hint)
         pass
+
+    def setProgressHint(self, percentage):
+        percentage = max(min(percentage, 1.0), 0.0)
+        self.setText('Export Progress: %.2f'%(percentage*100))
+        pass
+
+    def getLock(self, owner):
+        if self.lock is None:
+            self.lock = owner
+            return True
+        else:
+            return False
+
+    def releaseLock(self, owner):
+        if self.lock and self.lock==owner:
+            self.lock = None
+            self.setText(self.hint)
+            return True
+        else:
+            return False
     pass
 
 class InputBox(QPlainTextEdit):
@@ -78,7 +100,8 @@ class InputBox(QPlainTextEdit):
     pass
 
 class ToolBarIcon(QLabel):
-    def __init__(self, parent, type, pos=0):
+
+    def __init__(self, parent, type=None, pos=0):
         super().__init__('', parent)
         self.parent = parent
         self.topbar = parent.parent
@@ -94,32 +117,39 @@ class ToolBarIcon(QLabel):
             self.setToolTip(self.type)
             
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            if self.pos<0: #leftmost position
+            if self.pos<0:      #leftmost position
                 self.setFixedSize(*MIN_TOOLICON_SIZE)
-                self.setStyleSheet('QLabel { border-width: 1px 0px 0px 1px; }')
-            elif self.pos>0: #rightmost position
+                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 1px; }')
+            elif self.pos>0:    #rightmost position
                 self.setAlignment(Qt.AlignRight | Qt.AlignTop)
-                self.setStyleSheet('QLabel { border-width: 1px 1px 0px 0px; }')
-            else: #middle position
+                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
+            else:               #middle position
                 self.setFixedSize(*MIN_TOOLICON_SIZE)
-                self.setStyleSheet('QLabel { border-width: 1px 0px 0px 0px; }')
+                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
         else: #spacing
-            self.setFixedSize( int(self.type), MIN_TOPBAR_SIZE[1] )
-            self.setStyleSheet('QLabel { border-width: 1px 0px 0px 0px; }')
+            _width = MIN_TOPBAR_SIZE[0] - MIN_TOOLICON_SIZE[0]*TOOLICON_NUM - 33 #33 for one rightmost icon
+            self.setFixedSize( _width, MIN_TOPBAR_SIZE[1] )
+            self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
         pass
 
     def mousePressEvent(self, e):
-        if self.type == 'search':
-            self.topbar.switch( self.topbar.input_box )
-            self.topbar.input_box.setFocus()
-            pass
-        elif self.type == 'export':
-            pass
-        elif self.type == 'collapse':
-            self.topbar.parent.parent.w_editor.toggleHistoryWidget()
-            pass
-        else:
-            pass
+        if e.buttons() & Qt.LeftButton:
+            if self.type == 'search':
+                self.topbar.switch( self.topbar.input_box )
+                self.topbar.input_box.setFocus()
+                pass
+            elif self.type == 'export':
+                self.topbar.switch( self.topbar.hint_label )
+                #
+                self.worker = Worker(self.topbar.parent.dumpHistory,
+                                        args=(self.topbar.hint_label, ))
+                self.worker.start()
+                pass
+            elif self.type == 'collapse':
+                self.topbar.parent.parent.w_editor.toggleHistoryWidget()
+                pass
+            else:
+                pass
         return super().mousePressEvent(e)
     pass
 
@@ -136,9 +166,14 @@ class ToolBar(QWidget):
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget( ToolBarIcon(self, 'search',    -1),  0, Qt.AlignJustify )
         layout.addWidget( ToolBarIcon(self, 'export',     0),  0, Qt.AlignJustify )
-        layout.addWidget( ToolBarIcon(self, 600-32*3),         0, Qt.AlignJustify )
-        layout.addWidget( ToolBarIcon(self, 'collapse',      1),  0, Qt.AlignJustify )
+        layout.addWidget( ToolBarIcon(self),                   0, Qt.AlignJustify )
+        layout.addWidget( ToolBarIcon(self, 'collapse',   1),  0, Qt.AlignJustify )
         self.setLayout(layout)
+        self.setStyleSheet('''
+            QWidget {
+                border: 1px solid #5D6D7E;
+            }
+        ''')
         self.setFixedSize(*MIN_TOPBAR_SIZE)
         self.setVisible(False)
         pass

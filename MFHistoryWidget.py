@@ -7,7 +7,7 @@ from dateutil.tz import tzlocal, tzutc
 from MFUtility import MF_RNG, PixmapManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
-from PyQt5.QtCore import (Qt, QRect, QSize)
+from PyQt5.QtCore import (Qt, QRect, QSize, QThread)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
@@ -312,6 +312,9 @@ class MFHistory(QWidget):
             self.w_history_list.clear()
         pass
 
+    def setFocus(self):
+        self.parent.setFocus()
+
     def renderHistory(self, stp, items):
         self.w_history_list.clear()
         self.w_topbar.hint_label.setDateHint(stp)
@@ -326,7 +329,10 @@ class MFHistory(QWidget):
             pass
         pass
     
-    def setFocus(self):
-        self.parent.setFocus()
-
+    def dumpHistory(self, disp):
+        disp.getLock(self)
+        #TODO: dump current history
+        disp.releaseLock(self)
+        pass
+    
     pass
