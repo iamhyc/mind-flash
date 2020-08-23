@@ -16,10 +16,11 @@ INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
 TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
-TOOL_ICON_NUM     = 2
+TOOL_ICON_NUM     = 3
 TOOL_ICONS        = {
     'search':   {'pos':-1, 'hint':'Search', 'func':'searchIconEvent'},
     'export':   {'pos':0,  'hint':'Export', 'func':'exportIconEvent'},
+    'history':  {'pos':0,  'hint':'History (Alt+V)', 'func':'historyIconEvent'},
     '_'     :   {'pos':0,  'hint':'__space__'},
     'collapse': {'pos':+1, 'hint':'Collapse (Alt+H)', 'func':'collapseIconEvent'}
     }
@@ -137,7 +138,8 @@ class ToolBarIcon(QLabel):
             self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
             return
         
-        _icon = QIcon( './res/svg/{}.svg'.format(self.name) ).pixmap( QSize(32,32) )
+        self.icon_name = self.name
+        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(32,32) )
         self.setPixmap(_icon)
         self.setToolTip(self.attr['hint'])
         self.callback = self.__getattribute__( self.attr['func'] )
@@ -169,6 +171,17 @@ class ToolBarIcon(QLabel):
         self.worker = Worker(self.topbar.parent.dumpHistory,
                                 args=(self.topbar.hint_label, ))
         self.worker.start()
+        pass
+
+    def historyIconEvent(self):
+        _icons = ['history', 'history-week', 'history-month', 'history-year']
+        _idx = _icons.index(self.icon_name)
+        _idx = (_idx+1) % len(_icons)
+        self.icon_name = _icons[_idx]
+        #
+        self.topbar.parent.parent.w_editor.updateHistory(+1, None, True)
+        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(32,32) )
+        self.setPixmap(_icon)
         pass
 
     def collapseIconEvent(self):
