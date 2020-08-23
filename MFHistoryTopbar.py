@@ -13,10 +13,16 @@ COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', '
 
 MF_HINT_FONT      = ('Noto Sans CJK SC',10,QFont.Bold)
 INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
+TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
-TOOLICON_NUM      = 2
-TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
+TOOL_ICON_NUM     = 2
+TOOL_ICONS        = {
+    'search':   {'pos':-1, 'hint':'Search', 'func':'searchIconEvent'},
+    'export':   {'pos':0,  'hint':'Export', 'func':'exportIconEvent'},
+    '_'     :   {'pos':0,  'hint':'__space__'},
+    'collapse': {'pos':+1, 'hint':'Collapse (Alt+H)', 'func':'collapseIconEvent'}
+    }
 
 class HintLabel(QLabel):
     def __init__(self, parent, text=''):
@@ -60,7 +66,10 @@ class HintLabel(QLabel):
     @pyqtSlot(float)
     def setProgressHint(self, percentage):
         percentage = max(min(percentage, 1.0), 0.0)
-        self.setText('Progress: %.2f'%(percentage*100))
+        _text = 'Progress: %.2f'%( percentage*100 )
+        if percentage == 1.0:
+            _text = 'Done.'
+        self.setText(_text)
         pass
 
     @pyqtSlot(object)
@@ -104,56 +113,61 @@ class InputBox(QPlainTextEdit):
 
 class ToolBarIcon(QLabel):
 
-    def __init__(self, parent, type=None, pos=0):
+    def __init__(self, parent, item):
         super().__init__('', parent)
         self.parent = parent
         self.topbar = parent.parent
-        self.type = type
-        self.pos = pos
+        self.name   = item[0]
+        self.attr   = item[1]
         self.styleHelper()
         pass
 
     def styleHelper(self):
-        if type(self.type)==str:
-            _icon = QIcon( './res/svg/{}.svg'.format(self.type) ).pixmap( QSize(32,32) )
-            self.setPixmap(_icon)
-            self.setToolTip(self.type)
-            
-            self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            if self.pos<0:      #leftmost position
-                self.setFixedSize(*MIN_TOOLICON_SIZE)
-                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 1px; }')
-            elif self.pos>0:    #rightmost position
-                self.setAlignment(Qt.AlignRight | Qt.AlignTop)
-                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
-            else:               #middle position
-                self.setFixedSize(*MIN_TOOLICON_SIZE)
-                self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
-        else: #spacing
-            _width = MIN_TOPBAR_SIZE[0] - MIN_TOOLICON_SIZE[0]*TOOLICON_NUM - 33 #33 for one rightmost icon
+        if self.name=='_':
+            _width = MIN_TOPBAR_SIZE[0] - MIN_TOOLICON_SIZE[0]*TOOL_ICON_NUM - 33 #33 for one rightmost icon
             self.setFixedSize( _width, MIN_TOPBAR_SIZE[1] )
             self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
+            return
+        
+        _icon = QIcon( './res/svg/{}.svg'.format(self.name) ).pixmap( QSize(32,32) )
+        self.setPixmap(_icon)
+        self.setToolTip(self.attr['hint'])
+        self.callback = self.__getattribute__( self.attr['func'] )
+        self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        if self.attr['pos']<0:      #leftmost position
+            self.setFixedSize(*MIN_TOOLICON_SIZE)
+            self.setStyleSheet('QLabel { border-width: 1px 1px 1px 1px; }')
+        elif self.attr['pos']>0:    #rightmost position
+            self.setAlignment(Qt.AlignRight | Qt.AlignTop)
+            self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
+        else:                       #middle position
+            self.setFixedSize(*MIN_TOOLICON_SIZE)
+            self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
         pass
 
     def mousePressEvent(self, e):
         if e.buttons() & Qt.LeftButton:
-            if self.type == 'search':
-                self.topbar.switch( self.topbar.input_box )
-                self.topbar.input_box.setFocus()
-                pass
-            elif self.type == 'export':
-                self.topbar.switch( self.topbar.hint_label )
-                #
-                self.worker = Worker(self.topbar.parent.dumpHistory,
-                                        args=(self.topbar.hint_label, ))
-                self.worker.start()
-                pass
-            elif self.type == 'collapse':
-                self.topbar.parent.parent.w_editor.toggleHistoryWidget()
-                pass
-            else:
-                pass
+            if self.callback: self.callback()
         return super().mousePressEvent(e)
+    
+    def searchIconEvent(self):
+        self.topbar.switch( self.topbar.input_box )
+        self.topbar.input_box.setFocus()
+        pass
+
+    def exportIconEvent(self):
+        self.topbar.switch( self.topbar.hint_label )
+        #
+        self.worker = Worker(self.topbar.parent.dumpHistory,
+                                args=(self.topbar.hint_label, ))
+        self.worker.start()
+        pass
+
+    def collapseIconEvent(self):
+        self.topbar.parent.parent.w_editor.toggleHistoryWidget()
+        pass
+
     pass
 
 class ToolBar(QWidget):
@@ -167,10 +181,9 @@ class ToolBar(QWidget):
         layout = QBoxLayout(QBoxLayout.LeftToRight)
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
-        layout.addWidget( ToolBarIcon(self, 'search',    -1),  0, Qt.AlignJustify )
-        layout.addWidget( ToolBarIcon(self, 'export',     0),  0, Qt.AlignJustify )
-        layout.addWidget( ToolBarIcon(self),                   0, Qt.AlignJustify )
-        layout.addWidget( ToolBarIcon(self, 'collapse',   1),  0, Qt.AlignJustify )
+        for item in TOOL_ICONS.items():
+            layout.addWidget( ToolBarIcon(self, item), 0, Qt.AlignJustify )
+            pass
         self.setLayout(layout)
         self.setStyleSheet('''
             QWidget {

@@ -338,9 +338,10 @@ class MFHistory(QWidget):
         self.off_lock.connect(disp.releaseLock)
         self.set_label.connect(disp.setProgressHint)
         
-        _total = self.w_history_list.count()
         self.on_lock.emit(self)
         self.set_label.emit(0.0)
+        
+        _total = self.w_history_list.count()
         for i in range(_total):
             w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
             raw_item, uri = w_item.item, w_item.uri
@@ -348,6 +349,7 @@ class MFHistory(QWidget):
             
             self.set_label.emit( (i+1)/_total )
             pass
+        #
         QThread.msleep(1000)
         self.off_lock.emit(self)
         pass
