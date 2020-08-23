@@ -67,6 +67,8 @@ class MFTextEdit(QPlainTextEdit):
         self.ensureCursorVisible()
         self.lastKeyStroke = time.time() - 1.0
         self.hideCaret()
+        # Placeholder Text
+        self.showHelpText()
         pass
 
     def registerKeys(self):
@@ -135,6 +137,16 @@ class MFTextEdit(QPlainTextEdit):
         )
         pass
 
+    def showHelpText(self):
+        print(mf_exec.first_run, mf_exec.no_record)
+        if mf_exec.first_run:
+            self.setPlaceholderText('Try double click on me!')
+        elif mf_exec.no_record:
+            self.setPlaceholderText('press ENTER to flush it!')
+        else:
+            pass
+        pass
+
     def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.w_history.isVisible(): return
         #
@@ -157,14 +169,15 @@ class MFTextEdit(QPlainTextEdit):
 
     def toggleHistoryWidget(self):
         size_half = int( self.w_history.height()/2 )
-        if self.w_history.isVisible():
+        if self.w_history.isVisible():  #hide history widget
+            self.showHelpText()
             self.parent.grid.replaceWidget(self.w_history, self.w_todo)
             self.w_history.setVisible(False); self.w_todo.setVisible(True)
             self.parent.adjustSize()
             self.parent.resize(self.size())
             self.parent.move(self.parent.pos() + QPoint(0, size_half))
             pass
-        else:
+        else:                           #show history widget
             self.parent.grid.replaceWidget(self.w_todo, self.w_history)
             self.w_todo.setVisible(False); self.w_history.setVisible(True)
             self.parent.adjustSize()

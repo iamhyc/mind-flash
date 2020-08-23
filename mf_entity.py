@@ -14,7 +14,10 @@ class MFEntity:
 
     def __init__(self, base_path):
         self.base_path = base_path
-        Path(self.base_path, MF_HOSTNAME).mkdir(parents=True, exist_ok=True)
+        _path = Path(self.base_path, MF_HOSTNAME)
+        self.first_run  = not _path.is_dir()
+        self.no_record  = len(list( _path.iterdir() )) == 0
+        _path.mkdir(parents=True, exist_ok=True)
         self.MF_ACTION={
             'dump': self.act_dump,
             'record': self.mf_record,
