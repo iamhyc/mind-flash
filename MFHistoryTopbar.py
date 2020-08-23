@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from MFUtility import MF_RNG, KeysReactor, Worker
+from MFUtility import MF_RNG, KeysReactor, MFWorker
 from PyQt5.QtCore import (Qt, QSize, QEvent, QThread, pyqtSlot)
 from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
@@ -168,7 +168,7 @@ class ToolBarIcon(QLabel):
 
     def exportIconEvent(self):
         self.topbar.switch( self.topbar.hint_label )
-        self.worker = Worker(self.topbar.parent.dumpHistory,
+        self.worker = MFWorker(self.topbar.parent.dumpHistory,
                                 args=(self.topbar.hint_label, ))
         self.worker.start()
         pass

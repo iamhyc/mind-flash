@@ -336,7 +336,7 @@ class PixmapManager:
         return False
     pass
 
-class Worker(QObject):
+class MFWorker(QObject):
     def __init__(self, func, args=None):
         super().__init__(None)
         self.func = func
@@ -346,9 +346,17 @@ class Worker(QObject):
         self.thread.started.connect(self.run)
         pass
 
+    def isRunning(self):
+        return self.thread.isRunning()
+
     def start(self):
         self.thread.start()
+        pass
     
+    def terminate(self):
+        self.thread.exit(0)
+        pass
+
     def run(self):
         if self.args:
             self.func(*self.args)

@@ -138,7 +138,6 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def showHelpText(self):
-        print(mf_exec.first_run, mf_exec.no_record)
         if mf_exec.first_run:
             self.setPlaceholderText('Try double click on me!')
         elif mf_exec.no_record:
