@@ -1,6 +1,13 @@
 mind-flash (0.9.6) unstable; urgency=low
 
-  * 
+  * add PixmapManager with save/remove logic
+  * add wheel scroll zoom function in ImagePreviewer (smooth scaling)
+  * add TopBarManager QWidget and ToolBarIcon class
+  * add TopBar InputBox KeysFn
+  * fix history record removal disorder
+  * add QThread Worker class
+  * fix segmentation fault in QThread Worker
+  * add History Export function
 
  -- iamhyc <sudofree@163.com>  Sat, 22 Aug 2020 23:59:59 +0000
 
