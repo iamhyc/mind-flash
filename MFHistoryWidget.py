@@ -4,7 +4,7 @@ from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import MF_RNG, PixmapManager
+from MFUtility import MF_RNG, MF_HOSTNAME, PixmapManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
@@ -27,9 +27,9 @@ ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
-img_filter   = re.compile('<-file://(.*?)->')
-bold_filter  = re.compile('\*\*([^\*]+)\*\*')
-italic_filter= re.compile('\*(.*?)\*')
+img_filter   = re.compile("<-file://(.*?)->")
+bold_filter  = re.compile("\*\*([^\*]+)\*\*")
+italic_filter= re.compile("\*(.*?)\*")
 
 class QLabelWrapper(QLabel):
     def __init__(self, type, text='', pixmap='', alt=''):
@@ -149,14 +149,17 @@ class MFHistoryItem(QFrame):
 
     def updateItem(self):
         (_user, _time, _text) = self.item
+        _user = 'Myself' if _user==MF_HOSTNAME else _user
         _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%m-%d %H:%M') #%Y-%m-%d %H:%M:%S
+        _text = eval( _text ).strip() #mod
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
         _text = img_filter.split(_text)
+        self.split_text = _text
         # parse (hint, images, text)
         hint   = ' '.join([_user, _time])
         self.item_images = _text[1:][::2]
-        _text  = eval( ''.join(_text[0:][::2]) ).strip()
+        _text  = ''.join(_text[0:][::2]).strip()
         _text  = _text+'\n' if _text else '' #NOTE: for QFontMetrics.boundingRect correction
         self.item_text   = _text.replace('\n', '<br>')
         # create widgets
@@ -321,6 +324,7 @@ class MFHistory(QWidget):
         self.parent.setFocus()
 
     def renderHistory(self, stp, items):
+        self.stp = stp
         self.w_history_list.clear()
         self.w_topbar.hint_label.setDateHint(stp)
         
@@ -339,17 +343,31 @@ class MFHistory(QWidget):
         self.off_lock.connect(disp.releaseLock)
         self.set_hint.connect(disp.setHint)
         self.set_progress.connect(disp.setProgressHint)
-        
+        #
         self.on_lock.emit(self)
         self.set_progress.emit(self, 0.0)
-        
+        #
+        _file = 'MFExport %s.md'%self.stp.hint
+        _path = Path('~/Desktop', _file).expanduser()
         _total = self.w_history_list.count()
-        for i in range(_total):
-            w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
-            raw_item, uri = w_item.item, w_item.uri
-            #TODO: dump current history
-            
-            self.set_progress.emit( self, (i+1)/_total )
+        with open( str(_path), 'w+' ) as f:
+            f.write('# Mind Flash Export - %s\n'%self.stp.hint)
+            for i in range(_total):
+                w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
+                raw_item, uri = w_item.item, w_item.uri
+                # dump the history item
+                (_user, _time, _) = raw_item
+                _date = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+                _text = ''
+                for _idx,_raw in enumerate(w_item.split_text):
+                    if _idx%2==0:
+                        _text += _raw.strip()
+                    else:
+                        _text += '\n![](%s)\n'%(Path(self.base_path, _raw))
+                    pass
+                f.write("**`{user}`** `{date}`\n{text}\n\n------\n".format(
+                        date=_date, user=_user, text=_text))
+                self.set_progress.emit( self, (i+1)/_total )
             pass
         #
         QThread.msleep(1000)

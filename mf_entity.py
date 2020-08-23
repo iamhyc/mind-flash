@@ -54,7 +54,8 @@ class MFEntity:
         items = list()
         while stp.next():
             for userDir in Path(self.base_path).iterdir():
-                userHint = 'Myself' if userDir.stem==MF_HOSTNAME else userDir.stem
+                userHint = userDir.stem
+                # userHint = 'Myself' if userDir.stem==MF_HOSTNAME else userDir.stem
                 with workSpace(self.base_path, userDir, stp.weekno) as wrk:
                     with MFRecord(stp.dayno, userHint) as rec:
                         these_items = rec.readAll()

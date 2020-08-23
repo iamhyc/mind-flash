@@ -175,7 +175,7 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def saveImageCache(self):
-        img_filter = re.compile('<-file://(.*?)->')
+        img_filter = re.compile("<-file://(.*?)->")
         _text = img_filter.split(self.toPlainText())
         image_path = _text[1:][::2]
         for _path in image_path:
