@@ -40,6 +40,12 @@ class HintLabel(QLabel):
         # self.setAlignment(Qt.AlignHCenter | Qt.AlignCenter)
         pass
 
+    @pyqtSlot(object, str)
+    def setHint(self, owner, hint):
+        if owner is not self.lock: return
+        self.setText(hint)
+        pass
+
     def setDateHint(self, stp):
         _hint = stp.hint
         if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
@@ -63,8 +69,10 @@ class HintLabel(QLabel):
             self.setText(self.hint)
         pass
 
-    @pyqtSlot(float)
-    def setProgressHint(self, percentage):
+    @pyqtSlot(object, float)
+    def setProgressHint(self, owner, percentage):
+        if owner is not self.lock: return
+        
         percentage = max(min(percentage, 1.0), 0.0)
         _text = 'Progress: %.2f'%( percentage*100 )
         if percentage == 1.0:
@@ -158,7 +166,6 @@ class ToolBarIcon(QLabel):
 
     def exportIconEvent(self):
         self.topbar.switch( self.topbar.hint_label )
-        #
         self.worker = Worker(self.topbar.parent.dumpHistory,
                                 args=(self.topbar.hint_label, ))
         self.worker.start()

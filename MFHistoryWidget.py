@@ -279,7 +279,8 @@ class MFHistoryList(QListWidget):
 class MFHistory(QWidget):
     on_lock  = pyqtSignal(object)
     off_lock = pyqtSignal(object)
-    set_label= pyqtSignal(float)
+    set_hint = pyqtSignal(object, str)
+    set_progress = pyqtSignal(object, float)
 
     def __init__(self, parent, base_path):
         super().__init__(parent)
@@ -336,10 +337,11 @@ class MFHistory(QWidget):
     def dumpHistory(self, disp):
         self.on_lock.connect(disp.getLock)
         self.off_lock.connect(disp.releaseLock)
-        self.set_label.connect(disp.setProgressHint)
+        self.set_hint.connect(disp.setHint)
+        self.set_progress.connect(disp.setProgressHint)
         
         self.on_lock.emit(self)
-        self.set_label.emit(0.0)
+        self.set_progress.emit(self, 0.0)
         
         _total = self.w_history_list.count()
         for i in range(_total):
@@ -347,7 +349,7 @@ class MFHistory(QWidget):
             raw_item, uri = w_item.item, w_item.uri
             #TODO: dump current history
             
-            self.set_label.emit( (i+1)/_total )
+            self.set_progress.emit( self, (i+1)/_total )
             pass
         #
         QThread.msleep(1000)

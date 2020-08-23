@@ -348,8 +348,7 @@ class Worker(QObject):
 
     def start(self):
         self.thread.start()
-
-    @pyqtSlot()
+    
     def run(self):
         if self.args:
             self.func(*self.args)
