@@ -8,7 +8,7 @@ import re
 from os import chdir
 from pathlib import Path
 from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
-from PyQt5.QtGui import QFont, QFontMetrics, QIcon, QTextOption
+from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QTextOption, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                     QLayout, QGridLayout, QPlainTextEdit, QSizePolicy,
                     QGraphicsDropShadowEffect)
@@ -32,15 +32,17 @@ class MFTextEdit(QPlainTextEdit):
         self.w_history = w_history
         self.w_todo = w_todo
         self.clipboard = QApplication.clipboard()
-
+        #
         self.stp = None
+        self.pressed = False
         self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.font_style = QFont(*INPUTBOX_FONT)
         self.font_metric= QFontMetrics(self.font_style)
         self.styleHelper()
-
+        #
+        self.setAcceptDrops(True)
         self.textChanged.connect(self.textChangedEvent)
         self.keysFn = KeysReactor(self, 'MFTextEdit')
         self.keysFn.setKeyPressHook(self.showCaret)
@@ -218,17 +220,22 @@ class MFTextEdit(QPlainTextEdit):
         return _count
 
     def mousePressEvent(self, e):
+        self.pressed = True
         self.press_pos = e.pos()
         pass
 
     def mouseMoveEvent(self, e):
-        if e.buttons() & Qt.LeftButton:
+        if (e.buttons()&Qt.LeftButton) and self.pressed:
             self.parent.move( self.parent.mapToParent(e.pos() - self.press_pos) )
             # print(self.parent.pos() - self.init_pos)
             pass
         elif e.buttons() & Qt.RightButton:
             pass
         pass
+
+    def mouseReleaseEvent(self, e):
+        self.pressed = False
+        return super().mouseReleaseEvent(e)
 
     def mouseDoubleClickEvent(self, e):
         self.toggleHistoryWidget()
@@ -250,6 +257,31 @@ class MFTextEdit(QPlainTextEdit):
     def focusOutEvent(self, e):
         self.keysFn.clear()
         return super().focusOutEvent(e)
+
+    #Reference: https://www.qtcentre.org/threads/33513-QTextEdit-Drag-and-Drop
+    def dragEnterEvent(self, e):
+        e.accept()
+        pass
+
+    def dragMoveEvent(self, e):
+        e.accept()
+        pass
+
+    def dropEvent(self, e):
+        _mime = e.mimeData()
+        if _mime.hasUrls():
+            for _url in _mime.urls():
+                # _url.isLocalFile(), _url.toLocalFile(), _url.toString()
+                print(_url)
+            pass
+        elif _mime.hasHtml():
+            _doc  = QTextDocument(); _doc.setHtml(_mime.html())
+            _text = _doc.toPlainText()
+            self.insertPlainText(_text)
+            self.textChangedEvent()
+            pass
+        self.setFocus()
+        pass
 
     pass
 
