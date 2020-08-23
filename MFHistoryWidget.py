@@ -7,7 +7,7 @@ from dateutil.tz import tzlocal, tzutc
 from MFUtility import MF_RNG, PixmapManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
-from PyQt5.QtCore import (Qt, QRect, QSize, QThread)
+from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
 from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
@@ -277,6 +277,10 @@ class MFHistoryList(QListWidget):
     pass
 
 class MFHistory(QWidget):
+    on_lock  = pyqtSignal(object)
+    off_lock = pyqtSignal(object)
+    set_label= pyqtSignal(float)
+
     def __init__(self, parent, base_path):
         super().__init__(parent)
         self.parent = parent
@@ -330,17 +334,22 @@ class MFHistory(QWidget):
         pass
     
     def dumpHistory(self, disp):
-        disp.getLock(self)
+        self.on_lock.connect(disp.getLock)
+        self.off_lock.connect(disp.releaseLock)
+        self.set_label.connect(disp.setProgressHint)
+        
         _total = self.w_history_list.count()
+        self.on_lock.emit(self)
+        self.set_label.emit(0.0)
         for i in range(_total):
             w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
             raw_item, uri = w_item.item, w_item.uri
             #TODO: dump current history
-            QThread.msleep(100)
-            disp.setProgressHint( (i+1)/_total )
+            
+            self.set_label.emit( (i+1)/_total )
             pass
         QThread.msleep(1000)
-        disp.releaseLock(self)
+        self.off_lock.emit(self)
         pass
     
     pass

@@ -5,7 +5,7 @@ import tempfile, shutil
 from os import chdir
 from pathlib import Path
 from enum import Enum
-from PyQt5.QtCore import (Qt, QObject, QThread, pyqtSignal)
+from PyQt5.QtCore import (Qt, QObject, QThread, pyqtSignal, pyqtSlot)
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
@@ -349,9 +349,12 @@ class Worker(QObject):
     def start(self):
         self.thread.start()
 
+    @pyqtSlot()
     def run(self):
         if self.args:
             self.func(*self.args)
         else:
             self.func()
+        self.thread.exit(0)
+        pass
     pass

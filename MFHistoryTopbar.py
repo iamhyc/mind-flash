@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 from MFUtility import MF_RNG, KeysReactor, Worker
-from PyQt5.QtCore import (Qt, QSize, QEvent, QThread)
+from PyQt5.QtCore import (Qt, QSize, QEvent, QThread, pyqtSlot)
 from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
 
@@ -57,11 +57,13 @@ class HintLabel(QLabel):
             self.setText(self.hint)
         pass
 
-    def setProgressHint(self, percentage, hint=''):
+    @pyqtSlot(float)
+    def setProgressHint(self, percentage):
         percentage = max(min(percentage, 1.0), 0.0)
         self.setText('Progress: %.2f'%(percentage*100))
         pass
 
+    @pyqtSlot(object)
     def getLock(self, owner):
         if self.lock is None:
             self.lock = owner
@@ -69,6 +71,7 @@ class HintLabel(QLabel):
         else:
             return False
 
+    @pyqtSlot(object)
     def releaseLock(self, owner):
         if self.lock and self.lock==owner:
             self.lock = None

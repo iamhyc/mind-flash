@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import sys
 from PyQt5.QtCore import (Qt, QRect, QSize)
-from PyQt5.QtGui import (QFont, QFontMetrics, QIcon)
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QLabel,
                         QLayout, QGridLayout, QPlainTextEdit, QSizePolicy)
-from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
 from MFUtility import KeysReactor
 
 class MFPreviewWidget(QWidget):
@@ -52,7 +50,6 @@ class MFImagePreviewer(QWidget):
     def styleHelper(self):
         self.setWindowTitle('Image Previewer')
         self.setWindowFlags( Qt.Dialog | Qt.FramelessWindowHint )
-        # self.setWindowIcon( QIcon('./res/icons/pulse_heart.png') )
         self.setStyleSheet('''
             QWidget {
                 background: rgba(255,254,249, 1.00);
