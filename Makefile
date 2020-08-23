@@ -24,6 +24,7 @@ build-dist:clean-dist
 		rm -rf build dist; \
 		pyinstaller mf_gui.py -wy; \
 		cp -r third-party/win32/* ./dist/; \
+		cp -r res ./dist/mf_gui; \
 		cd dist; zip -r msh-tray-$(VERSION)-win32.zip ./*; cd ..; \
 	elif [ "$(PLATFORM)" = "linux" ]; then \
 		mkdir -p build/opt/mind-flash; mkdir dist; \

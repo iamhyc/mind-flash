@@ -348,7 +348,10 @@ class MFHistory(QWidget):
         self.set_progress.emit(self, 0.0)
         #
         _file = 'MFExport %s.md'%self.stp.hint
-        _path = Path('~/Desktop', _file).expanduser()
+        if Path('~/Desktop').expanduser().is_dir():
+            _path = Path('~/Desktop', _file).expanduser()
+        else: #bypass some Windows OneDrive
+            _path = Path('~/', _file).expanduser()
         _total = self.w_history_list.count()
         with open( str(_path), 'w+' ) as f:
             f.write('# Mind Flash Export - %s\n'%self.stp.hint)
