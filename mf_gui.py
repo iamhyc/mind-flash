@@ -82,7 +82,7 @@ class MFTextEdit(QPlainTextEdit):
         #NOTE: Return; flash recording
         def mf_flash_binding():
             mf_text = self.toPlainText().encode('utf-8').decode('utf-8')
-            self.saveImageCache()
+            self.saveFileCache()
             if mf_text:
                 mf_exec.mf_record( repr(mf_text.strip()) )
             self.parent.close()
@@ -166,9 +166,9 @@ class MFTextEdit(QPlainTextEdit):
         self.setFocus() # for convenience
         pass
 
-    def saveImageCache(self):
-        img_filter = re.compile("<-file://(.*?)->")
-        _text = img_filter.split(self.toPlainText())
+    def saveFileCache(self):
+        icon_filter = re.compile("<-file://(.*?)->")
+        _text = icon_filter.split(self.toPlainText())
         image_path = _text[1:][::2]
         for _path in image_path:
             mdm.save(_path)

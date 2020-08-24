@@ -27,15 +27,16 @@ ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
-img_filter   = re.compile("<-file://(.*?)->")
-bold_filter  = re.compile("\*\*([^\*]+)\*\*")
-italic_filter= re.compile("\*(.*?)\*")
+img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
+icon_filter   = re.compile("<-file://(.*?)->")
+bold_filter   = re.compile("\*\*([^\*]+)\*\*")
+italic_filter = re.compile("\*(.*?)\*")
 
 class QLabelWrapper(QLabel):
     def __init__(self, type, text='', pixmap='', alt=''):
         super().__init__(text)
-        self.type = type
-        self.alt  = alt
+        self.type   = type
+        self.alt    = alt
         if pixmap: self.setPixmap(pixmap)
         self.styleHelper()
         pass
@@ -75,6 +76,12 @@ class QLabelWrapper(QLabel):
         elif self.type=='img_label':
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
+        elif self.type=='file_label':
+            _pixmap = self.pixmap().scaledToWidth(120, Qt.SmoothTransformation)
+            #TODO: alter _pixmap with right-slide filename
+            self.setPixmap(_pixmap)
+            self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            pass
         else:
             raise Exception
             pass
@@ -95,6 +102,13 @@ class QLabelWrapper(QLabel):
         elif self.type=='img_label' and ev.buttons() & Qt.LeftButton:
             _pixmap = self.alt if self.alt else self.pixmap()
             w_preview = MFImagePreviewer(self, _pixmap)
+            pass
+        elif self.type=='file_label' and ev.buttons() & Qt.RightButton:
+            #TODO: copy to clipboard mime data
+            # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "File %s Copied."'%self.alt.name)
+            pass
+        elif self.type=='file_label' and ev.buttons() & Qt.LeftButton:
+            #TODO: open with QDesktopService
             pass
         return super().mousePressEvent(ev)
 
@@ -148,6 +162,14 @@ class MFHistoryItem(QFrame):
         self.size_height += self.getHeightHint(ref, pos)
         return ref
 
+    def getIconPath(self, _path):
+        _file = Path(self.base_path, _path)
+        if img_filter.match(_file.suffix):
+            return ('', str(_file))
+        else:
+            return (_file,  "./res/svg/archive.svg")
+        pass
+
     def updateItem(self):
         (_user, _time, _text) = self.item
         _user = 'Myself' if _user==MF_HOSTNAME else _user
@@ -155,11 +177,11 @@ class MFHistoryItem(QFrame):
         _text = eval( _text ).strip() #mod
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
-        _text = img_filter.split(_text)
+        _text = icon_filter.split(_text)
         self.split_text = _text
         # parse (hint, images, text)
         hint   = ' '.join([_user, _time])
-        self.item_images = _text[1:][::2]
+        self.item_icons = _text[1:][::2]
         _text  = ''.join(_text[0:][::2]).strip()
         _text  = _text+'\n' if _text else '' #NOTE: for QFontMetrics.boundingRect correction
         self.item_text   = _text.replace('\n', '<br>')
@@ -167,28 +189,47 @@ class MFHistoryItem(QFrame):
         hint_label = QLabelWrapper('item_hint', hint)
         if self.item_text:
             text_label = QLabelWrapper('item_text', self.item_text)
-        image_pixmaps = [QPixmap( str(Path(self.base_path, image)) ) for image in self.item_images]
+        #NOTE: not all item_icons are images, maybe files
+        icon_pixmaps = list()
+        for _icon in self.item_icons:
+            _file, _path = self.getIconPath(_icon)
+            icon_pixmaps.append( (_file, QPixmap(_path)) )
+            pass
         # adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
-        if not self.item_images: #text only
+        if not self.item_icons: #text only
             self.wrapWidget(text_label, [1,0, 1,3])
             pass
         elif not self.item_text: #images only
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
-            for (i,pixmap) in enumerate(image_pixmaps):
-                cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=pixmap)
-                self.wrapWidget(image_label, [i+1,0, 1,3])
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
+            for (i,pixmap) in enumerate(icon_pixmaps):
+                #
+                _file, _pixmap = pixmap
+                if _file:
+                    icon_label = QLabelWrapper('file_label', pixmap=_pixmap, alt=_file)
+                    icon_label.setToolTip(_file.name)
+                else:
+                    cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
+                    icon_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
+                #
+                self.wrapWidget(icon_label, [i+1,0, 1,3])
+                icon_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
             pass
         else:          #mixture
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
-            for (i,pixmap) in enumerate(image_pixmaps):
-                cropped_pixmap = pixmap.copy( CropRect(pixmap) )
-                image_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=pixmap)
-                self.wrapWidget(image_label, [i+1,0, 1,1])
-                image_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
+            for (i,pixmap) in enumerate(icon_pixmaps):
+                #
+                _file, _pixmap = pixmap
+                if _file:
+                    icon_label = QLabelWrapper('file_label', pixmap=_pixmap, alt=_file)
+                    icon_label.setToolTip(_file.name)
+                else:
+                    cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
+                    icon_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
+                #
+                self.wrapWidget(icon_label, [i+1,0, 1,1])
+                icon_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
                 pass
             self.wrapWidget(text_label, [1,1, -1,-1])
             pass
@@ -265,7 +306,7 @@ class MFHistoryList(QListWidget):
             self.takeItem(self.row(item))
             self.parent.setFocus()
             # remove the images temporarily
-            for image in w_item.item_images:
+            for image in w_item.item_icons:
                 self.mdm.remove(image)
                 pass
             # remove the record
