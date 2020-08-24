@@ -285,10 +285,13 @@ class MFHistory(QWidget):
     set_hint = pyqtSignal(object, str)
     set_progress = pyqtSignal(object, float)
 
-    def __init__(self, parent, base_path):
+    def __init__(self, parent, base_path, mf_exec):
         super().__init__(parent)
-        self.parent = parent
+        self.parent    = parent
         self.base_path = base_path
+        self.mf_exec   = mf_exec
+        self.stp = None
+        self.time_type, self.time_anchor = 0, 0
         self.styleHelper()
         pass
     
@@ -322,6 +325,26 @@ class MFHistory(QWidget):
 
     def setFocus(self):
         self.parent.setFocus()
+
+    def updateHistory(self, type_delta, anchor_delta, relative=False):
+        if not self.isVisible(): return
+        #
+        mf_type   = (self.time_type+type_delta)     if type_delta is not None else 0
+        mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta is not None else 0
+        if mf_type >= 4: #reset to today
+            mf_type, mf_anchor = 0, 0
+            relative = False
+        if mf_anchor > 0: return #no future history
+        #
+        if relative: #relative to previous stp
+            self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
+            self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
+        else:
+            self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, locate_flag=True)
+            self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
+        #
+        self.renderHistory(self.stp, items)
+        return self.time_type
 
     def renderHistory(self, stp, items):
         self.stp = stp

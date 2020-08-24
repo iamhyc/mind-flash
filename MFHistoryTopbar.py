@@ -111,6 +111,8 @@ class InputBox(QPlainTextEdit):
     def styleHelper(self):
         self.setFont( QFont(*INPUTBOX_FONT) )
         self.setPlaceholderText("Press ENTER to search ...")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFixedSize(*MIN_TOPBAR_SIZE)
         self.setVisible(False)
         pass
@@ -156,6 +158,7 @@ class ToolBarIcon(QLabel):
             self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
         pass
 
+
     def mousePressEvent(self, e):
         if e.buttons() & Qt.LeftButton:
             if self.callback: self.callback()
@@ -175,11 +178,9 @@ class ToolBarIcon(QLabel):
 
     def historyIconEvent(self):
         _icons = ['history', 'history-week', 'history-month', 'history-year']
-        _idx = _icons.index(self.icon_name)
-        _idx = (_idx+1) % len(_icons)
-        self.icon_name = _icons[_idx]
         #
-        self.topbar.parent.parent.w_editor.updateHistory(+1, None, True)
+        _idx = self.topbar.parent.updateHistory(+1, None, True)
+        self.icon_name = _icons[_idx]
         _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(32,32) )
         self.setPixmap(_icon)
         pass
@@ -194,6 +195,8 @@ class ToolBar(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.keys   = TOOL_ICONS.keys()
+        self.items  = dict()
         self.styleHelper()
         pass
 
@@ -202,16 +205,19 @@ class ToolBar(QWidget):
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         for item in TOOL_ICONS.items():
-            layout.addWidget( ToolBarIcon(self, item), 0, Qt.AlignJustify )
+            _name, _attr = item
+            self.items[_name] = ToolBarIcon(self, item)
+            layout.addWidget( self.items[_name], 0, Qt.AlignJustify )
             pass
         self.setLayout(layout)
+        #
+        self.setFixedSize(*MIN_TOPBAR_SIZE)
+        self.setVisible(False)
         self.setStyleSheet('''
             QWidget {
                 border: 1px solid #5D6D7E;
             }
         ''')
-        self.setFixedSize(*MIN_TOPBAR_SIZE)
-        self.setVisible(False)
         pass
     pass
 

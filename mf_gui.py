@@ -33,9 +33,7 @@ class MFTextEdit(QPlainTextEdit):
         self.w_todo = w_todo
         self.clipboard = QApplication.clipboard()
         #
-        self.stp = None
         self.pressed = False
-        self.time_type, self.time_anchor = 0, 0
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
         self.font_style = QFont(*INPUTBOX_FONT)
@@ -120,17 +118,17 @@ class MFTextEdit(QPlainTextEdit):
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
-            lambda:self.updateHistory(+1, None, True)
+            lambda:self.w_history.updateHistory(+1, None, True)
         )
         ### Alt+J ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_J], 
-            lambda:self.updateHistory(0, +1)
+            lambda:self.w_history.updateHistory(0, +1)
         )
         ### Alt+K ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_K], 
-            lambda:self.updateHistory(0, -1)
+            lambda:self.w_history.updateHistory(0, -1)
         )
         ### Alt+H ###
         self.keysFn.register(
@@ -148,26 +146,6 @@ class MFTextEdit(QPlainTextEdit):
             pass
         pass
 
-    def updateHistory(self, type_delta, anchor_delta, relative=False):
-        if not self.w_history.isVisible(): return
-        #
-        mf_type   = (self.time_type+type_delta)     if type_delta is not None else 0
-        mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta is not None else 0
-        if mf_type >= 4: #reset to today
-            mf_type, mf_anchor = 0, 0
-            relative = False
-        if mf_anchor > 0: return #no future history
-        #
-        if relative: #relative to previous stp
-            self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
-            self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
-        else:
-            self.stp, items = mf_exec.mf_fetch(mf_type, mf_anchor, None, locate_flag=True)
-            self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
-
-        self.w_history.renderHistory(self.stp, items)
-        pass
-
     def toggleHistoryWidget(self):
         size_half = int( self.w_history.height()/2 )
         if self.w_history.isVisible():  #hide history widget
@@ -183,7 +161,7 @@ class MFTextEdit(QPlainTextEdit):
             self.w_todo.setVisible(False); self.w_history.setVisible(True)
             self.parent.adjustSize()
             self.parent.move(self.parent.pos() - QPoint(0, size_half))
-            self.updateHistory(0, 0) #refresh, default history for today
+            self.w_history.updateHistory(0, 0) #refresh, default history for today
             pass
         self.setFocus() # for convenience
         pass
@@ -290,7 +268,7 @@ class MFGui(QWidget):
         super().__init__()
         self.mf_exec   = mf_exec
         self.w_todo    = MFTodoWidget(self, MF_DIR, sync=False)
-        self.w_history = MFHistory(self,  MF_DIR)
+        self.w_history = MFHistory(self,  MF_DIR, mf_exec)
         self.w_editor  = MFTextEdit(self, self.w_history, self.w_todo)
         # set main window layout as grid
         self.grid = QGridLayout()
@@ -332,22 +310,22 @@ class MFGui(QWidget):
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
-            lambda:self.w_editor.updateHistory(+1, None, True)
+            lambda:self.w_history.updateHistory(+1, None, True)
         )
         ### Alt+J ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_J], 
-            lambda:self.w_editor.updateHistory(0, +1)
+            lambda:self.w_history.updateHistory(0, +1)
         )
         ### Alt+K ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_K], 
-            lambda:self.w_editor.updateHistory(0, -1)
+            lambda:self.w_history.updateHistory(0, -1)
         )
         ### Alt+H ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_H], 
-            lambda:self.w_editor.toggleHistoryWidget()
+            lambda:self.w_history.toggleHistoryWidget()
         )
         pass
 
