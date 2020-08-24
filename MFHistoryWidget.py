@@ -64,6 +64,7 @@ class QLabelWrapper(QLabel):
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
             self.setTextFormat(Qt.RichText)
             self.setTextInteractionFlags(Qt.TextBrowserInteraction)
+            self.setOpenExternalLinks(True)
             self.setStyleSheet('''
                 QLabel {
                     background-color: %r;

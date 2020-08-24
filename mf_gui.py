@@ -249,15 +249,25 @@ class MFTextEdit(QPlainTextEdit):
         _mime = e.mimeData()
         if _mime.hasUrls():
             for _url in _mime.urls():
-                # _url.isLocalFile(), _url.toLocalFile(), _url.toString()
-                print(_url)
+                if _url.isLocalFile():
+                    _url.toLocalFile() #_url.toString()
+                    pass
+                else:
+                    _text = '<a href="{url}">{url}</a>'.format(url=_url.toString())
+                    self.insertPlainText(_text)
+                    pass
             pass
         elif _mime.hasHtml():
             _doc  = QTextDocument(); _doc.setHtml(_mime.html())
             _text = _doc.toPlainText()
             self.insertPlainText(_text)
-            self.textChangedEvent()
             pass
+        elif _mime.hasText():
+            _text = self.text().strip()
+            self.insertPlainText(_text)
+            pass
+        self.textChangedEvent()
+        self.showCaret(force=True)
         self.setFocus()
         pass
 
