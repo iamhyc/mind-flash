@@ -299,7 +299,7 @@ class MFRecord:
 
     pass
 
-class PixmapManager:
+class MimeDataManager:
     def __init__(self, base_path):
         self.temp = tempfile.gettempdir()
         self.home = base_path
@@ -312,6 +312,20 @@ class PixmapManager:
         pixmap.save(_path, 'PNG')
         _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'img', _file)
         return _fake_path
+
+    def saveFiles(self, files):
+        _stp = TextStamp(now=1)
+        # _folder = 'archived_%s'%_stp.unixtime
+        
+        _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'files')
+        _temp_path = Path(self.temp)
+        ret = list()
+        for _url in files:
+            _file = Path( _url.toLocalFile() )
+            shutil.copy( str(_file), _temp_path )
+            ret.append( str(Path(_fake_path, _file.name)) )
+            pass
+        return ret
 
     def save(self, real_path):
         temp_path = Path(self.temp, Path(real_path).name)

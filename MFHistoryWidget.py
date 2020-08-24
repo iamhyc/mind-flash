@@ -4,7 +4,7 @@ from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import MF_RNG, MF_HOSTNAME, PixmapManager
+from MFUtility import MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
@@ -203,7 +203,7 @@ class MFHistoryList(QListWidget):
     def __init__(self, parent, base_path):
         super().__init__(parent)
         self.parent = parent
-        self.pxm    = PixmapManager(base_path)
+        self.mdm    = MimeDataManager(base_path)
         self.itemDoubleClicked.connect(self.itemDoubleClickEvent)
         self.styleHelper()
         pass
@@ -266,7 +266,7 @@ class MFHistoryList(QListWidget):
             self.parent.setFocus()
             # remove the images temporarily
             for image in w_item.item_images:
-                self.pxm.remove(image)
+                self.mdm.remove(image)
                 pass
             # remove the record
             _uri, _id = w_item.uri.rsplit(':', 1)

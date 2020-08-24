@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import MF_RNG, KeysReactor, PixmapManager
+from MFUtility import MF_RNG, KeysReactor, MimeDataManager
 
 MF_NAME     = 'Mind Flash'
 MF_DIR      = Path('~/.mf/').expanduser()
@@ -23,7 +23,7 @@ INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2,3)
 
-pxm = PixmapManager(MF_DIR)
+mdm = MimeDataManager(MF_DIR)
 
 class MFTextEdit(QPlainTextEdit):
     def __init__(self, parent, w_history, w_todo):
@@ -96,7 +96,7 @@ class MFTextEdit(QPlainTextEdit):
             else:
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
-                    fake_path = pxm.savePixmap(pixmap)
+                    fake_path = mdm.savePixmap(pixmap)
                     _text = "<-file://{}->".format(fake_path)
                     self.insertPlainText(_text)
                 pass
@@ -171,7 +171,7 @@ class MFTextEdit(QPlainTextEdit):
         _text = img_filter.split(self.toPlainText())
         image_path = _text[1:][::2]
         for _path in image_path:
-            pxm.save(_path)
+            mdm.save(_path)
         pass
 
     def hideCaret(self):
@@ -248,14 +248,22 @@ class MFTextEdit(QPlainTextEdit):
     def dropEvent(self, e):
         _mime = e.mimeData()
         if _mime.hasUrls():
-            for _url in _mime.urls():
-                if _url.isLocalFile():
-                    _url.toLocalFile() #_url.toString()
-                    pass
-                else:
-                    _text = '<a href="{url}">{url}</a>'.format(url=_url.toString())
+            url_list = _mime.urls()
+            #
+            local_urls = list( filter(lambda x:x.isLocalFile(), url_list) )
+            if len(local_urls)>0:
+                ret = mdm.saveFiles(local_urls)
+                ret = ["<-file://{}->".format(_path) for _path in ret]
+                _text = '\n'.join(ret)
+                self.insertPlainText(_text)
+                pass
+            #
+            web_urls = list( filter(lambda x:not x.isLocalFile(), url_list) )
+            if len(web_urls)>0:
+                for _url in url_list:
+                    _text = '<a href="{url}">{url}</a>\n'.format(url=_url.toString())
                     self.insertPlainText(_text)
-                    pass
+                pass
             pass
         elif _mime.hasHtml():
             _doc  = QTextDocument(); _doc.setHtml(_mime.html())
