@@ -269,7 +269,7 @@ class MFHistoryList(QListWidget):
                 pass
             # remove the record
             _uri, _id = w_item.uri.rsplit(':', 1)
-            with open(_uri, 'r+') as f:
+            with open(_uri, 'r+', encoding='utf-8') as f:
                 _tmp = f.readlines()
                 _idx = _tmp.index(_id)
                 _tmp = _tmp[:_idx] + _tmp[_idx+3:]
@@ -353,7 +353,7 @@ class MFHistory(QWidget):
         else: #bypass some Windows OneDrive
             _path = Path('~/', _file).expanduser()
         _total = self.w_history_list.count()
-        with open( str(_path), 'w+' ) as f:
+        with open( str(_path), 'w+', encoding='utf-8' ) as f:
             f.write('# Mind Flash Export - %s\n'%self.stp.hint)
             for i in range(_total):
                 w_item = self.w_history_list.itemWidget( self.w_history_list.item(i) )
