@@ -20,76 +20,31 @@ class MF_RNG(Enum):
     YEAR = 3
     pass
 
-class TextStamp():
-    def __init__(self, mf_type=0, mf_anchor=0, now=0):
-        self.mf_type = mf_type
-        self.start,  self.end,   self.hint     = None, None, None
-        self.weekno, self.dayno, self.unixtime = None, None, None
-        self.end = datetime.now()
-        self.back_stepper = relativedelta(days=-1)
-        
-        if not now:
-            self.update_type(mf_type, mf_anchor)
-            self.update_hint()
+class workSpace:
+    def __init__(self, p, *p_l, **kargs):
+        self.wrk = Path(p, *p_l).expanduser().resolve()
+        self.pwd = Path.cwd()
+        if 'forceUpdate' in kargs.keys():
+            self.forceUpdate = True
         else:
-            self.start = self.end
-            self.update_hint()
+            self.forceUpdate = False
         pass
-
-    def diff_time(self, mf_type):
-        _diff = relativedelta(self.end, datetime.now())
-        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
-        if mf_type==MF_RNG.DAY:
-            return _diff.days
-        elif mf_type==MF_RNG.WEEK:
-            return _diff.weeks
-        elif mf_type==MF_RNG.MONTH:
-            return _diff.months
-        elif mf_type==MF_RNG.YEAR:
-            return _diff.years
+    
+    def __enter__(self):
+        if not Path(self.wrk).is_dir():
+            if self.forceUpdate:
+                Path(self.wrk).mkdir(mode=0o755, exist_ok=True)
+            else:
+                return self.__exit__(*sys.exc_info())
         else:
-            return _diff
+            pass
+        chdir(self.wrk)
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        chdir(self.pwd)
+        if exc_tb: pass
         pass
-
-    def update_type(self, mf_type, mf_anchor=0):
-        if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
-            tmp = datetime(self.end.year, self.end.month, self.end.day)
-            self.end   = tmp + relativedelta(days=mf_anchor)
-            self.start = self.end + relativedelta(days=1)
-            self.hint  = self.end.strftime('%Y-%m-%d (%a)')
-        elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
-            tmp = datetime(self.end.year, self.end.month, self.end.day)
-            mf_anchor  = -1 if mf_anchor==0 else mf_anchor #FIXME: get last Monday when anchor==0
-            self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
-            self.start = self.end + relativedelta(days=7)
-            self.hint  = self.end.strftime('Week %U (%b), %Y')
-        elif mf_type==MF_RNG.MONTH:                    # from 1st to end-th
-            tmp = datetime(self.end.year, self.end.month, 1)
-            self.end   = tmp + relativedelta(months=mf_anchor)
-            self.start = self.end + relativedelta(months=1)
-            self.hint  = self.end.strftime('%b, %Y')
-        elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
-            self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
-            self.start = self.end + relativedelta(years=1)
-            self.hint  = self.end.strftime('Year %Y')
-        else:
-            return
-        self.mf_type = mf_type
-        pass
-
-    def next(self):
-        if self.start + self.back_stepper < self.end:
-            return False
-        self.start += self.back_stepper
-        self.update_hint()
-        return True
-
-    def update_hint(self):
-        self.weekno   = self.start.strftime('%Y-%U')
-        self.dayno    = self.start.strftime('%m-%d')
-        self.unixtime = str(int( self.start.timestamp() ))
-        pass
-
     pass
 
 class KeysReactor():
@@ -221,31 +176,76 @@ class MouseReactor(object):
 
     pass
 
-class workSpace:
-    def __init__(self, p, *p_l, **kargs):
-        self.wrk = Path(p, *p_l).expanduser().resolve()
-        self.pwd = Path.cwd()
-        if 'forceUpdate' in kargs.keys():
-            self.forceUpdate = True
+class TextStamp():
+    def __init__(self, mf_type=0, mf_anchor=0, now=0):
+        self.mf_type = mf_type
+        self.start,  self.end,   self.hint     = None, None, None
+        self.weekno, self.dayno, self.unixtime = None, None, None
+        self.end = datetime.now()
+        self.back_stepper = relativedelta(days=-1)
+        
+        if not now:
+            self.update_type(mf_type, mf_anchor)
+            self.update_hint()
         else:
-            self.forceUpdate = False
+            self.start = self.end
+            self.update_hint()
         pass
-    
-    def __enter__(self):
-        if not Path(self.wrk).is_dir():
-            if self.forceUpdate:
-                Path(self.wrk).mkdir(mode=0o755, exist_ok=True)
-            else:
-                return self.__exit__(*sys.exc_info())
-        else:
-            pass
-        chdir(self.wrk)
-        return self
 
-    def __exit__(self, exc_type, exc_value, exc_tb):
-        chdir(self.pwd)
-        if exc_tb: pass
+    def diff_time(self, mf_type):
+        _diff = relativedelta(self.end, datetime.now())
+        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
+        if mf_type==MF_RNG.DAY:
+            return _diff.days
+        elif mf_type==MF_RNG.WEEK:
+            return _diff.weeks
+        elif mf_type==MF_RNG.MONTH:
+            return _diff.months
+        elif mf_type==MF_RNG.YEAR:
+            return _diff.years
+        else:
+            return _diff
         pass
+
+    def update_type(self, mf_type, mf_anchor=0):
+        if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
+            tmp = datetime(self.end.year, self.end.month, self.end.day)
+            self.end   = tmp + relativedelta(days=mf_anchor)
+            self.start = self.end + relativedelta(days=1)
+            self.hint  = self.end.strftime('%Y-%m-%d (%a)')
+        elif mf_type==MF_RNG.WEEK:                     # from MON to SUN
+            tmp = datetime(self.end.year, self.end.month, self.end.day)
+            mf_anchor  = -1 if mf_anchor==0 else mf_anchor #FIXME: get last Monday when anchor==0
+            self.end   = tmp + relativedelta(weekday=MO(mf_anchor))
+            self.start = self.end + relativedelta(days=7)
+            self.hint  = self.end.strftime('Week %U (%b), %Y')
+        elif mf_type==MF_RNG.MONTH:                    # from 1st to end-th
+            tmp = datetime(self.end.year, self.end.month, 1)
+            self.end   = tmp + relativedelta(months=mf_anchor)
+            self.start = self.end + relativedelta(months=1)
+            self.hint  = self.end.strftime('%b, %Y')
+        elif mf_type==MF_RNG.YEAR:                     # from Jan to Dec
+            self.end   = datetime(self.end.year, 1, 1) + relativedelta(years=mf_anchor)
+            self.start = self.end + relativedelta(years=1)
+            self.hint  = self.end.strftime('Year %Y')
+        else:
+            return
+        self.mf_type = mf_type
+        pass
+
+    def next(self):
+        if self.start + self.back_stepper < self.end:
+            return False
+        self.start += self.back_stepper
+        self.update_hint()
+        return True
+
+    def update_hint(self):
+        self.weekno   = self.start.strftime('%Y-%U')
+        self.dayno    = self.start.strftime('%m-%d')
+        self.unixtime = str(int( self.start.timestamp() ))
+        pass
+
     pass
 
 class MFRecord:
