@@ -10,7 +10,7 @@ from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal)
 from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QPainter,
                         QPixmap, QTextDocument, QDesktopServices)
-from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
+from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
                             QListWidget, QListWidgetItem, QGridLayout)
 
 COLOR_DAYTIME  = ['#856d72', '#83cbac', '#f1939c', '#93b5cf'] #00-06, 06-12, 12-18, 18-24
@@ -133,7 +133,6 @@ class QLabelWrapper(QLabel):
             w_preview = MFImagePreviewer(self, _pixmap)
             pass
         elif self.type=='file_label' and ev.buttons() & Qt.RightButton:
-            #TODO: copy to clipboard mime data
             _clipboard = QApplication.clipboard()
             _mimeData  = QMimeData(); _mimeData.setUrls([ QUrl.fromLocalFile(str(self.alt)) ])
             _clipboard.setMimeData(_mimeData)
@@ -327,6 +326,7 @@ class MFHistoryList(QListWidget):
         self.setSpacing(0)
         self.setContentsMargins(0,0,0,0)
         self.setFixedWidth(MIN_HISTORY_SIZE[0])
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         pass
 
     def itemDoubleClickEvent(self, item):
