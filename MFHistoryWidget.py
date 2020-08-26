@@ -7,7 +7,7 @@ from dateutil.tz import tzlocal, tzutc
 from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
-from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
+from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal)
 from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QPainter,
                         QPixmap, QTextDocument, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
@@ -134,10 +134,16 @@ class QLabelWrapper(QLabel):
             pass
         elif self.type=='file_label' and ev.buttons() & Qt.RightButton:
             #TODO: copy to clipboard mime data
-            # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "File %s Copied."'%self.alt.name)
+            _clipboard = QApplication.clipboard()
+            _mimeData  = QMimeData(); _mimeData.setUrls([ QUrl.fromLocalFile(str(self.alt)) ])
+            _clipboard.setMimeData(_mimeData)
+            try:
+                os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 15000 "File  %s  Copied."'%self.alt.name)
+            except:
+                pass
             pass
         elif self.type=='file_label' and ev.buttons() & Qt.LeftButton:
-            #TODO: open with QDesktopService
+            QDesktopServices.openUrl(QUrl.fromLocalFile( POSIX(self.alt.parent) ))
             pass
         return super().mousePressEvent(ev)
 
