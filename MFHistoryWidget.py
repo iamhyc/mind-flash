@@ -4,7 +4,7 @@ from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import MF_RNG, MF_HOSTNAME, MimeDataManager
+from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
@@ -165,7 +165,7 @@ class MFHistoryItem(QFrame):
     def getIconPath(self, _path):
         _file = Path(self.base_path, _path)
         if img_filter.match(_file.suffix):
-            return ('', str(_file))
+            return ('', POSIX(_file))
         else:
             return (_file,  "./res/svg/archive.svg")
         pass

@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import MF_RNG, KeysReactor, MimeDataManager
+from MFUtility import POSIX, MF_RNG, KeysReactor, MimeDataManager
 
 MF_NAME     = 'Mind Flash'
 MF_DIR      = Path('~/.mf/').expanduser()

@@ -10,8 +10,9 @@ from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
 
-MF_HOSTNAME= platform.node().split('-')[0]
+MF_HOSTNAME = platform.node().split('-')[0]
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
+POSIX = lambda x: x.as_posix() if x.__getattribute__('as_posix') else x
 
 class MF_RNG(Enum):
     DAY  = 0
@@ -308,7 +309,7 @@ class MimeDataManager:
     def savePixmap(self, pixmap):
         _stp  = TextStamp(now=1)
         _file = 'pasted_%s.png'%_stp.unixtime
-        _path = str( Path(self.temp, _file) )
+        _path = POSIX( Path(self.temp, _file) )
         pixmap.save(_path, 'PNG')
         _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'img', _file)
         return _fake_path
@@ -322,8 +323,8 @@ class MimeDataManager:
         ret = list()
         for _url in files:
             _file = Path( _url.toLocalFile() )
-            shutil.copy( str(_file), _temp_path )
-            ret.append( str(Path(_fake_path, _file.name)) )
+            shutil.copy( POSIX(_file), _temp_path )
+            ret.append( POSIX(Path(_fake_path, _file.name)) )
             pass
         return ret
 
@@ -332,7 +333,7 @@ class MimeDataManager:
         home_path = Path(self.home, real_path)
         if temp_path.is_file():
             Path(home_path.parent).mkdir(mode=0o755, exist_ok=True)
-            shutil.copy2( str(temp_path), str(home_path) )
+            shutil.copy2( POSIX(temp_path), POSIX(home_path) )
             return True
         else:
             return False
@@ -342,7 +343,7 @@ class MimeDataManager:
         # temp_path = Path(self.temp, Path(real_path).name)
         # home_path = Path(self.home, real_path)
         # try:
-        #     shutil.move( str(home_path), str(temp_path) )
+        #     shutil.move( POSIX(home_path), POSIX(temp_path) )
         #     return True
         # except:
         #     return False

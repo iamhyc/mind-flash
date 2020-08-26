@@ -66,7 +66,7 @@ class MFEntity:
                             # uri: <userDir>/<weekno>/<stp.dayno>:<unixtime_line>
                             for _item in these_items:
                                 _uri = '{path}:{id}'.format(
-                                        path=str(Path(userDir, stp.weekno, stp.dayno)), id=_item[1])
+                                        path=POSIX(Path(userDir, stp.weekno, stp.dayno)), id=_item[1])
                                 items.append( (_uri, _item) )
                             pass
                         else:

@@ -3,7 +3,7 @@ from pathlib import Path
 from PyQt5.QtCore import (Qt, QSize, QTimer)
 from PyQt5.QtGui import (QColor, QFont, QFontMetrics)
 from PyQt5.QtWidgets import (QListWidget, QListWidgetItem)
-from MFUtility import MF_HOSTNAME
+from MFUtility import POSIX, MF_HOSTNAME
 
 MIN_TODO_SIZE       = (600, 20)
 TODO_ITEM_FONT      = ('Noto Sans CJK SC',12)
