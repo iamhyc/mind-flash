@@ -480,7 +480,11 @@ class MFHistory(QWidget):
                     if _idx%2==0:
                         _text += _raw.strip()
                     else:
-                        _text += '\n![](%s)\n'%(Path(self.base_path, _raw))
+                        _tmp = Path(_raw)
+                        if img_filter.match(_tmp.suffix):
+                            _text += '\n![](%s)\n'%(POSIX(Path(self.base_path, _tmp)))
+                        else:
+                            _text += '\n[%s](%s)\n'%(_tmp.name, POSIX(Path(self.base_path, _tmp)))
                     pass
                 f.write("**`{user}`** `{date}`\n{text}\n\n------\n".format(
                         date=_date, user=_user, text=_text))
