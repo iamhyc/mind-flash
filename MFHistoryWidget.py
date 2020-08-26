@@ -169,12 +169,12 @@ class MFHistoryItem(QFrame):
         self.size_height += self.getHeightHint(ref, pos)
         return ref
 
-    def getIconPath(self, _path):
+    def getIconType(self, _path):
         _file = Path(self.base_path, _path)
         if img_filter.match(_file.suffix):
             return ('', POSIX(_file))
         else:
-            return (_file,  "./res/svg/archive.svg")
+            return (_file, "./res/svg/archive.svg")
         pass
 
     def updateItem(self):
@@ -201,16 +201,16 @@ class MFHistoryItem(QFrame):
         # not all item_icons are images, maybe files
         icon_pixmaps = list()
         for _icon in self.item_icons:
-            _file, _path = self.getIconPath(_icon)
-            icon_pixmaps.append( (_file, QPixmap(_path)) )
+            _file, _pixmap = self.getIconType(_icon)
+            icon_pixmaps.append( (_file, QPixmap(_pixmap)) )
             pass
 
         #NOTE: 3. adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
-        if not self.item_icons: #text only
+        if not self.item_icons:     #text only
             self.wrapWidget(text_label, [1,0, 1,3])
             pass
-        elif not self.item_text: #images only
+        elif not self.item_text:    #images only
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(icon_pixmaps):
                 #
@@ -220,13 +220,13 @@ class MFHistoryItem(QFrame):
                     icon_label.setToolTip(_file.name)
                 else:
                     cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
-                    icon_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
+                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
                 #
                 self.wrapWidget(icon_label, [i+1,0, 1,3])
                 icon_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
                 pass
             pass
-        else:          #mixture
+        else:                       #mixture
             CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
             for (i,pixmap) in enumerate(icon_pixmaps):
                 #
@@ -236,7 +236,7 @@ class MFHistoryItem(QFrame):
                     icon_label.setToolTip(_file.name)
                 else:
                     cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
-                    icon_label    = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
+                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
                 #
                 self.wrapWidget(icon_label, [i+1,0, 1,1])
                 icon_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
@@ -307,9 +307,18 @@ class MFHistoryList(QListWidget):
         raw_item, uri = w_item.item, w_item.uri
 
         if w_item.double_clicked==0:
-            w_item.double_clicked = 1
-            self.parent.parent.w_editor.insertPlainText( eval(raw_item[2])+'\n' )
+            _text = raw_item[2]
+            for icon in w_item.item_icons:
+                _file, _image = w_item.getIconType(icon)
+                if _file:
+                    _fake_path = self.mdm.saveFiles([_file])[0]
+                else:
+                    _fake_path = self.mdm.savePixmap( QPixmap(_image) )
+                _text = _text.replace(icon, _fake_path)
+                pass
+            self.parent.parent.w_editor.insertPlainText( eval(_text)+'\n' )
             self.parent.parent.w_editor.setFocus()
+            w_item.double_clicked = 1
             pass
         else:
             self.removeItemWidget(item)

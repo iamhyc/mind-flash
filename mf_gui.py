@@ -252,7 +252,7 @@ class MFTextEdit(QPlainTextEdit):
             #
             local_urls = list( filter(lambda x:x.isLocalFile(), url_list) )
             if len(local_urls)>0:
-                ret = mdm.saveFiles(local_urls)
+                ret = mdm.saveUrls(local_urls)
                 ret = ["<-file://{}->".format(_path) for _path in ret]
                 _text = '\n'.join(ret)
                 self.insertPlainText(_text)

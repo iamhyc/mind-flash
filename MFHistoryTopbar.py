@@ -138,6 +138,7 @@ class ToolBarIcon(QLabel):
             _width = MIN_TOPBAR_SIZE[0] - MIN_TOOLICON_SIZE[0]*TOOL_ICON_NUM - 33 #33 for one rightmost icon
             self.setFixedSize( _width, MIN_TOPBAR_SIZE[1] )
             self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
+            self.callback = None #TODO: impl. MouseReactor
             return
         
         self.icon_name = self.name

@@ -12,7 +12,7 @@ from dateutil.relativedelta import relativedelta
 
 MF_HOSTNAME = platform.node().split('-')[0]
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
-POSIX = lambda x: x.as_posix() if x.__getattribute__('as_posix') else x
+POSIX = lambda x: x.as_posix() if hasattr(x, 'as_posix') else x
 
 class MF_RNG(Enum):
     DAY  = 0
@@ -311,8 +311,12 @@ class MimeDataManager:
         _file = 'pasted_%s.png'%_stp.unixtime
         _path = POSIX( Path(self.temp, _file) )
         pixmap.save(_path, 'PNG')
-        _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'img', _file)
+        _fake_path = POSIX( Path(MF_HOSTNAME, _stp.weekno, 'img', _file) )
         return _fake_path
+
+    def saveUrls(self, urls):
+        _files = [_url.toLocalFile() for _url in urls]
+        return self.saveFiles(_files)
 
     def saveFiles(self, files):
         _stp = TextStamp(now=1)
@@ -321,8 +325,8 @@ class MimeDataManager:
         _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'files')
         _temp_path = Path(self.temp)
         ret = list()
-        for _url in files:
-            _file = Path( _url.toLocalFile() )
+        for _file in files:
+            _file = Path( _file )
             shutil.copy( POSIX(_file), _temp_path )
             ret.append( POSIX(Path(_fake_path, _file.name)) )
             pass
