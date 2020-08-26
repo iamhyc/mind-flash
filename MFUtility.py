@@ -307,7 +307,7 @@ class MimeDataManager:
 
     def savePixmap(self, pixmap):
         _stp  = TextStamp(now=1)
-        _file = 'pasted_%s'%_stp.unixtime
+        _file = 'pasted_%s.png'%_stp.unixtime
         _path = str( Path(self.temp, _file) )
         pixmap.save(_path, 'PNG')
         _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'img', _file)
