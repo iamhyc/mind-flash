@@ -81,7 +81,7 @@ class QLabelWrapper(QLabel):
             pass
         elif self.type=='file_label':
             _pixmap = self.getFileIcon()
-            self.setPixmap(_pixmap)
+            self.setPixmap( _pixmap.scaledToWidth(75, Qt.SmoothTransformation) )
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         else:
@@ -180,6 +180,7 @@ class MFHistoryItem(QFrame):
         pass
 
     def getHeightHint(self, label_ref, pos):
+        _text =''
         if label_ref.text():
             _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
             _text = _doc.toPlainText()
@@ -194,7 +195,8 @@ class MFHistoryItem(QFrame):
                 size   = QSize(0, _height)
             pass
         else:
-            size  = QSize(MIN_ITEM_SIZE[1], 0)
+            _height = min(label_ref.pixmap().height()+25, MIN_ITEM_SIZE[1])
+            size  = QSize(_height, 0)
             pass
         return size
 
