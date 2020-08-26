@@ -8,7 +8,8 @@ from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
-from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument)
+from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument,
+                        QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
 
@@ -77,7 +78,7 @@ class QLabelWrapper(QLabel):
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         elif self.type=='file_label':
-            _pixmap = self.pixmap().scaledToWidth(120, Qt.SmoothTransformation)
+            _pixmap = QPixmap('./res/svg/archive.svg').scaledToWidth(120, Qt.SmoothTransformation)
             #TODO: alter _pixmap with right-slide filename
             self.setPixmap(_pixmap)
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -207,41 +208,33 @@ class MFHistoryItem(QFrame):
 
         #NOTE: 3. adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
-        if not self.item_icons:     #text only
+        if not self.item_icons: #text only
             self.wrapWidget(text_label, [1,0, 1,3])
             pass
-        elif not self.item_text:    #images only
-            CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
+        else:
+            if not self.item_text:
+                CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
+                IconSize = (1, 3)
+                ImgWidth = MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX
+            else:
+                CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
+                IconSize = (1, 1)
+                ImgWidth = MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX
+            #
             for (i,pixmap) in enumerate(icon_pixmaps):
-                #
                 _file, _pixmap = pixmap
                 if _file:
-                    icon_label = QLabelWrapper('file_label', pixmap=_pixmap, alt=_file)
+                    icon_label = QLabelWrapper('file_label', alt=_file)
                     icon_label.setToolTip(_file.name)
                 else:
                     cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
                     icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
                 #
-                self.wrapWidget(icon_label, [i+1,0, 1,3])
-                icon_label.setFixedWidth(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX)
+                self.wrapWidget(icon_label, [*(i+1,0), *IconSize])
+                icon_label.setFixedWidth(ImgWidth)
                 pass
-            pass
-        else:                       #mixture
-            CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
-            for (i,pixmap) in enumerate(icon_pixmaps):
-                #
-                _file, _pixmap = pixmap
-                if _file:
-                    icon_label = QLabelWrapper('file_label', pixmap=_pixmap, alt=_file)
-                    icon_label.setToolTip(_file.name)
-                else:
-                    cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
-                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
-                #
-                self.wrapWidget(icon_label, [i+1,0, 1,1])
-                icon_label.setFixedWidth(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX)
-                pass
-            self.wrapWidget(text_label, [1,1, -1,-1])
+            #
+            if self.item_text: self.wrapWidget(text_label, [1,1, -1,-1])
             pass
         pass
 
