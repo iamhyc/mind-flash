@@ -39,6 +39,7 @@ class MFImagePreviewer(QWidget):
         self.move(qr.topLeft())
         #
         self.keysFn = KeysReactor(self)
+        self.keysFn.register([Qt.Key_Escape], lambda:self.close())
         self.keysFn.register([Qt.Key_Return], lambda:self.close())
         self.keysFn.register([Qt.Key_Enter],  lambda:self.close())
         #

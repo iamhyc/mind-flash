@@ -340,14 +340,13 @@ class MimeDataManager:
         pass
     
     def remove(self, real_path):
-        # temp_path = Path(self.temp, Path(real_path).name)
-        # home_path = Path(self.home, real_path)
-        # try:
-        #     shutil.move( POSIX(home_path), POSIX(temp_path) )
-        #     return True
-        # except:
-        #     return False
-        #FIXME: need to keep track of reference, so not delete for now
+        temp_path = Path(self.temp, Path(real_path).name)
+        home_path = Path(self.home, real_path)
+        try:
+            shutil.move( POSIX(home_path), POSIX(temp_path) )
+            return True
+        except:
+            return False
         return False
     pass
 

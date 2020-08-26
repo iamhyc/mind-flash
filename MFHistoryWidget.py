@@ -146,15 +146,32 @@ class MFHistoryItem(QFrame):
         pass
 
     def getHeightHint(self, label_ref, pos):
-        _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
-        _text = _doc.toPlainText()
-        if _text:
+        if label_ref.text():
+            _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
+            _text = _doc.toPlainText()
             fm    = QFontMetrics(label_ref.font())
-            fm_rect = QRect(0,0,590,100)
-            _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
-            size   = QSize(0, _height)
-        elif label_ref.pixmap():
-            size   = QSize(MIN_ITEM_SIZE[1], 0)
+            if label_ref.type=='item_hint':
+                fm_rect = QRect(0,0,590,100)
+                _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
+                size   = QSize(_height, _height)
+            else:
+                fm_rect = QRect(0,0,590,100) if len(self.item_icons)==0 else QRect(0,0,590/3*2,100)
+                _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
+                size   = QSize(0, _height)
+            pass
+        else:
+            size  = QSize(MIN_ITEM_SIZE[1], 0)
+            pass
+        
+        # _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
+        # _text = _doc.toPlainText()
+        # if _text:
+        #     fm    = QFontMetrics(label_ref.font())
+        #     fm_rect = QRect(0,0,590,100) if self.size_height.width()==0 else QRect(0,0,590/3*2,100)
+        #     _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
+        #     size   = QSize(0, _height)
+        # elif label_ref.pixmap():
+        #     size   = QSize(MIN_ITEM_SIZE[1], 0)
         return size
 
     def wrapWidget(self, ref, pos):
@@ -179,23 +196,26 @@ class MFHistoryItem(QFrame):
         _text = italic_filter.sub(r'<i>\1</i>', _text)
         _text = icon_filter.split(_text)
         self.split_text = _text
-        # parse (hint, images, text)
+        
+        #NOTE: 1. parse (hint, images, text)
         hint   = ' '.join([_user, _time])
         self.item_icons = _text[1:][::2]
         _text  = ''.join(_text[0:][::2]).strip()
-        _text  = _text+'\n' if _text else '' #NOTE: for QFontMetrics.boundingRect correction
-        self.item_text   = _text.replace('\n', '<br>')
-        # create widgets
+        _text  = _text+'\n' if _text else '' # for QFontMetrics.boundingRect correction
+        self.item_text = _text.replace('\n', '<br>')
+        
+        #NOTE: 2. create widgets
         hint_label = QLabelWrapper('item_hint', hint)
         if self.item_text:
             text_label = QLabelWrapper('item_text', self.item_text)
-        #NOTE: not all item_icons are images, maybe files
+        # not all item_icons are images, maybe files
         icon_pixmaps = list()
         for _icon in self.item_icons:
             _file, _path = self.getIconPath(_icon)
             icon_pixmaps.append( (_file, QPixmap(_path)) )
             pass
-        # adjust gridlayout
+
+        #NOTE: 3. adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
         if not self.item_icons: #text only
             self.wrapWidget(text_label, [1,0, 1,3])
