@@ -8,8 +8,8 @@ from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QRect, QSize, QThread, pyqtSignal)
-from PyQt5.QtGui import (QFont, QFontMetrics, QPixmap, QPainter, QTextDocument,
-                        QDesktopServices)
+from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QPainter,
+                        QPixmap, QTextDocument, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel,
                             QListWidget, QListWidgetItem, QGridLayout)
 
@@ -22,6 +22,8 @@ ITEM_USER_COLOR  = 'silver'
 ITEM_DATE_COLOR  = '#2b1216'
 ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
 ITEM_TEXT_COLOR  = '#252526'
+FILE_ICON_FONT   = ('Noto Sans CJK SC',11,QFont.Bold)
+ICON_HINT_FONT   = ('Noto Sans CJK SC',12,0,1)
 LIST_BACKGROUND  = '#FFFEF9' #xuebai
 ITEM_BACKGROUND  = '#EEF7F2'
 ITEM_BORDERCOLOR = '#DFECD5'
@@ -78,8 +80,7 @@ class QLabelWrapper(QLabel):
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         elif self.type=='file_label':
-            _pixmap = QPixmap('./res/svg/archive.svg').scaledToWidth(120, Qt.SmoothTransformation)
-            #TODO: alter _pixmap with right-slide filename
+            _pixmap = self.getFileIcon()
             self.setPixmap(_pixmap)
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
@@ -87,6 +88,33 @@ class QLabelWrapper(QLabel):
             raise Exception
             pass
         pass
+
+    def getFileIcon(self):
+        #
+        _text   = Path(self.alt).name
+        _suffix = Path(self.alt).suffix.upper()
+        _suffix = _suffix[1:] if _suffix else "(Unknown)"
+        _pixmap = QPixmap(120, 120); _pixmap.fill(QColor(0,0,0,0))
+        _painter= QPainter(_pixmap)
+        _painter.setRenderHints(QPainter.Antialiasing|QPainter.TextAntialiasing)
+        # draw rounded rect
+        _pen = _painter.pen(); _pen.setWidth(2)
+        _painter.setPen(_pen)
+        _painter.drawRoundedRect(QRect(1,1,118,118), 15, 15)
+        # draw suffix text
+        _rect = QRect(10, 10, 110, 35)  #100*25
+        _painter.setPen(QPen(QColor("#0f59a4")))
+        _painter.setFont(QFont(*ICON_HINT_FONT))
+        _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextSingleLine, _suffix )
+        _painter.setPen(_pen)
+        # draw splitter
+        _painter.drawLine(1, 40, 118, 40)
+        # draw suffix text
+        _rect = QRect(10, 45, 110, 110) #100*65
+        _painter.setFont(QFont(*FILE_ICON_FONT))
+        _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextWrapAnywhere, _text )
+        del _painter
+        return _pixmap
 
     def mousePressEvent(self, ev):
         if self.type=='img_label' and ev.buttons() & Qt.RightButton:
@@ -175,7 +203,7 @@ class MFHistoryItem(QFrame):
         if img_filter.match(_file.suffix):
             return ('', POSIX(_file))
         else:
-            return (_file, "./res/svg/archive.svg")
+            return (_file, "./res/svg/files.svg")
         pass
 
     def updateItem(self):
