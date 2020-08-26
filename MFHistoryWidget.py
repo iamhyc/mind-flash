@@ -162,16 +162,6 @@ class MFHistoryItem(QFrame):
         else:
             size  = QSize(MIN_ITEM_SIZE[1], 0)
             pass
-        
-        # _doc  = QTextDocument(); _doc.setHtml(label_ref.text())
-        # _text = _doc.toPlainText()
-        # if _text:
-        #     fm    = QFontMetrics(label_ref.font())
-        #     fm_rect = QRect(0,0,590,100) if self.size_height.width()==0 else QRect(0,0,590/3*2,100)
-        #     _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
-        #     size   = QSize(0, _height)
-        # elif label_ref.pixmap():
-        #     size   = QSize(MIN_ITEM_SIZE[1], 0)
         return size
 
     def wrapWidget(self, ref, pos):
