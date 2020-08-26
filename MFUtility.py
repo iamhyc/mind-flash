@@ -320,15 +320,20 @@ class MimeDataManager:
 
     def saveFiles(self, files):
         _stp = TextStamp(now=1)
-        # _folder = 'archived_%s'%_stp.unixtime
+        _folder = '' #'%s'%( _stp.dayno )
         
-        _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'files')
+        _fake_path = Path(MF_HOSTNAME, _stp.weekno, 'files', _folder)
         _temp_path = Path(self.temp)
         ret = list()
         for _file in files:
             _file = Path( _file )
-            shutil.copy( POSIX(_file), _temp_path )
-            ret.append( POSIX(Path(_fake_path, _file.name)) )
+            if _file.is_file():
+                _file_name, _idx = _file.name, 0
+                while Path(self.home, _fake_path, _file_name).exists():
+                    _idx += 1
+                    _file_name = '{} ({}){}'.format(_file.stem, _idx, _file.suffix)
+                shutil.copy( POSIX(_file), POSIX(Path(_temp_path, _file_name)) )
+                ret.append( POSIX(Path(_fake_path, _file_name)) )
             pass
         return ret
 

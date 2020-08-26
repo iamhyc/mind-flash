@@ -311,11 +311,20 @@ class MFHistoryList(QListWidget):
             for icon in w_item.item_icons:
                 _file, _image = w_item.getIconType(icon)
                 if _file:
-                    _fake_path = self.mdm.saveFiles([_file])[0]
+                    _ret = self.mdm.saveFiles([_file])
+                    if len(_ret)>0:
+                        _fake_path = "<-file://{}->".format(_ret[0])
+                    else:
+                        _fake_path = ''
                 else:
-                    _fake_path = self.mdm.savePixmap( QPixmap(_image) )
-                _text = _text.replace(icon, _fake_path)
+                    try:
+                        _fake_path = self.mdm.savePixmap( QPixmap(_image) )
+                        _fake_path = "<-file://{}->".format(_fake_path)
+                    except:
+                        _fake_path = ''
+                _text = _text.replace("<-file://{}->".format(icon), _fake_path)
                 pass
+            _text += '\n' if _text else ''
             self.parent.parent.w_editor.insertPlainText( eval(_text)+'\n' )
             self.parent.parent.w_editor.setFocus()
             w_item.double_clicked = 1
