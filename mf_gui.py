@@ -135,6 +135,8 @@ class MFTextEdit(QPlainTextEdit):
             [Qt.Key_Alt, Qt.Key_H], 
             lambda:self.toggleHistoryWidget()
         )
+        ### Escape ###
+        self.keysFn.register([Qt.Key_Escape], lambda:self.parent.close())
         pass
 
     def showHelpText(self):
