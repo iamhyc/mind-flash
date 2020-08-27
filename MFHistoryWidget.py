@@ -285,6 +285,8 @@ class MFHistoryList(QListWidget):
         super().__init__(parent)
         self.parent = parent
         self.mdm    = MimeDataManager(base_path)
+        self.offset = 0
+        self.to_bound = 0
         self.itemDoubleClicked.connect(self.itemDoubleClickEvent)
         self.styleHelper()
         pass
@@ -378,6 +380,22 @@ class MFHistoryList(QListWidget):
                 pass
             pass
         pass
+    
+    def wheelEvent(self, e):
+        _offset = self.verticalOffset()
+        _move_up = e.angleDelta().y()>0
+        if (_move_up and self.offset==0) or (not _move_up and self.offset==_offset):
+            self.to_bound += 1
+        else:
+            self.to_bound = 0
+        self.offset = _offset
+        #
+        if self.to_bound>=5:
+            self.to_bound = 0
+            _direction = -1 if _move_up else +1
+            self.parent.updateHistory(0, _direction)
+            pass
+        return super().wheelEvent(e)
     pass
 
 class MFHistory(QWidget):
