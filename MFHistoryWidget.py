@@ -8,8 +8,8 @@ from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal)
-from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QPainter,
-                        QPixmap, QTextDocument, QDesktopServices)
+from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QTextLayout,
+                        QPainter, QPixmap, QTextDocument, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
                             QListWidget, QListWidgetItem, QGridLayout)
 
@@ -102,7 +102,7 @@ class QLabelWrapper(QLabel):
         _painter.setPen(_pen)
         _painter.drawRoundedRect(QRect(1,1,118,118), 15, 15)
         # draw suffix text
-        _rect = QRect(10, 10, 110, 35)  #100*25
+        _rect = QRect(8, 10, 108, 35)  #100*25
         _painter.setPen(QPen(QColor("#0f59a4")))
         _painter.setFont(QFont(*ICON_HINT_FONT))
         _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextSingleLine, _suffix )
@@ -110,8 +110,10 @@ class QLabelWrapper(QLabel):
         # draw splitter
         _painter.drawLine(1, 40, 118, 40)
         # draw suffix text
-        _rect = QRect(10, 45, 110, 110) #100*65
+        _rect = QRect(8, 45, 108, 110) #100*65
         _painter.setFont(QFont(*FILE_ICON_FONT))
+        _fm   = QFontMetrics( _painter.font() )
+        # _elided_text = _fm.elidedText(_text, Qt.ElideMiddle, _rect.width(), Qt.TextWrapAnywhere)
         _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextWrapAnywhere, _text )
         del _painter
         return _pixmap
