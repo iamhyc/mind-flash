@@ -1,3 +1,20 @@
+mind-flash (0.9.8) unstable; urgency=low
+
+  * add history type switch icon
+  * show help text when first run
+  * add local/online URL drop support
+  * add local/online URL parse
+  * fix POSIX path resolve on win32 platform
+  * fix history item height hint
+  * fix MDM save/remove logic
+  * add file icon draw function
+  * impl. left/right click action on file icon
+  * update history list scroll at pixel
+  * enhance Escape key response
+  * add scroll event for history jump
+
+ -- iamhyc <sudofree@163.com>  Sat, 27 Aug 2020 23:59:59 +0000
+
 mind-flash (0.9.6) unstable; urgency=low
 
   * add PixmapManager with save/remove logic
