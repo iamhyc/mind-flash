@@ -22,9 +22,10 @@ The latest *multi-platform* packages are available on [release page](https://git
    
     > It will automatically download the requirements, and install itself in system (need root privilege).
     
-3. Use `msh-gui` to display GUI, and `msh` for CLI.
+3. Run `msh-userfix` in your terminal (support gnome or dde desktop), and then try <kbd>Super</kbd> + <kbd>N</kbd> to start the journey.
    
-    > The default shortcut binding for gnome/dde is: <kbd>Super</kbd> + <kbd>N</kbd>.
+    > This script will fix default shortcut binding for current user, and fcitx input method.
+    > If nothing happened, try manually add custom keybingding to `/usr/bin/msh-gui` for your used desktop.
     
 4. (Optional) Build platform-dependent distribution package by run `make build-dist`, and the package will be generated in `./dist` folder.
 
