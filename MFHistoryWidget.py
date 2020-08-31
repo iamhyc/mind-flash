@@ -37,8 +37,9 @@ bold_filter   = re.compile("\*\*([^\*]+)\*\*")
 italic_filter = re.compile("\*(.*?)\*")
 
 class QLabelWrapper(QLabel):
-    def __init__(self, type, text='', pixmap='', alt=''):
+    def __init__(self, type, text='', pixmap='', alt='', parent=None):
         super().__init__(text)
+        self.parent = parent
         self.type   = type
         self.alt    = alt
         if pixmap: self.setPixmap(pixmap)
@@ -153,8 +154,9 @@ class QLabelWrapper(QLabel):
     pass
 
 class MFHistoryItem(QFrame):
-    def __init__(self, w_item, base_path, item):
+    def __init__(self, parent, w_item, base_path, item):
         super().__init__(None)
+        self.parent = parent
         self.w_item = w_item
         self.base_path = base_path
         self.styleHelper()
@@ -264,11 +266,11 @@ class MFHistoryItem(QFrame):
             for (i,pixmap) in enumerate(icon_pixmaps):
                 _file, _pixmap = pixmap
                 if _file:
-                    icon_label = QLabelWrapper('file_label', alt=_file)
+                    icon_label = QLabelWrapper('file_label', alt=_file, parent=self)
                     icon_label.setToolTip(_file.name)
                 else:
                     cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
-                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap)
+                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap, parent=self)
                 #
                 self.wrapWidget(icon_label, [*(i+1,0), *IconSize])
                 icon_label.setFixedWidth(ImgWidth)
@@ -475,7 +477,7 @@ class MFHistory(QWidget):
         
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
-            w_item_widget = MFHistoryItem(w_item, self.base_path, item)
+            w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
             size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
             w_item.setSizeHint(size_hint)
             self.w_history_list.addItem(w_item)
