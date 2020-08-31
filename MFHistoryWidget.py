@@ -30,6 +30,7 @@ ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
+MAX_NUM_SCROLL   = 8#wheel
 img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
 icon_filter   = re.compile("<-file://(.*?)->")
 bold_filter   = re.compile("\*\*([^\*]+)\*\*")
@@ -62,6 +63,7 @@ class QLabelWrapper(QLabel):
                             date_color=ITEM_DATE_COLOR, date=_date,
                             time_color=_time_color, time=_time
                         ))
+            self.setToolTip(self.alt)
             pass
         elif self.type=='item_text':
             self.setFont(QFont(*ITEM_TEXT_FONT))
@@ -216,9 +218,9 @@ class MFHistoryItem(QFrame):
         pass
 
     def updateItem(self):
-        (_user, _time, _text) = self.item
+        (_user, _stp, _text) = self.item
         _user = 'Myself' if _user==MF_HOSTNAME else _user
-        _time = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%m-%d %H:%M') #%Y-%m-%d %H:%M:%S
+        _time = datetime.fromtimestamp(int(_stp), tz=tzlocal()).strftime('%m-%d %H:%M') #%Y-%m-%d %H:%M:%S
         _text = eval( _text ).strip() #mod
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
@@ -233,7 +235,8 @@ class MFHistoryItem(QFrame):
         self.item_text = _text.replace('\n', '<br>')
         
         #NOTE: 2. create widgets
-        hint_label = QLabelWrapper('item_hint', hint)
+        _hint_alt  = datetime.fromtimestamp(int(_stp), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+        hint_label = QLabelWrapper('item_hint', hint, alt=_hint_alt)
         if self.item_text:
             text_label = QLabelWrapper('item_text', self.item_text)
         # not all item_icons are images, maybe files
@@ -390,7 +393,7 @@ class MFHistoryList(QListWidget):
             self.to_bound = 0
         self.offset = _offset
         #
-        if self.to_bound>=5:
+        if self.to_bound>=MAX_NUM_SCROLL:
             self.to_bound = 0
             _direction = -1 if _move_up else +1
             self.parent.updateHistory(0, _direction)

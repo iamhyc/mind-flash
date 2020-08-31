@@ -24,6 +24,7 @@ class TodoItemWrapper(QListWidgetItem):
         self.todo_item = todo_item
         stat, text = todo_item
         if stat=='title':
+            self.setToolTip('Add: <Alt+Q>\nToggle: right click\nDelete: double click')
             self.setFlags(self.flags() & (not Qt.ItemIsSelectable))
             self.setFont(QFont(*TODO_TITLE_FONT))
             self.setText(text)
