@@ -10,9 +10,7 @@ It's a flash over your mind. <img src="./res/icons/pulse_heart.png" width="24">
 
 ## Install
 
-The latest *multi-platform* packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
-
-> For Linux user, please run `msh-userfix` after installation for *fcitx* and *custom keybindings* fix.
+The latest out-of-the-box packages are available on [release page](https://github.com/iamhyc/mind-flash/releases/latest).
 
 **Manual build:**
 
@@ -24,36 +22,39 @@ The latest *multi-platform* packages are available on [release page](https://git
     
 3. Run `msh-userfix` in your terminal (support gnome or dde desktop), and then try <kbd>Super</kbd> + <kbd>N</kbd> to start the journey.
    
-    > This script will fix default shortcut binding for current user, and fcitx input method.
-    > If nothing happened, try manually add custom keybingding to `/usr/bin/msh-gui` for your used desktop.
+    > This script will fix default shortcut binding for current user, and functions for Fcitx input method.
+    > If nothing happened, try manually add the custom key binding to `/usr/bin/msh-gui` for your used desktop.
     
 4. (Optional) Build platform-dependent distribution package by run `make build-dist`, and the package will be generated in `./dist` folder.
 
 ## Usage
 
-**Basic usage:**
+**Basic Usage:**
 
 | Default Shortcuts |                 Function                 |
 | :-------------: | :--------------------------------------: |
-| <kbd>Super</kbd> + <kbd>N</kbd> | Quick Launch |
-|    <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd>    | Next Line |
+| <kbd>Super</kbd> + <kbd>N</kbd> | Launch |
+|    <kbd>Escape</kbd> OR <kbd>Ctrl</kbd>+<kbd>W</kbd>    | Close |
+| Double <kbd>click</kbd> | Show/Hide History |
+| <kbd>Ctrl</kbd> + <kbd>Return</kbd> OR <kbd>Enter</kbd> | Next Line |
 |    <kbd>Return</kbd>    |          Save & Exit    |
-| <kbd>Escape</kbd> OR <kbd>Ctrl</kbd>+<kbd>W</kbd> | (global) Close Window |
-| | |
-|  Double <kbd>click</kbd> OR <kbd>Alt</kbd>+<kbd>H</kbd>  |    Pop-up History |
-|  <kbd>Alt</kbd> + <kbd>v</kbd>  | History - Week |
-| <kbd>Alt</kbd> + <kbd>vv</kbd> | History - Month |
-| <kbd>Alt</kbd> + <kbd>vvv</kbd> | History - Year |
-| <kbd>Alt</kbd> + <kbd>k</kbd> | Last piece of History |
-| <kbd>Alt</kbd> + <kbd>j</kbd> | Next piece of History |
-* `*italic_text*`, `**bold_text**` render support when input
-* <kbd>Ctrl</kbd> + <kbd>V</kbd> support pasting plaintext or image
+**Todo List Usage**: please refer to tooltip by hovering over the `TODO LIST` title.
 
-**Todolist usage**:
+**Other Features:**
 
-* <kbd>Alt</kbd> + <kbd>Q</kbd> to add current text to todolist
-* **Right Click** on item to toggle completion status
-* **Double Click** on item to remove the item
+- support `**bold_text**` and `*italic_tex*` style;
+
+- support `<a href="">...</a>` hyperlink;
+
+- support screenshot (pixmap) pasting;
+
+  > right-click on thumbnail to copy, left-click for pop-up preview (scroll for zooming).
+
+- support file drag-and-drop saving;
+
+  > right-click on thumbnail to copy, left-click to open containing folder.
+
+- support export history records into Markdown style on your Desktop.
 
 ## License
 This project is licensed under [GPLv3](LICENSE).
