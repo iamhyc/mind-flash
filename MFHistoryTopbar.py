@@ -159,7 +159,6 @@ class ToolBarIcon(QLabel):
             self.setStyleSheet('QLabel { border-width: 1px 1px 1px 0px; }')
         pass
 
-
     def mousePressEvent(self, e):
         if e.buttons() & Qt.LeftButton:
             if self.callback: self.callback()

@@ -4,7 +4,7 @@ from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager
+from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager, MFWorker, signal_emit
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal)
@@ -129,7 +129,12 @@ class QLabelWrapper(QLabel):
             else:
                 _clipboard.setPixmap(self.pixmap())
             try:
-                os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
+                w_history = self.parent.parent
+                _text     = "Image copied."
+                self.worker = MFWorker(w_history.showHint,
+                                        args=(_text, 1000))
+                self.worker.start()
+                # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
             except Exception:
                 pass
             pass
@@ -142,7 +147,12 @@ class QLabelWrapper(QLabel):
             _mimeData  = QMimeData(); _mimeData.setUrls([ QUrl.fromLocalFile(str(self.alt)) ])
             _clipboard.setMimeData(_mimeData)
             try:
-                os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 15000 "File  %s  Copied."'%self.alt.name)
+                w_history = self.parent.parent
+                _text     = "File <u>%s</u> copied."%self.alt.name
+                self.worker = MFWorker(w_history.showHint,
+                                        args=(_text, 1600))
+                self.worker.start()
+                # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1500 "File  %s  Copied."'%self.alt.name)
             except:
                 pass
             pass
@@ -414,9 +424,16 @@ class MFHistory(QWidget):
         self.parent    = parent
         self.base_path = base_path
         self.mf_exec   = mf_exec
+        #
         self.stp = None
         self.time_type, self.time_anchor = 0, 0
         self.styleHelper()
+        #
+        _disp = self.w_topbar.hint_label
+        self.on_lock.connect(_disp.getLock)
+        self.off_lock.connect(_disp.releaseLock)
+        self.set_hint.connect(_disp.setHint)
+        self.set_progress.connect(_disp.setProgressHint)
         pass
     
     def styleHelper(self):
@@ -485,12 +502,14 @@ class MFHistory(QWidget):
             pass
         pass
     
+    def showHint(self, hint, show_ms):
+        self.on_lock.emit(self)
+        self.set_hint.emit(self, hint)
+        QThread.msleep(show_ms)
+        self.off_lock.emit(self)
+        pass
+
     def dumpHistory(self, disp):
-        self.on_lock.connect(disp.getLock)
-        self.off_lock.connect(disp.releaseLock)
-        self.set_hint.connect(disp.setHint)
-        self.set_progress.connect(disp.setProgressHint)
-        #
         self.on_lock.emit(self)
         self.set_progress.emit(self, 0.0)
         #

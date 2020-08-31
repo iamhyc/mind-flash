@@ -388,3 +388,9 @@ class MFWorker(QObject):
         self.thread.exit(0)
         pass
     pass
+
+def signal_emit(_signal, _slot, _msg):
+    _signal.connect(_slot)
+    _signal.emit(*_msg)
+    _signal.disconnect(_slot)
+    pass
