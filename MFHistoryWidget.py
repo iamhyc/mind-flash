@@ -427,7 +427,8 @@ class MFHistory(QWidget):
         self.base_path = base_path
         self.mf_exec   = mf_exec
         #
-        self.stp = None
+        self.worker = None
+        self.stp    = None
         self.time_type, self.time_anchor = 0, 0
         self.styleHelper()
         #
@@ -471,6 +472,9 @@ class MFHistory(QWidget):
 
     def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.isVisible(): return
+        if self.worker and self.worker.isRunning():
+            self.worker.terminate()
+            self.worker.thread.wait()
         #
         mf_type   = (self.time_type+type_delta)     if type_delta is not None else 0
         mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta is not None else 0
@@ -479,6 +483,13 @@ class MFHistory(QWidget):
             relative = False
         if mf_anchor > 0: return #no future history
         #
+        self.w_topbar.hint_label.setText("(Loading ...)")
+        self.worker = MFWorker(self._updateHistory,
+                                args=(mf_type, mf_anchor, relative))
+        self.worker.start()
+        return mf_type
+
+    def _updateHistory(self, mf_type, mf_anchor, relative):
         if relative: #relative to previous stp
             self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
             self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
@@ -486,33 +497,22 @@ class MFHistory(QWidget):
             self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, locate_flag=True)
             self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
         #
-        self.renderHistory(items)
-        return self.time_type
+        signal_emit(self._signal1, self.w_topbar.hint_label.setDateHint, (self.stp, ))
+        signal_emit(self._signal1, self.renderHistory, (items, ))
+        pass
 
     @pyqtSlot(object)
     def renderHistory(self, items):
-        signal_emit(self._signal0, self.w_history_list.clear)
+        self.w_history_list.clear()
         
-        item_list = list()
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
             w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
             size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
             w_item.setSizeHint(size_hint)
-            item_list.append( (w_item, w_item_widget) )
-            pass
-        self._render(item_list)
-        # signal_emit(self._signal1, self._render, (item_list, ))
-        pass
-    
-    @pyqtSlot(object)
-    def _render(self, item_list):
-        # self.w_history_list.clear()
-        self.w_topbar.hint_label.setDateHint(self.stp)
-        for item in item_list:
-            w_item, w_item_widget = item
             self.w_history_list.addItem(w_item)
             self.w_history_list.setItemWidget(w_item, w_item_widget)
+            pass
         pass
     
     def showHint(self, hint, show_ms):

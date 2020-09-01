@@ -39,6 +39,7 @@ class MFEntity:
             pass
         pass
 
+    #FIXME: I/O is bottleneck now.
     def mf_fetch(self, *args, **kargs):
         mf_type, mf_anchor, mf_filter = args
         mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
