@@ -471,6 +471,8 @@ class MFHistory(QWidget):
 
     def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.isVisible(): return
+        # self.worker = MFWorker(self.showHint, args=("(Loading ...)", -1))
+        # self.worker.start()
         #
         mf_type   = (self.time_type+type_delta)     if type_delta is not None else 0
         mf_anchor = (self.time_anchor+anchor_delta) if anchor_delta is not None else 0
@@ -486,11 +488,10 @@ class MFHistory(QWidget):
             self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, locate_flag=True)
             self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
         #
-        self.renderHistory(self.stp, items)
+        self.renderHistory(items)
         return self.time_type
 
-    def renderHistory(self, stp, items):
-        self.stp = stp
+    def renderHistory(self, items):
         signal_emit(self._signal0, self.w_history_list.clear)
         
         item_list = list()
