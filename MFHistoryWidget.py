@@ -4,7 +4,8 @@ from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager, MFWorker, signal_emit
+from MFUtility import (POSIX, MF_RNG, MF_HOSTNAME, signal_emit,
+                        TextStamp, MimeDataManager, MFWorker)
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal, pyqtSlot)
@@ -482,21 +483,23 @@ class MFHistory(QWidget):
             mf_type, mf_anchor = 0, 0
             relative = False
         if mf_anchor > 0: return #no future history
+        if relative:
+            self.stp.update_type(mf_type, mf_anchor)
+        else:
+            self.stp = TextStamp(mf_type, mf_anchor)
         #
-        self.w_topbar.hint_label.setText("(Loading ...)")
+        self.w_topbar.hint_label.setDateHint(self.stp, " (Loading...)")
         self.worker = MFWorker(self._updateHistory,
                                 args=(mf_type, mf_anchor, relative))
         self.worker.start()
         return mf_type
 
     def _updateHistory(self, mf_type, mf_anchor, relative):
-        if relative: #relative to previous stp
-            self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
+        items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
+        if relative:
             self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
         else:
-            self.stp, items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, locate_flag=True)
-            self.time_type, self.time_anchor = mf_type, mf_anchor # iteratively update
-        #
+            self.time_type, self.time_anchor = mf_type, mf_anchor                   # iteratively update
         signal_emit(self._signal1, self.w_topbar.hint_label.setDateHint, (self.stp, ))
         signal_emit(self._signal1, self.renderHistory, (items, ))
         pass

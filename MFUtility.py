@@ -209,6 +209,7 @@ class TextStamp():
         pass
 
     def update_type(self, mf_type, mf_anchor=0):
+        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
         if mf_type==MF_RNG.DAY:                        # from 00:00 to 24:00
             tmp = datetime(self.end.year, self.end.month, self.end.day)
             self.end   = tmp + relativedelta(days=mf_anchor)

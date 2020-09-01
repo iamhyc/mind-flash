@@ -42,11 +42,10 @@ class MFEntity:
     #FIXME: I/O is bottleneck now.
     def mf_fetch(self, *args, **kargs):
         mf_type, mf_anchor, mf_filter = args
-        mf_type = MF_RNG(mf_type) if type(mf_type)==int else mf_type
 
         if 'stp' in kargs:
             stp = kargs['stp']
-            stp.update_type(mf_type, mf_anchor)
+            # stp.update_type(mf_type, mf_anchor)
         else:
             stp = TextStamp(mf_type, mf_anchor)
 
@@ -80,7 +79,7 @@ class MFEntity:
             else:
                 items.sort(key=lambda x:x[1])
             pass
-        return stp, items
+        return items
 
     def mf_sync(self, *args):
         print('Move the contents in %s to your sync folder! THX!'%(R_T(self.base_path)))

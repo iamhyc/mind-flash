@@ -48,7 +48,7 @@ class HintLabel(QLabel):
         pass
 
     @pyqtSlot(object)
-    def setDateHint(self, stp):
+    def setDateHint(self, stp, postfix=''):
         _hint = stp.hint
         if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
             _month = stp.end.month
@@ -68,7 +68,7 @@ class HintLabel(QLabel):
             self.hint = '<a style="color:black">%s</a>'%(_hint)
         
         if self.lock is None:
-            self.setText(self.hint)
+            self.setText(self.hint + postfix)
         pass
 
     @pyqtSlot(object, float)
