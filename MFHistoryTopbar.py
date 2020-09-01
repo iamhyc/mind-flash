@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from pathlib import Path
 from MFUtility import MF_RNG, KeysReactor, MFWorker
 from PyQt5.QtCore import (Qt, QSize, QEvent, QThread, pyqtSlot)
@@ -18,7 +19,7 @@ MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
 TOOL_ICON_NUM     = 3
 TOOL_ICONS        = {
-    'search':   {'pos':-1, 'hint':'Search', 'func':'searchIconEvent'},
+    'filter':   {'pos':-1, 'hint':'Filter', 'func':'filterIconEvent'},
     'export':   {'pos':0,  'hint':'Export', 'func':'exportIconEvent'},
     'history':  {'pos':0,  'hint':'History (Alt+V)', 'func':'historyIconEvent'},
     '_'     :   {'pos':0,  'hint':'__space__'},
@@ -47,7 +48,7 @@ class HintLabel(QLabel):
         self.setText(hint)
         pass
 
-    @pyqtSlot(object)
+    @pyqtSlot(object, str)
     def setDateHint(self, stp, postfix=''):
         _hint = stp.hint
         if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
@@ -68,7 +69,7 @@ class HintLabel(QLabel):
             self.hint = '<a style="color:black">%s</a>'%(_hint)
         
         if self.lock is None:
-            self.setText(self.hint + postfix)
+            self.setText(self.hint + ' ' + postfix)
         pass
 
     @pyqtSlot(object, float)
@@ -103,7 +104,8 @@ class HintLabel(QLabel):
 class InputBox(QPlainTextEdit):
     def __init__(self, parent):
         super().__init__(parent)
-        self.parent = parent
+        self.parent    = parent
+        self.w_history = parent.parent
         self.keysFn = KeysReactor(self)
         self.registerKeys()
         self.styleHelper()
@@ -111,7 +113,7 @@ class InputBox(QPlainTextEdit):
 
     def styleHelper(self):
         self.setFont( QFont(*INPUTBOX_FONT) )
-        self.setPlaceholderText("Press ENTER to search ...")
+        self.setPlaceholderText("Press ENTER to apply ...")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFixedSize(*MIN_TOPBAR_SIZE)
@@ -119,8 +121,23 @@ class InputBox(QPlainTextEdit):
         pass
 
     def registerKeys(self):
-        self.keysFn.register([Qt.Key_Return], lambda:self.clear())
+        self.keysFn.register([Qt.Key_Return], lambda:self.setFilter())
         pass
+
+    def setFilter(self):
+        _regex = self.toPlainText()
+        if len(_regex)>0:
+            _regex = re.sub(r'(?<!\\)\*', "(.*)", _regex)
+            _regex = re.compile(_regex)
+            self.w_history.setFilter(_regex)
+        else:
+            self.w_history.setFilter(None)
+        pass
+
+    def focusOutEvent(self, e):
+        if len(self.toPlainText())==0:
+            self.w_history.setFilter(None)
+        return super().focusOutEvent(e)
     pass
 
 class ToolBarIcon(QLabel):
@@ -165,7 +182,7 @@ class ToolBarIcon(QLabel):
             if self.callback: self.callback()
         return super().mousePressEvent(e)
     
-    def searchIconEvent(self):
+    def filterIconEvent(self):
         self.topbar.switch( self.topbar.input_box )
         self.topbar.input_box.setFocus()
         pass
@@ -262,6 +279,7 @@ class TopbarManager(QWidget):
             self.switch(self.tool_bar)
         elif event.type() == QEvent.Leave:
             self.switch(self.hint_label)
+            self.parent.setFocus()
             pass
         return super().eventFilter(object, event)
     pass

@@ -417,6 +417,7 @@ class MFHistoryList(QListWidget):
 class MFHistory(QWidget):
     _signal0 = pyqtSignal()
     _signal1 = pyqtSignal(object)
+    _signal2 = pyqtSignal(object,str)
     on_lock  = pyqtSignal(object)
     off_lock = pyqtSignal(object)
     set_hint = pyqtSignal(object, str)
@@ -428,6 +429,7 @@ class MFHistory(QWidget):
         self.base_path = base_path
         self.mf_exec   = mf_exec
         #
+        self.filter = None
         self.worker = None
         self.stp    = None
         self.time_type, self.time_anchor = 0, 0
@@ -471,6 +473,11 @@ class MFHistory(QWidget):
     def setFocus(self):
         self.parent.setFocus()
 
+    def setFilter(self, _filter):
+        self.filter = _filter
+        self.updateHistory(0, 0)
+        pass
+
     def updateHistory(self, type_delta, anchor_delta, relative=False):
         if not self.isVisible(): return
         if self.worker and self.worker.isRunning():
@@ -488,20 +495,21 @@ class MFHistory(QWidget):
         else:
             self.stp = TextStamp(mf_type, mf_anchor)
         #
-        self.w_topbar.hint_label.setDateHint(self.stp, " (Loading...)")
+        self.w_topbar.hint_label.setDateHint(self.stp, "(Loading...)")
         self.worker = MFWorker(self._updateHistory,
                                 args=(mf_type, mf_anchor, relative))
         self.worker.start()
         return mf_type
 
     def _updateHistory(self, mf_type, mf_anchor, relative):
-        items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
+        self.items = self.mf_exec.mf_fetch(mf_type, mf_anchor, None, stp=self.stp, locate_flag=True)
         if relative:
             self.time_type, self.time_anchor = mf_type, self.stp.diff_time(mf_type) # relative update
         else:
             self.time_type, self.time_anchor = mf_type, mf_anchor                   # iteratively update
-        signal_emit(self._signal1, self.w_topbar.hint_label.setDateHint, (self.stp, ))
-        signal_emit(self._signal1, self.renderHistory, (items, ))
+        _postfix = '(filtered)' if self.filter is not None else ''
+        signal_emit(self._signal2, self.w_topbar.hint_label.setDateHint, (self.stp, _postfix))
+        signal_emit(self._signal1, self.renderHistory, (self.items, ))
         pass
 
     @pyqtSlot(object)
@@ -509,12 +517,14 @@ class MFHistory(QWidget):
         self.w_history_list.clear()
         
         for item in items:
-            w_item = QListWidgetItem(self.w_history_list)
-            w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
-            size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
-            w_item.setSizeHint(size_hint)
-            self.w_history_list.addItem(w_item)
-            self.w_history_list.setItemWidget(w_item, w_item_widget)
+            (_user, _stp, _text) = item[1] #TODO: match user/timestamp/content/<theme>
+            if (self.filter is None) or self.filter.search(_text):
+                w_item = QListWidgetItem(self.w_history_list)
+                w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
+                size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
+                w_item.setSizeHint(size_hint)
+                self.w_history_list.addItem(w_item)
+                self.w_history_list.setItemWidget(w_item, w_item_widget)
             pass
         pass
     
