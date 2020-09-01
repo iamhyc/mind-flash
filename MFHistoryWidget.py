@@ -492,9 +492,6 @@ class MFHistory(QWidget):
     def renderHistory(self, stp, items):
         self.stp = stp
         signal_emit(self._signal0, self.w_history_list.clear)
-        signal_emit(self._signal1, self.w_topbar.hint_label.setDateHint, (stp, ))
-        # self.w_history_list.clear()
-        # self.w_topbar.hint_label.setDateHint(stp)
         
         item_list = list()
         for item in items:
@@ -503,12 +500,14 @@ class MFHistory(QWidget):
             size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
             w_item.setSizeHint(size_hint)
             item_list.append( (w_item, w_item_widget) )
-            signal_emit(self._signal1, self._render, (item_list, ))
             pass
+        signal_emit(self._signal1, self._render, (item_list, ))
         pass
     
     @pyqtSlot(object)
     def _render(self, item_list):
+        # self.w_history_list.clear()
+        self.w_topbar.hint_label.setDateHint(self.stp)
         for item in item_list:
             w_item, w_item_widget = item
             self.w_history_list.addItem(w_item)
