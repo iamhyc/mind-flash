@@ -7,7 +7,7 @@ from dateutil.tz import tzlocal, tzutc
 from MFUtility import POSIX, MF_RNG, MF_HOSTNAME, MimeDataManager, MFWorker, signal_emit
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
-from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal)
+from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QTextLayout,
                         QPainter, QPixmap, QTextDocument, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
@@ -414,6 +414,8 @@ class MFHistoryList(QListWidget):
     pass
 
 class MFHistory(QWidget):
+    _signal0 = pyqtSignal()
+    _signal1 = pyqtSignal(object)
     on_lock  = pyqtSignal(object)
     off_lock = pyqtSignal(object)
     set_hint = pyqtSignal(object, str)
@@ -489,17 +491,28 @@ class MFHistory(QWidget):
 
     def renderHistory(self, stp, items):
         self.stp = stp
-        self.w_history_list.clear()
-        self.w_topbar.hint_label.setDateHint(stp)
+        signal_emit(self._signal0, self.w_history_list.clear)
+        signal_emit(self._signal1, self.w_topbar.hint_label.setDateHint, (stp, ))
+        # self.w_history_list.clear()
+        # self.w_topbar.hint_label.setDateHint(stp)
         
+        item_list = list()
         for item in items:
             w_item = QListWidgetItem(self.w_history_list)
             w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
             size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
             w_item.setSizeHint(size_hint)
+            item_list.append( (w_item, w_item_widget) )
+            signal_emit(self._signal1, self._render, (item_list, ))
+            pass
+        pass
+    
+    @pyqtSlot(object)
+    def _render(self, item_list):
+        for item in item_list:
+            w_item, w_item_widget = item
             self.w_history_list.addItem(w_item)
             self.w_history_list.setItemWidget(w_item, w_item_widget)
-            pass
         pass
     
     def showHint(self, hint, show_ms):

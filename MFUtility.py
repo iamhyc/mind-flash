@@ -389,8 +389,8 @@ class MFWorker(QObject):
         pass
     pass
 
-def signal_emit(_signal, _slot, _msg):
+def signal_emit(_signal, _slot, _msg=None):
     _signal.connect(_slot)
-    _signal.emit(*_msg)
+    _signal.emit(*_msg) if _msg else _signal.emit()
     _signal.disconnect(_slot)
     pass
