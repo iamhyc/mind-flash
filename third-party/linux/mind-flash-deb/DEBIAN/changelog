@@ -1,6 +1,9 @@
 mind-flash (1.0.0) unstable; urgency=low
 
-  * 
+  * add some tooltips
+  * show notify on hint label
+  * optimize GUI rendering logic
+  * implement filter utility function
 
  -- iamhyc <sudofree@163.com>  Wed, 2 Sep 2020 23:59:59 +0000
 
