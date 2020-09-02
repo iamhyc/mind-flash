@@ -12,15 +12,15 @@ COLOR_AUTUMN   = '#9F2D20'
 COLOR_WINTER   = '#1E90FF'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 
-MF_HINT_FONT      = ('Noto Sans CJK SC',10,QFont.Bold)
+MF_HINT_FONT      = ('Noto Sans CJK SC',11,QFont.Bold)
 INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
 TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
 TOOL_ICON_NUM     = 3
 TOOL_ICONS        = {
-    'filter':   {'pos':-1, 'hint':'Filter', 'func':'filterIconEvent'},
-    'export':   {'pos':0,  'hint':'Export', 'func':'exportIconEvent'},
+    'filter':   {'pos':-1, 'hint':'Filter Records', 'func':'filterIconEvent'},
+    'export':   {'pos':0,  'hint':'Export Current Records', 'func':'exportIconEvent'},
     'history':  {'pos':0,  'hint':'History (Alt+V)', 'func':'historyIconEvent'},
     '_'     :   {'pos':0,  'hint':'__space__'},
     'collapse': {'pos':+1, 'hint':'Collapse (Alt+H)', 'func':'collapseIconEvent'}
@@ -132,6 +132,7 @@ class InputBox(QPlainTextEdit):
             self.w_history.setFilter(_regex)
         else:
             self.w_history.setFilter(None)
+        self.parent.switch( self.parent.hint_label )
         pass
 
     def focusOutEvent(self, e):
