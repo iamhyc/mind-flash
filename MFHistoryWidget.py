@@ -31,7 +31,7 @@ ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
-MAX_NUM_SCROLL   = 8#wheel
+MAX_NUM_SCROLL   = 7#wheel
 img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
 icon_filter   = re.compile("<-file://(.*?)->")
 bold_filter   = re.compile("\*\*([^\*]+)\*\*")
@@ -82,6 +82,7 @@ class QLabelWrapper(QLabel):
             pass
         elif self.type=='img_label':
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.setToolTip("View: Left-Click\nCopy: Right-Click")
             pass
         elif self.type=='file_label':
             _pixmap = self.getFileIcon()

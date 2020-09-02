@@ -8,7 +8,6 @@ from MFUtility import *
 
 MF_CTIME   = ctime()
 MF_HINT    = '>_<: '
-MF_HISTORY = Path( '~/.mf/{}'.format(MF_HOSTNAME) ).expanduser()
 
 class MFEntity:
 
@@ -16,8 +15,8 @@ class MFEntity:
         self.base_path = base_path
         _path = Path(self.base_path, MF_HOSTNAME)
         self.first_run  = not _path.is_dir()
-        self.no_record  = len(list( _path.iterdir() )) == 0
         _path.mkdir(parents=True, exist_ok=True)
+        self.no_record  = len( list(_path.glob("*-*")) ) == 0
         self.MF_ACTION={
             'dump': self.act_dump,
             'record': self.mf_record,

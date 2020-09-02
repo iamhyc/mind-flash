@@ -141,9 +141,9 @@ class MFTextEdit(QPlainTextEdit):
 
     def showHelpText(self):
         if mf_exec.first_run:
-            self.setPlaceholderText('Try double click on me!')
+            self.setPlaceholderText('Try Double Click on Me!')
         elif mf_exec.no_record:
-            self.setPlaceholderText('press ENTER to flush it!')
+            self.setPlaceholderText('Press ENTER to Flush It!')
         else:
             pass
         pass
@@ -151,6 +151,7 @@ class MFTextEdit(QPlainTextEdit):
     def toggleHistoryWidget(self):
         size_half = int( self.w_history.height()/2 )
         if self.w_history.isVisible():  #hide history widget
+            mf_exec.first_run = False
             self.showHelpText()
             self.parent.grid.replaceWidget(self.w_history, self.w_todo)
             self.w_history.setVisible(False); self.w_todo.setVisible(True)
