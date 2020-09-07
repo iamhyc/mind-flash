@@ -30,7 +30,7 @@ build-dist:clean-dist
 		mkdir -p build/opt/mind-flash; mkdir dist; \
 		cp -r third-party/linux/mind-flash-deb/* ./build/; \
 		cp -r res *.py ./build/opt/mind-flash; \
-		dpkg-deb --build build dist/mind-flash-linux-all.deb; \
+		dpkg-deb --build build dist/mind-flash_$(VERSION)_all.deb; \
 	else \
 		echo "Not supporting platform: $(PLATFORM)."; \
 	fi
