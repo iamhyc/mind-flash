@@ -5,6 +5,6 @@ Name=Mind Flash
 Comment=Mind Flash, capture every small thoughts fleeting over your mind.
 Path=/opt/mind-flash
 Exec=msh-gui
-Icon=./res/icons/pulse_heart.png
+Icon=/opt/mind-flash/res/icons/pulse_heart.png
 Terminal=false
 Categories=Office;Qt;
