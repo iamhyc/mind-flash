@@ -2,6 +2,7 @@
 from pathlib import Path
 from sys import argv
 from time import ctime
+from os import system as os_system
 # from getpass import getpass
 # from termcolor import colored, cprint
 from MFUtility import *
@@ -15,6 +16,10 @@ class MFEntity:
         self.base_path = base_path
         _path = Path(self.base_path, MF_HOSTNAME)
         self.first_run  = not _path.is_dir()
+        try: #NOTE: execute `msh-userfix` for linux users
+            if self.first_run: os_system('/usr/bin/msh-userfix')
+        except:
+            pass
         _path.mkdir(parents=True, exist_ok=True)
         self.no_record  = len( list(_path.glob("*-*")) ) == 0
         self.MF_ACTION={
