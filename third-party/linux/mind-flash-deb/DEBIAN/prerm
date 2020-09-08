@@ -1,4 +1,4 @@
 #!/bin/bash
 rm -rf /opt/mind-flash/__pycache__
 rm -f /usr/bin/msh-gui
-rm -f /usr/bin/msh
+#rm -f /usr/bin/msh
