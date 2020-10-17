@@ -80,17 +80,22 @@ class MFTextEdit(QPlainTextEdit):
         self.keysFn.register([Qt.Key_Control, Qt.Key_Return], mf_edit_binding)
 
         #NOTE: Return; flash recording
-        def mf_flash_binding():
+        def mf_flush_binding():
             mf_text = self.toPlainText().encode('utf-8').decode('utf-8')
-            self.saveFileCache()
             if mf_text:
+                self.saveFileCache()
                 mf_exec.mf_record( repr(mf_text.strip()) )
-            self.parent.close()
+            #
+            if self.w_history.isVisible():
+                self.clear()
+                self.w_history.updateHistory(None, None)
+            else:
+                self.parent.close()
             pass
-        self.keysFn.register([Qt.Key_Return], mf_flash_binding)
+        self.keysFn.register([Qt.Key_Return], mf_flush_binding)
 
-        #NOTE: Ctrl+V; paste pixmaps
-        def mf_paste_pixmap():
+        #NOTE: Ctrl+V; paste actions
+        def mf_paste_binding():
             if self.canPaste():
                 self.paste()
             else:
@@ -101,7 +106,7 @@ class MFTextEdit(QPlainTextEdit):
                     self.insertPlainText(_text)
                 pass
             pass
-        self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_pixmap)
+        self.keysFn.register([Qt.Key_Control, Qt.Key_V], mf_paste_binding)
 
         #NOTE: Alt+Q; add to todo list
         def mf_add_todo():
