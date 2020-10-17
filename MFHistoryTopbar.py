@@ -113,7 +113,7 @@ class InputBox(QPlainTextEdit):
 
     def styleHelper(self):
         self.setFont( QFont(*INPUTBOX_FONT) )
-        self.setPlaceholderText("Press ENTER to apply ...")
+        self.setPlaceholderText("Search with Regex ...")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFixedSize(*MIN_TOPBAR_SIZE)
@@ -122,17 +122,23 @@ class InputBox(QPlainTextEdit):
 
     def registerKeys(self):
         self.keysFn.register([Qt.Key_Return], lambda:self.setFilter())
+        self.keysFn.register([Qt.Key_Escape], lambda:self.focusOut())
         pass
 
     def setFilter(self):
         _regex = self.toPlainText()
         if len(_regex)>0:
-            _regex = re.sub(r'(?<!\\)\*', "(.*)", _regex)
-            _regex = re.compile(_regex)
+            # _regex = re.sub(r'(?<!\\)\*', "(.*)", _regex)
+            _regex = re.compile(_regex, re.IGNORECASE)
             self.w_history.setFilter(_regex)
         else:
             self.w_history.setFilter(None)
-        self.parent.switch( self.parent.hint_label )
+        self.focusOut()
+        pass
+
+    def focusOut(self):
+        self.parent.switch()
+        self.w_history.setFocus()
         pass
 
     def focusOutEvent(self, e):

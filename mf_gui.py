@@ -333,6 +333,14 @@ class MFGui(QWidget):
         self.keysFn.register([Qt.Key_Escape],            lambda:self.close())
         ### Ctrl+L ###
         self.keysFn.register([Qt.Key_Control, Qt.Key_L], lambda:self.setFocus())
+        ### Ctrl+F ###
+        def mf_search_binding():
+            if self.w_history.isVisible():
+                _topbar = self.w_history.w_topbar
+                _topbar.switch( _topbar.input_box )
+                _topbar.input_box.setFocus()
+            pass
+        self.keysFn.register([Qt.Key_Control, Qt.Key_F], mf_search_binding)
         ### Alt+V ###
         self.keysFn.register(
             [Qt.Key_Alt, Qt.Key_V],
