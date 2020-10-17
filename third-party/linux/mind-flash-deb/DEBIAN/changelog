@@ -1,3 +1,12 @@
+mind-flash (1.0.1) unstable; urgency=low
+
+  * fix mkdir fail when parents folder absent
+  * support continuous input, when history widget visible
+  * add Ctrl+F for search
+  * use case-insensitive in search (with regex)
+
+ -- iamhyc <sudofree@163.com>  Sat, 17 Oct 2020 23:59:59 +0000
+
 mind-flash (1.0.0) unstable; urgency=low
 
   * add some tooltips
