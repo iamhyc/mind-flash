@@ -2,8 +2,8 @@
 import re
 from pathlib import Path
 from MFUtility import MF_RNG, KeysReactor, MFWorker
-from PyQt5.QtCore import (Qt, QSize, QEvent, QThread, pyqtSlot)
-from PyQt5.QtGui import (QIcon, QFont, QFontMetrics, QPixmap)
+from PyQt5.QtCore import (Qt, QSize, QEvent, pyqtSlot)
+from PyQt5.QtGui import (QIcon, QFont)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
 
 COLOR_SPRING   = '#018749'
@@ -49,9 +49,10 @@ class HintLabel(QLabel):
         pass
 
     @pyqtSlot(object, str)
-    def setDateHint(self, stp, postfix=''):
-        _hint = stp.hint
-        if stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
+    def setDateHint(self, stp=None, postfix=''):
+        if stp is None:
+            self.hint = self.hint #not change
+        elif stp.mf_type==MF_RNG.WEEK or stp.mf_type==MF_RNG.MONTH:
             _month = stp.end.month
             if _month in range(2,5):
                 _color = COLOR_SPRING
@@ -61,12 +62,12 @@ class HintLabel(QLabel):
                 _color = COLOR_AUTUMN
             else:
                 _color = COLOR_WINTER
-            self.hint = '<a style="color:%s">%s</a>'%(_color, _hint)
+            self.hint = '<a style="color:%s">%s</a>'%(_color, stp.hint)
         elif stp.mf_type==MF_RNG.DAY:
             _color = COLOR_WEEKDAY[ stp.end.weekday() ]
             self.hint = stp.end.strftime('%Y-%m-%d <a style="color:{}">(%a)</a>'.format(_color))
         else:
-            self.hint = '<a style="color:black">%s</a>'%(_hint)
+            self.hint = '<a style="color:black">%s</a>'%(stp.hint)
         
         if self.lock is None:
             self.setText(self.hint + ' ' + postfix)
@@ -163,6 +164,9 @@ class ToolBarIcon(QLabel):
             _width = MIN_TOPBAR_SIZE[0] - MIN_TOOLICON_SIZE[0]*TOOL_ICON_NUM - 33 #33 for one rightmost icon
             self.setFixedSize( _width, MIN_TOPBAR_SIZE[1] )
             self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
+            self.setTextFormat(Qt.RichText)
+            self.setTextInteractionFlags(Qt.TextBrowserInteraction)
+            self.setOpenExternalLinks(True)
             self.callback = None #TODO: impl. MouseReactor
             return
         

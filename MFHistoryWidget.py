@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import re
-from os import system as os_system
 from pathlib import Path
 from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
-from MFUtility import (POSIX, MF_RNG, MF_HOSTNAME, signal_emit,
+from MFUtility import (POSIX, MF_HOSTNAME, signal_emit,
                         TextStamp, MimeDataManager, MFWorker)
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics, QTextLayout,
+from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics,
                         QPainter, QPixmap, QTextDocument, QDesktopServices)
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
                             QListWidget, QListWidgetItem, QGridLayout)
@@ -136,7 +135,6 @@ class QLabelWrapper(QLabel):
                 self.worker = MFWorker(w_history.showHint,
                                         args=(_text, 1000))
                 self.worker.start()
-                # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1000 "Image Copied."')
             except Exception:
                 pass
             pass
@@ -154,7 +152,6 @@ class QLabelWrapper(QLabel):
                 self.worker = MFWorker(w_history.showHint,
                                         args=(_text, 1600))
                 self.worker.start()
-                # os_system('notify-send -a "Mind Flash" -i "$PWD/res/icons/pulse_heart.png" -t 1500 "File  %s  Copied."'%self.alt.name)
             except:
                 pass
             pass

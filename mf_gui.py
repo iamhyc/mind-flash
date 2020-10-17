@@ -3,21 +3,23 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import sys, signal, socket, time
-import re
+import re, sys, signal, socket, time, json
 from os import chdir
+from urllib import request as url_request
 from pathlib import Path
-from PyQt5.QtCore import Qt, QObject, QPoint, QTimer, QMargins, QRect, QSize
+from PyQt5.QtCore import (Qt, QPoint, QSize, QTimer, QThread, pyqtSignal)
 from PyQt5.QtGui import (QFont, QFontMetrics, QIcon, QTextOption, QTextDocument)
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
-                    QLayout, QGridLayout, QPlainTextEdit, QSizePolicy,
-                    QGraphicsDropShadowEffect)
+                    QLayout, QGridLayout, QPlainTextEdit, QGraphicsDropShadowEffect)
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import POSIX, MF_RNG, KeysReactor, MimeDataManager
+from MFUtility import KeysReactor, MimeDataManager, MFWorker, signal_emit
 
 MF_NAME     = 'Mind Flash'
+MF_VERSION  = '1.0.1'
+MF_WEBSITE  = 'https://github.com/iamhyc/mind-flash'
+MF_STATUS   = 'https://api.github.com/repos/iamhyc/mind-flash/tags'
 MF_DIR      = Path('~/.mf/').expanduser()
 INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
@@ -290,6 +292,9 @@ class MFTextEdit(QPlainTextEdit):
     pass
 
 class MFGui(QWidget):
+    _signal1 = pyqtSignal(str)
+    _signal2 = pyqtSignal(object, str)
+
     def __init__(self):
         super().__init__()
         self.mf_exec   = mf_exec
@@ -325,6 +330,9 @@ class MFGui(QWidget):
         )
         self.setFocus()
         self.show()
+        # check update
+        self.worker = MFWorker(self.checkUpdate)
+        self.worker.start()
         pass
 
     def registerGlobalKeys(self):
@@ -361,6 +369,20 @@ class MFGui(QWidget):
             [Qt.Key_Alt, Qt.Key_H], 
             lambda:self.w_history.toggleHistoryWidget()
         )
+        pass
+
+    def checkUpdate(self):
+        QThread.sleep(5)
+        try:
+            res = url_request.urlopen(MF_STATUS).read().decode('utf-8')
+            res = json.loads(res)
+            _latest = res[0]['name'][1:]
+            if _latest!=MF_VERSION and self.w_history.isVisible():
+                _hint = '<a href="{url}/releases/tag/v{ver}">(v{ver} Available)</a>'.format(url=MF_WEBSITE, ver=_latest)
+                signal_emit(self._signal2, self.w_history.w_topbar.hint_label.setDateHint, (None, _hint))
+                signal_emit(self._signal1, self.w_history.w_topbar.tool_bar.items['_'].setText, (_hint,))
+        except Exception as e:
+            print('Check Update Failed: ', e)
         pass
 
     def setFocus(self):

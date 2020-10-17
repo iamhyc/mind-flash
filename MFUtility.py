@@ -273,7 +273,7 @@ class MFRecord:
         return self
     
     def __exit__(self, exc_type, exc_value, exc_tb):
-        if exc_value: raise
+        if exc_value: raise Exception
         if self.updated:
             fd = open(self.file, 'w', encoding='utf-8')
             for tt in zip(self.time_line, self.text_line):
