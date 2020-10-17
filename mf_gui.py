@@ -88,7 +88,7 @@ class MFTextEdit(QPlainTextEdit):
                 self.saveFileCache()
                 mf_exec.mf_record( repr(mf_text.strip()) )
             #
-            if self.w_history.isVisible():
+            if mf_text and self.w_history.isVisible():
                 self.clear()
                 self.w_history.updateHistory(None, None)
             else:
