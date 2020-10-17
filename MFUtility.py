@@ -34,7 +34,7 @@ class workSpace:
     def __enter__(self):
         if not Path(self.wrk).is_dir():
             if self.forceUpdate:
-                Path(self.wrk).mkdir(mode=0o755, exist_ok=True)
+                Path(self.wrk).mkdir(mode=0o755, parents=True, exist_ok=True)
             else:
                 return self.__exit__(*sys.exc_info())
         else:
@@ -342,7 +342,7 @@ class MimeDataManager:
         temp_path = Path(self.temp, Path(real_path).name)
         home_path = Path(self.home, real_path)
         if temp_path.is_file():
-            Path(home_path.parent).mkdir(mode=0o755, exist_ok=True)
+            Path(home_path.parent).mkdir(mode=0o755, parents=True, exist_ok=True)
             shutil.copy2( POSIX(temp_path), POSIX(home_path) )
             return True
         else:
