@@ -19,7 +19,7 @@ MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
 TOOL_ICON_NUM     = 3
 TOOL_ICONS        = {
-    'filter':   {'pos':-1, 'hint':'Filter', 'func':'filterIconEvent'},
+    'filter':   {'pos':-1, 'hint':'Filter (Ctrl+F)', 'func':'filterIconEvent'},
     'export':   {'pos':0,  'hint':'Export', 'func':'exportIconEvent'},
     'history':  {'pos':0,  'hint':'History (Alt+V)', 'func':'historyIconEvent'},
     '_'     :   {'pos':0,  'hint':'__space__'},
