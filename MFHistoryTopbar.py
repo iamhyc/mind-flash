@@ -2,7 +2,7 @@
 import re
 from pathlib import Path
 from MFUtility import MF_RNG, KeysReactor, MFWorker
-from PyQt5.QtCore import (Qt, QSize, QEvent, pyqtSlot)
+from PyQt5.QtCore import (Qt, QSize, QPoint, QEvent, pyqtSlot)
 from PyQt5.QtGui import (QIcon, QFont)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
 
@@ -156,6 +156,7 @@ class ToolBarIcon(QLabel):
         self.topbar = parent.parent
         self.name   = item[0]
         self.attr   = item[1]
+        self.press_pos = QPoint(0, 0)
         self.styleHelper()
         pass
 
@@ -189,10 +190,21 @@ class ToolBarIcon(QLabel):
         pass
 
     def mousePressEvent(self, e):
+        self.press_pos = e.pos()
         if e.buttons() & Qt.LeftButton:
             if self.callback: self.callback()
         return super().mousePressEvent(e)
     
+    def mouseMoveEvent(self, e):
+        if (self.callback is None) and (e.buttons()&Qt.LeftButton):
+            _main_body = self.topbar.parent.parent
+            _main_body.move( _main_body.mapToParent(e.pos() - self.press_pos) )
+            # print(self.parent.pos() - self.init_pos)
+            pass
+        elif e.buttons() & Qt.RightButton:
+            pass
+        pass
+
     def filterIconEvent(self):
         self.topbar.switch( self.topbar.input_box )
         self.topbar.input_box.setFocus()
