@@ -33,6 +33,8 @@ OFFSET_FIX       = 2#px
 MAX_NUM_SCROLL   = 7#wheel
 img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
 icon_filter   = re.compile("<-file://(.*?)->")
+icon_filter2  = re.compile('!\[(?P<alt>[^\]]*)\]\((?P<filename>.*?)(?=\"|\))\)')
+link_filter   = re.compile() #TODO:
 bold_filter   = re.compile("\*\*([^\*]+)\*\*")
 italic_filter = re.compile("\*(.*?)\*")
 
