@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from MFUtility import (POSIX, MF_HOSTNAME, signal_emit,
                         TextStamp, MimeDataManager, MFWorker)
+from MFUtility import (icon_filter, link_filter)
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal, pyqtSlot)
@@ -31,10 +32,8 @@ ITEM_MARGIN      = 5#px
 ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
 MAX_NUM_SCROLL   = 7#wheel
+
 img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
-icon_filter   = re.compile("<-file://(.*?)->")
-icon_filter2  = re.compile('!\[(?P<alt>[^\]]*)\]\((?P<filename>.*?)(?=\"|\))\)')
-link_filter   = re.compile() #TODO:
 bold_filter   = re.compile("\*\*([^\*]+)\*\*")
 italic_filter = re.compile("\*(.*?)\*")
 
@@ -207,7 +206,7 @@ class MFHistoryItem(QFrame):
                 _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
                 size   = QSize(_height, _height)
             else:
-                fm_rect = QRect(0,0,590,100) if len(self.item_icons)==0 else QRect(0,0,590/3*2,100)
+                fm_rect = QRect(0,0,590,100) if not self.draw_image else QRect(0,0,590/3*2,100)
                 _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
                 size   = QSize(0, _height)
             pass
@@ -237,35 +236,65 @@ class MFHistoryItem(QFrame):
         _text = eval( _text ).strip() #mod
         _text = bold_filter.sub(r'<b>\1</b>', _text)
         _text = italic_filter.sub(r'<i>\1</i>', _text)
-        _text = icon_filter.split(_text)
-        self.split_text = _text
-        
-        #NOTE: 1. parse (hint, images, text)
-        hint   = ' '.join([_user, _time])
-        self.item_icons = _text[1:][::2]
-        _text  = ''.join(_text[0:][::2]).strip()
-        _text  = _text+'\n' if _text else '' # for QFontMetrics.boundingRect correction
-        self.item_text = _text.replace('\n', '<br>')
-        
-        #NOTE: 2. create widgets
-        _hint_alt  = datetime.fromtimestamp(int(_stp), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
-        hint_label = QLabelWrapper('item_hint', hint, alt=_hint_alt)
-        if self.item_text:
-            text_label = QLabelWrapper('item_text', self.item_text)
-        # not all item_icons are images, maybe files
-        icon_pixmaps = list()
-        for _icon in self.item_icons:
-            _file, _pixmap = self.getIconType(_icon)
-            icon_pixmaps.append( (_file, QPixmap(_pixmap)) )
-            pass
 
-        #NOTE: 3. adjust gridlayout
+        #NOTE: 1. get rich text with regex
+        self.draw_image = False
+        self.rich_text = list()
+        icon_iter = icon_filter.finditer(_text)
+        for _icon in icon_iter:
+            _path = Path( _icon.groups()[0] )
+            if img_filter.match(_path.suffix):
+                self.draw_image = True
+                self.rich_text.append( (_icon.span(), 'img', POSIX(_path)) )
+            else:
+                self.draw_image = True
+                self.rich_text.append( (_icon.span(), 'file',POSIX(_path)) )
+            pass
+        link_iter = link_filter.finditer(_text)
+        for _link in link_iter:
+            _tag, _alt, _path = _link.groups()
+            if _tag=='!' or _alt=='img':
+                self.draw_image = True
+                self.rich_text.append( (_link.span(), 'img', _path) )
+            elif _alt=='file':
+                self.draw_image = True
+                self.rich_text.append( (_link.span(), 'file',_path) )
+            else:
+                self.rich_text.append( (_link.span(), 'url', _path) )
+            pass
+        self.rich_text.sort(key=lambda x:x[0][0]) #sort by start of span
+        
+        #NOTE: 2. get plain text with segment tree
+        self.plain_text = list()
+        draw_text       = str()
+        last_span       = (0, 0)
+        for _item in self.rich_text:
+            this_span = _item[0]
+            self.plain_text.append( _text[last_span[1]:this_span[0]] )
+            this_span = last_span
+            draw_text += self.plain_text[-1]; print(self.plain_text[-1])
+            if _item[1]=='url':
+                draw_text += '<a href={path}>{path}</a>'.format(_item[2])
+            pass
+        self.plain_text.append( _text[last_span[1]:] )
+        draw_text += self.plain_text[-1]
+        #
+        draw_text = draw_text.strip()
+        draw_text += '\n' if _text else '' # for QFontMetrics.boundingRect correction
+        draw_text = draw_text.replace('\n', '<br>')
+        
+        #NOTE: 3. create hint_label and text_label
+        hint_alt   = datetime.fromtimestamp(int(_stp), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
+        hint_label = QLabelWrapper('item_hint', '%s %s'%(_user, _time), alt=hint_alt)
+        text_label = QLabelWrapper('item_text', draw_text)
+
+        #NOTE: 4. adjust gridlayout
         self.wrapWidget(hint_label, [0,0, 1,3])
-        if not self.item_icons: #text only
+        if not self.draw_image: #text only
             self.wrapWidget(text_label, [1,0, 1,3])
             pass
         else:
-            if not self.item_text:
+            if not draw_text:
                 CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
                 IconSize = (1, 3)
                 ImgWidth = MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX
@@ -274,20 +303,25 @@ class MFHistoryItem(QFrame):
                 IconSize = (1, 1)
                 ImgWidth = MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX
             #
-            for (i,pixmap) in enumerate(icon_pixmaps):
-                _file, _pixmap = pixmap
-                if _file:
+            for (i,_item) in enumerate(self.rich_text):
+                if _item[1]=='img':
+                    _file = Path(self.base_path, _item[2]).as_posix()
+                    _pixmap = QPixmap( POSIX(_file) )
+                    cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
+                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap, parent=self)
+                elif _item[1]=='file':
+                    _file = Path(self.base_path, _item[2])
                     icon_label = QLabelWrapper('file_label', alt=_file, parent=self)
                     icon_label.setToolTip(_file.name)
                 else:
-                    cropped_pixmap = _pixmap.copy( CropRect(_pixmap) )
-                    icon_label     = QLabelWrapper('img_label', pixmap=cropped_pixmap, alt=_pixmap, parent=self)
+                    icon_label = None
+                    pass
                 #
                 self.wrapWidget(icon_label, [*(i+1,0), *IconSize])
                 icon_label.setFixedWidth(ImgWidth)
                 pass
             #
-            if self.item_text: self.wrapWidget(text_label, [1,1, -1,-1])
+            if draw_text: self.wrapWidget(text_label, [1,1, -1,-1])
             pass
         pass
 
@@ -357,21 +391,24 @@ class MFHistoryList(QListWidget):
 
         if w_item.double_clicked==0:
             _text = raw_item[2]
-            for icon in w_item.item_icons:
-                _file, _image = w_item.getIconType(icon)
-                if _file:
+            for _item in w_item.rich_text:
+                if _item[1]=='file':
+                    _file = Path(self.base_path, _item[2])
                     _ret = self.mdm.saveFiles([_file])
-                    if len(_ret)>0:
-                        _fake_path = "<-file://{}->".format(_ret[0])
-                    else:
-                        _fake_path = ''
-                else:
+                    fake_path = _ret[0] if len(_ret)>0 else ''
+                    _text = _text.replace(_item[2], fake_path)
+                    pass
+                elif _item[1]=='img':
+                    _file = Path(self.base_path, _item[2]).as_posix()
                     try:
-                        _fake_path = self.mdm.savePixmap( QPixmap(_image) )
-                        _fake_path = "<-file://{}->".format(_fake_path)
+                        fake_path = self.mdm.savePixmap( QPixmap(_file) )
                     except:
-                        _fake_path = ''
-                _text = _text.replace("<-file://{}->".format(icon), _fake_path)
+                        fake_path = ''
+                    finally:
+                        _text = _text.replace(_item[2], fake_path)
+                    pass
+                else:
+                    pass
                 pass
             _text += '\n' if _text else ''
             self.parent.parent.w_editor.insertPlainText( eval(_text)+'\n' )
@@ -383,8 +420,9 @@ class MFHistoryList(QListWidget):
             self.takeItem(self.row(item))
             self.parent.setFocus()
             # remove the images temporarily
-            for image in w_item.item_icons:
-                self.mdm.remove(image)
+            for _item in w_item.rich_text:
+                if _item[1]=='img' or _item[1]=='file':
+                    self.mdm.remove(_item[2])
                 pass
             # remove the record
             _uri, _id = w_item.uri.rsplit(':', 1)
@@ -554,16 +592,20 @@ class MFHistory(QWidget):
                 # dump the history item
                 (_user, _time, _) = raw_item
                 _date = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
-                _text = ''
-                for _idx,_raw in enumerate(w_item.split_text):
-                    if _idx%2==0:
-                        _text += _raw.strip()
+                _text = w_item.plain_text[0].strip() if w_item.plain_text else ''
+                for _idx,_item in enumerate(w_item.rich_text):
+                    if _item[1]=='img':
+                        _file = Path(self.base_path,_item[2])
+                        _text += '\n![](%s)\n'%( POSIX(_file) )
+                    elif _item[1]=='file':
+                        _file = Path(self.base_path,_item[2])
+                        _text += '\n[%s](%s)\n'%( _file.name, POSIX(_file) )
+                        pass
+                    elif _item[1]=='url':
+                        _text += '[](%s)'%( _item[2] )
+                        pass
                     else:
-                        _tmp = Path(_raw)
-                        if img_filter.match(_tmp.suffix):
-                            _text += '\n![](%s)\n'%(POSIX(Path(self.base_path, _tmp)))
-                        else:
-                            _text += '\n[%s](%s)\n'%(_tmp.name, POSIX(Path(self.base_path, _tmp)))
+                        pass
                     pass
                 f.write("**`{user}`** `{date}`\n{text}\n\n------\n".format(
                         date=_date, user=_user, text=_text))

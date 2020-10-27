@@ -3,7 +3,7 @@
 This is *mf*, a flash pass your mind.
 You Write, You Listen.
 '''
-import re, sys, signal, socket, time, json
+import sys, signal, socket, time, json
 from os import chdir
 from urllib import request as url_request
 from pathlib import Path
@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
 from mf_entity import MFEntity
 from MFHistoryWidget import MFHistory
 from MFTodoWidget import MFTodoWidget
-from MFUtility import KeysReactor, MimeDataManager, MFWorker, signal_emit
+from MFUtility import KeysReactor, MimeDataManager, MFWorker, signal_emit, link_filter
 
 MF_NAME     = 'Mind Flash'
 MF_VERSION  = '1.0.1'
@@ -104,7 +104,7 @@ class MFTextEdit(QPlainTextEdit):
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
                     fake_path = mdm.savePixmap(pixmap)
-                    _text = "<-file://{}->".format(fake_path)
+                    _text = "![img]({})".format(fake_path)
                     self.insertPlainText(_text)
                 pass
             pass
@@ -177,11 +177,12 @@ class MFTextEdit(QPlainTextEdit):
         pass
 
     def saveFileCache(self):
-        icon_filter = re.compile("<-file://(.*?)->")
-        _text = icon_filter.split(self.toPlainText())
-        image_path = _text[1:][::2]
-        for _path in image_path:
-            mdm.save(_path)
+        link_iter = link_filter.finditer(self.toPlainText())
+        for _link in link_iter:
+            (_tag, _alt, _path) = _link.groups()
+            if _tag=="!" or _alt=="file": #only save image or file
+                mdm.save(_path)
+            pass
         pass
 
     def hideCaret(self):
@@ -263,7 +264,7 @@ class MFTextEdit(QPlainTextEdit):
             local_urls = list( filter(lambda x:x.isLocalFile(), url_list) )
             if len(local_urls)>0:
                 ret = mdm.saveUrls(local_urls)
-                ret = ["<-file://{}->".format(_path) for _path in ret]
+                ret = ["![file]({})".format(_path) for _path in ret]
                 _text = '\n'.join(ret)
                 self.insertPlainText(_text)
                 pass
@@ -271,7 +272,7 @@ class MFTextEdit(QPlainTextEdit):
             web_urls = list( filter(lambda x:not x.isLocalFile(), url_list) )
             if len(web_urls)>0:
                 for _url in url_list:
-                    _text = '<a href="{url}">{url}</a>\n'.format(url=_url.toString())
+                    _text = '[url]({url})\n'.format(url=_url.toString())
                     self.insertPlainText(_text)
                 pass
             pass

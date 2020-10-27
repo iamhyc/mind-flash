@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import locale
-import sys, bisect, platform
+import re, sys, bisect, platform
 import tempfile, shutil
 from os import chdir
 from pathlib import Path
@@ -13,6 +13,9 @@ from dateutil.relativedelta import relativedelta
 MF_HOSTNAME = platform.node().split('-')[0]
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
 POSIX = lambda x: x.as_posix() if hasattr(x, 'as_posix') else x
+
+icon_filter = re.compile("<-file://(.*?)->")
+link_filter = re.compile('(?P<tag>!?)\[(?P<alt>[^\]]*)\]\((?P<path>.*?)(?=\"|\))\)')
 
 class MF_RNG(Enum):
     DAY  = 0
@@ -357,7 +360,6 @@ class MimeDataManager:
             return True
         except:
             return False
-        return False
     pass
 
 class MFWorker(QObject):
