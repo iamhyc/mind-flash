@@ -334,6 +334,7 @@ class MFHistoryList(QListWidget):
     def __init__(self, parent, base_path):
         super().__init__(parent)
         self.parent = parent
+        self.base_path = base_path
         self.mdm    = MimeDataManager(base_path)
         self.offset = 0
         self.to_bound = 0
@@ -392,14 +393,15 @@ class MFHistoryList(QListWidget):
         if w_item.double_clicked==0:
             _text = raw_item[2]
             for _item in w_item.rich_text:
+                print(_item)
                 if _item[1]=='file':
-                    _file = Path(_item[2])
+                    _file = Path(self.base_path, _item[2])
                     _ret = self.mdm.saveFiles([_file])
                     fake_path = _ret[0] if len(_ret)>0 else ''
                     _text = _text.replace(_item[2], fake_path)
                     pass
                 elif _item[1]=='img':
-                    _file = Path(_item[2]).as_posix()
+                    _file = Path(self.base_path, _item[2]).as_posix()
                     try:
                         fake_path = self.mdm.savePixmap( QPixmap(_file) )
                     except:

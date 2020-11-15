@@ -180,7 +180,7 @@ class MFTextEdit(QPlainTextEdit):
         link_iter = link_filter.finditer(self.toPlainText())
         for _link in link_iter:
             (_tag, _alt, _path) = _link.groups()
-            if _tag=="!" or _alt=="file": #only save image or file
+            if _tag=="!" or _alt=="img" or _alt=="file": #only save image or file
                 mdm.save(_path)
             pass
         pass
