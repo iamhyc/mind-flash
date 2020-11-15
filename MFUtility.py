@@ -123,10 +123,12 @@ class KeysReactor():
             self.release_hook_pre(e)
         
         #NOTE: remove keys
-        if key in self.keySpecsKeys:    # remove a special key
+        if key in self.keySpecsKeys:                # remove a special key
             self.key_list[0] = self.key_list[0] & (~self.keySpecs[key]) #remove specific keys
-        elif key in self.key_list:      # remove a common key
+        elif key in self.key_list:                  # remove a common key
             self.key_list.remove(key)
+        elif key in [Qt.Key_Return, Qt.Key_Enter]:  # reset the list
+            self.key_list = [0x00]
         self.super.keyReleaseEvent(e)
         if self.key_list[0]==0x00: #reset, if no specific keys presented
             self.key_list = [0x00]
