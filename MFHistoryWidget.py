@@ -260,7 +260,7 @@ class MFHistoryItem(QFrame):
                 self.draw_image = True
                 self.rich_text.append( (_link.span(), 'file',_path) )
             else:
-                self.rich_text.append( (_link.span(), 'url', _path) )
+                self.rich_text.append( (_link.span(), _alt, _path) )
             pass
         self.rich_text.sort(key=lambda x:x[0][0]) #sort by start of span
         
@@ -273,8 +273,9 @@ class MFHistoryItem(QFrame):
             self.plain_text.append( _text[last_span[1]:this_span[0]] )
             last_span = this_span
             draw_text += self.plain_text[-1]
-            if _item[1]=='url':
-                draw_text += '<a href={path}>{path}</a>'.format(_item[2])
+            if _item[1] not in ['img','file']:
+                _alt = _item[2] if (_item[1] in ['','url']) else _item[1]
+                draw_text += '<a href={path}>{alt}</a>'.format(alt=_alt, path=_item[2])
             pass
         self.plain_text.append( _text[last_span[1]:] )
         draw_text += self.plain_text[-1]
@@ -393,7 +394,6 @@ class MFHistoryList(QListWidget):
         if w_item.double_clicked==0:
             _text = raw_item[2]
             for _item in w_item.rich_text:
-                print(_item)
                 if _item[1]=='file':
                     _file = Path(self.base_path, _item[2])
                     _ret = self.mdm.saveFiles([_file])
@@ -594,20 +594,22 @@ class MFHistory(QWidget):
                 # dump the history item
                 (_user, _time, _) = raw_item
                 _date = datetime.fromtimestamp(int(_time), tz=tzlocal()).strftime('%Y-%m-%d %H:%M:%S')
-                _text = w_item.plain_text[0].strip() if w_item.plain_text else ''
-                for _idx,_item in enumerate(w_item.rich_text):
-                    if _item[1]=='img':
-                        _file = Path(self.base_path,_item[2])
-                        _text += '\n![](%s)\n'%( POSIX(_file) )
-                    elif _item[1]=='file':
-                        _file = Path(self.base_path,_item[2])
-                        _text += '\n[%s](%s)\n'%( _file.name, POSIX(_file) )
-                        pass
-                    elif _item[1]=='url':
-                        _text += '[](%s)'%( _item[2] )
-                        pass
+                _text = ''
+                _rich_text = w_item.rich_text.copy()
+                for _idx in range(len(w_item.plain_text)):
+                    if w_item.plain_text[_idx]=='':
+                        if len(_rich_text)==0: continue
+                        _item = _rich_text.pop(0)
+                        if _item[1]=='img':
+                            _file = Path(self.base_path,_item[2])
+                            _text += '\n![](%s)\n'%( POSIX(_file) )
+                        elif _item[1]=='file':
+                            _file = Path(self.base_path,_item[2])
+                            _text += '\n[%s](%s)\n'%( _file.name, POSIX(_file) )
+                        else:
+                            _text += '[%s](%s)'%( _item[1],_item[2] )
                     else:
-                        pass
+                        _text += '\n'+w_item.plain_text[_idx].strip()
                     pass
                 f.write("**`{user}`** `{date}`\n{text}\n\n------\n".format(
                         date=_date, user=_user, text=_text))
