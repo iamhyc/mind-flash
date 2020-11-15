@@ -99,7 +99,7 @@ class MFTextEdit(QPlainTextEdit):
         #NOTE: Ctrl+V; paste actions
         def mf_paste_binding():
             if self.canPaste():
-                self.paste()
+                self.dropEvent(self.clipboard)
             else:
                 pixmap = self.clipboard.mimeData().imageData()
                 if pixmap:
@@ -282,7 +282,7 @@ class MFTextEdit(QPlainTextEdit):
             self.insertPlainText(_text)
             pass
         elif _mime.hasText():
-            _text = self.text().strip()
+            _text = _mime.text().strip()
             self.insertPlainText(_text)
             pass
         self.textChangedEvent()

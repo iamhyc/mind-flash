@@ -221,14 +221,6 @@ class MFHistoryItem(QFrame):
         self.size_height += self.getHeightHint(ref, pos)
         return ref
 
-    def getIconType(self, _path):
-        _file = Path(self.base_path, _path)
-        if img_filter.match(_file.suffix):
-            return ('', POSIX(_file))
-        else:
-            return (_file, "./res/svg/files.svg")
-        pass
-
     def updateItem(self):
         (_user, _stp, _text) = self.item
         _user = 'Myself' if _user==MF_HOSTNAME else _user
