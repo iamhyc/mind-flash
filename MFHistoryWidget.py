@@ -271,8 +271,8 @@ class MFHistoryItem(QFrame):
         for _item in self.rich_text:
             this_span = _item[0]
             self.plain_text.append( _text[last_span[1]:this_span[0]] )
-            this_span = last_span
-            draw_text += self.plain_text[-1]; print(self.plain_text[-1])
+            last_span = this_span
+            draw_text += self.plain_text[-1]
             if _item[1]=='url':
                 draw_text += '<a href={path}>{path}</a>'.format(_item[2])
             pass
@@ -280,7 +280,7 @@ class MFHistoryItem(QFrame):
         draw_text += self.plain_text[-1]
         #
         draw_text = draw_text.strip()
-        draw_text += '\n' if _text else '' # for QFontMetrics.boundingRect correction
+        draw_text += '\n' if draw_text else '' # for QFontMetrics.boundingRect correction
         draw_text = draw_text.replace('\n', '<br>')
         
         #NOTE: 3. create hint_label and text_label
@@ -393,13 +393,13 @@ class MFHistoryList(QListWidget):
             _text = raw_item[2]
             for _item in w_item.rich_text:
                 if _item[1]=='file':
-                    _file = Path(self.base_path, _item[2])
+                    _file = Path(_item[2])
                     _ret = self.mdm.saveFiles([_file])
                     fake_path = _ret[0] if len(_ret)>0 else ''
                     _text = _text.replace(_item[2], fake_path)
                     pass
                 elif _item[1]=='img':
-                    _file = Path(self.base_path, _item[2]).as_posix()
+                    _file = Path(_item[2]).as_posix()
                     try:
                         fake_path = self.mdm.savePixmap( QPixmap(_file) )
                     except:
