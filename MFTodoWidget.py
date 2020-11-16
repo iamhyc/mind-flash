@@ -8,7 +8,7 @@ from MFUtility import (CFG, POSIX, MF_HOSTNAME)
 MIN_TODO_SIZE       = (600, 20)
 TODO_ITEM_FONT      = ('Noto Sans CJK SC',12)
 TODO_TITLE_FONT     = ('Noto Sans CJK SC',8,QFont.Bold)
-TODO_TITLE_FONT_ALT = ('Noto Sans CJK SC',8,-1,True)
+TODO_TITLE_FONT_ALT = ('Noto Sans CJK SC',8,-1,1)
 TODO_BACKGROUND     = 'rgba(255,255,255, 0.25)'
 TODO_BACKGROUND_ALT = 'rgba(255,255,255, 0.00)'
 

@@ -39,9 +39,9 @@ class MFImagePreviewer(QWidget):
         self.move(qr.topLeft())
         #
         self.keysFn = KeysReactor(self)
-        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.close())
-        self.keysFn.register(CFG.keys(self,'KEYS_CLOSE1'), lambda:self.close())
-        self.keysFn.register(CFG.keys(self,'KEYS_CLOSE2'),  lambda:self.close())
+        self.keysFn.register(CFG.KEYS_CLOSE(), lambda:self.close())
+        self.keysFn.register(CFG.KEYS_CLOSE1(self), lambda:self.close())
+        self.keysFn.register(CFG.KEYS_CLOSE2(self),  lambda:self.close())
         #
         self.styleHelper()
         self.setFocus()

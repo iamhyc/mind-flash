@@ -6,6 +6,7 @@ from os import chdir
 from pathlib import Path
 from enum import Enum
 from PyQt5.QtCore import (Qt, QObject, QThread, pyqtSignal, pyqtSlot)
+from PyQt5.QtGui import (QFont)
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
@@ -397,23 +398,48 @@ class MFWorker(QObject):
 
 class MFConfig:
     def __init__(self, filename=''):
+        self.default_sec = 'General'
         self.config = ConfigParser(allow_no_value=True, default_section='General')
         if filename:
             self.config.read(filename)
         pass
 
+    def __getattribute__(self, name):
+        if name.isupper():
+            def configWrap(ref=''):
+                _section = type(ref).__name__ if ref else self.default_sec
+                if name.startswith('KEYS_'):
+                    ret = self.parseKeys(_section, name)
+                elif name.startswith('FONT_'):
+                    ret = self.parseFont(_section, name)
+                elif name.startswith('SIZE_'):
+                    ret = self.parseSize(_section, name)
+                else:
+                    ret = self.config[_section][name]
+                return ret
+            return configWrap
+        else:
+            return super().__getattribute__(name)
+        pass
+
     def read(self, filenames=''):
         return self.config.read(filenames)
 
-    def keys(self, ref, keyword=''):
-        if keyword=='':
-            keyword  = ref
-            _section = 'General'
-        else:
-            _section = type(ref).__name__
-        #
-        _keys = self.config[_section][keyword].split('+')
+    def parseSize(self, section, keyword):
         ret = list()
+        # ret = self.config[section][keyword].split(',')
+        # ret = tuple( [int(x) if x.isdigit() else x for x in ret] )
+        return ret
+
+    def parseFont(self, section, keyword):
+        ret = list()
+        # ret = self.config[section][keyword].split(',')
+        # ret = tuple( [int(x) if x.isdigit() else x for x in ret] )
+        return ret
+
+    def parseKeys(self, section, keyword):
+        ret = list()
+        _keys = self.config[section][keyword].split('+')
         for _key in _keys:
             _key = _key.strip().upper()
             if _key=='CTRL':    _key = 'Control'
@@ -426,7 +452,6 @@ class MFConfig:
             if hasattr(Qt, 'Key_'+_key):
                 ret.append( getattr(Qt, 'Key_'+_key) )
         return ret
-
     pass
 CFG = MFConfig()
 

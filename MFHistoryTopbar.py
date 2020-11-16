@@ -122,8 +122,8 @@ class InputBox(QPlainTextEdit):
         pass
 
     def registerKeys(self):
-        self.keysFn.register(CFG.keys(self,'KEYS_EDIT'), lambda:self.setFilter())
-        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.focusOut())
+        self.keysFn.register(CFG.KEYS_EDIT(self), lambda:self.setFilter())
+        self.keysFn.register(CFG.KEYS_CLOSE(), lambda:self.focusOut())
         pass
 
     def setFilter(self):

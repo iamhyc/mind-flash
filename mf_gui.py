@@ -79,7 +79,7 @@ class MFTextEdit(QPlainTextEdit):
             self.showCaret()
             self.insertPlainText('\n')
             pass
-        self.keysFn.register(CFG.keys(self,'KEYS_EDIT'), mf_edit_binding)
+        self.keysFn.register(CFG.KEYS_EDIT(self), mf_edit_binding)
 
         #NOTE: Return; flash recording
         def mf_flush_binding():
@@ -94,7 +94,7 @@ class MFTextEdit(QPlainTextEdit):
             else:
                 self.parent.close()
             pass
-        self.keysFn.register(CFG.keys(self,'KEYS_FLUSH'), mf_flush_binding)
+        self.keysFn.register(CFG.KEYS_FLUSH(self), mf_flush_binding)
 
         #NOTE: Ctrl+V; paste actions
         def mf_paste_binding():
@@ -108,7 +108,7 @@ class MFTextEdit(QPlainTextEdit):
                     self.insertPlainText(_text)
                 pass
             pass
-        self.keysFn.register(CFG.keys(self,'KEYS_PASTE'), mf_paste_binding)
+        self.keysFn.register(CFG.KEYS_PASTE(self), mf_paste_binding)
 
         #NOTE: Alt+Q; add to todo list
         def mf_add_todo():
@@ -120,30 +120,30 @@ class MFTextEdit(QPlainTextEdit):
                 self.w_todo.renderTodos()
                 pass
             pass
-        self.keysFn.register(CFG.keys(self,'KEYS_ADD_TODO'), mf_add_todo)
+        self.keysFn.register(CFG.KEYS_ADD_TODO(self), mf_add_todo)
 
         ### Alt+V ###
         self.keysFn.register(
-            CFG.keys('KEYS_RANGE_SWITCH'),
+            CFG.KEYS_RANGE_SWITCH(),
             lambda:self.w_history.updateHistory(+1, None, True)
         )
         ### Alt+J ###
         self.keysFn.register(
-            CFG.keys('KEYS_JUMP_FORWARD'), 
+            CFG.KEYS_JUMP_FORWARD(), 
             lambda:self.w_history.updateHistory(0, +1)
         )
         ### Alt+K ###
         self.keysFn.register(
-            CFG.keys('KEYS_JUMP_BACKWARD'), 
+            CFG.KEYS_JUMP_BACKWARD(), 
             lambda:self.w_history.updateHistory(0, -1)
         )
         ### Alt+H ###
         self.keysFn.register(
-            CFG.keys('KEYS_TOGGLE'), 
+            CFG.KEYS_TOGGLE(), 
             lambda:self.toggleHistoryWidget()
         )
         ### Escape ###
-        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.parent.close())
+        self.keysFn.register(CFG.KEYS_CLOSE(), lambda:self.parent.close())
         pass
 
     def showHelpText(self):
@@ -338,10 +338,10 @@ class MFGui(QWidget):
 
     def registerGlobalKeys(self):
         ### Escape / Ctrl+W ###
-        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.close())
-        self.keysFn.register(CFG.keys(self,'KEYS_CLOSE'), lambda:self.close())
+        self.keysFn.register(CFG.KEYS_CLOSE(), lambda:self.close())
+        self.keysFn.register(CFG.KEYS_CLOSE(self), lambda:self.close())
         ### Ctrl+L ###
-        self.keysFn.register(CFG.keys(self,'KEYS_TO_EDIT'), lambda:self.setFocus())
+        self.keysFn.register(CFG.KEYS_TO_EDIT(self), lambda:self.setFocus())
         ### Ctrl+F ###
         def mf_search_binding():
             if self.w_history.isVisible():
@@ -349,25 +349,25 @@ class MFGui(QWidget):
                 _topbar.switch( _topbar.input_box )
                 _topbar.input_box.setFocus()
             pass
-        self.keysFn.register(CFG.keys(self, "KEYS_SEARCH"), mf_search_binding)
+        self.keysFn.register(CFG.KEYS_SEARCH(self), mf_search_binding)
         ### Alt+V ###
         self.keysFn.register(
-            CFG.keys('KEYS_RANGE_SWITCH'),
+            CFG.KEYS_RANGE_SWITCH(),
             lambda:self.w_history.updateHistory(+1, None, True)
         )
         ### Alt+J ###
         self.keysFn.register(
-            CFG.keys('KEYS_JUMP_FORWARD'), 
+            CFG.KEYS_JUMP_FORWARD(), 
             lambda:self.w_history.updateHistory(0, +1)
         )
         ### Alt+K ###
         self.keysFn.register(
-            CFG.keys('KEYS_JUMP_BACKWARD'), 
+            CFG.KEYS_JUMP_BACKWARD(), 
             lambda:self.w_history.updateHistory(0, -1)
         )
         ### Alt+H ###
         self.keysFn.register(
-            CFG.keys('KEYS_TOGGLE'), 
+            CFG.KEYS_TOGGLE(), 
             lambda:self.w_history.toggleHistoryWidget()
         )
         pass
