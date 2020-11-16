@@ -407,7 +407,13 @@ class MFConfig:
     def __getattribute__(self, name):
         if name.isupper():
             def configWrap(ref=''):
-                _section = type(ref).__name__ if ref else self.default_sec
+                if not ref:
+                    _section = self.default_sec
+                elif type(ref)==str:
+                    _section = ref
+                else:
+                    _section = type(ref).__name__
+                #
                 if name.startswith('KEYS_'):
                     ret = self.parseKeys(_section, name)
                 elif name.startswith('FONT_'):
@@ -432,9 +438,17 @@ class MFConfig:
         return ret
 
     def parseFont(self, section, keyword):
-        ret = list()
-        # ret = self.config[section][keyword].split(',')
-        # ret = tuple( [int(x) if x.isdigit() else x for x in ret] )
+        ret = QFont('Noto Sans CJK SC')
+        val = self.config[section][keyword].strip('[]()').split(',')
+        for x in val:
+            x = x.strip().replace('\'', '').replace('\"', '')
+            if x.isdigit():
+                ret.setPointSize( int(x) )
+            elif x in ['*', '**', '***']:
+                ret.setItalic(x=='*' or x=='***')
+                ret.setBold(x=='**'  or x=='***')
+            else:
+                ret.setFamily(x)
         return ret
 
     def parseKeys(self, section, keyword):

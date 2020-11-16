@@ -21,7 +21,6 @@ MF_VERSION  = '1.0.1'
 MF_WEBSITE  = 'https://github.com/iamhyc/mind-flash'
 MF_STATUS   = 'https://api.github.com/repos/iamhyc/mind-flash/tags'
 MF_DIR      = Path('~/.mf/').expanduser()
-INPUTBOX_FONT  = ('Noto Sans CJK SC',14)
 MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2,3)
 
@@ -38,7 +37,7 @@ class MFTextEdit(QPlainTextEdit):
         self.pressed = False
         self.press_pos = QPoint(0, 0)
         self.init_pos = self.parent.pos()
-        self.font_style = QFont(*INPUTBOX_FONT)
+        self.font_style = QFont( CFG.FONT_DEFAULT(self) )
         self.font_metric= QFontMetrics(self.font_style)
         self.styleHelper()
         #

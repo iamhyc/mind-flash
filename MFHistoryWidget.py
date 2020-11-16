@@ -18,13 +18,9 @@ COLOR_DAYTIME  = ['#856d72', '#83cbac', '#f1939c', '#93b5cf'] #00-06, 06-12, 12-
 # color reference: http://zhongguose.com/, https://nipponcolors.com/
 MIN_HISTORY_SIZE = (600, 450)
 MIN_ITEM_SIZE    = (600, 150)
-ITEM_HINT_FONT   = ('Noto Sans CJK SC',12)
 ITEM_USER_COLOR  = 'silver'
 ITEM_DATE_COLOR  = '#2b1216'
-ITEM_TEXT_FONT   = ('Noto Sans CJK SC',14)
 ITEM_TEXT_COLOR  = '#252526'
-FILE_ICON_FONT   = ('Noto Sans CJK SC',11,QFont.Bold)
-ICON_HINT_FONT   = ('Noto Sans CJK SC',12,0,1)
 LIST_BACKGROUND  = '#FFFEF9' #xuebai
 ITEM_BACKGROUND  = '#EEF7F2'
 ITEM_BORDERCOLOR = '#DFECD5'
@@ -50,7 +46,7 @@ class QLabelWrapper(QLabel):
     def styleHelper(self):
         self.setWordWrap(True)
         if self.type=='item_hint':
-            self.setFont(QFont(*ITEM_HINT_FONT))
+            self.setFont( CFG.FONT_ITEM_HINT('MFHistoryItem') )
             self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
             self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
 
@@ -68,7 +64,7 @@ class QLabelWrapper(QLabel):
             self.setToolTip(self.alt)
             pass
         elif self.type=='item_text':
-            self.setFont(QFont(*ITEM_TEXT_FONT))
+            self.setFont( CFG.FONT_ITEM_TEXT('MFHistoryItem') )
             self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
             self.setTextFormat(Qt.RichText)
             self.setTextInteractionFlags(Qt.TextBrowserInteraction)
@@ -109,14 +105,14 @@ class QLabelWrapper(QLabel):
         # draw suffix text
         _rect = QRect(8, 10, 108, 35)  #100*25
         _painter.setPen(QPen(QColor("#0f59a4")))
-        _painter.setFont(QFont(*ICON_HINT_FONT))
+        _painter.setFont( CFG.FONT_ICON_SUFFIX('MFHistoryItem') )
         _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextSingleLine, _suffix )
         _painter.setPen(_pen)
         # draw splitter
         _painter.drawLine(1, 40, 118, 40)
         # draw suffix text
         _rect = QRect(8, 45, 108, 110) #100*65
-        _painter.setFont(QFont(*FILE_ICON_FONT))
+        _painter.setFont( CFG.FONT_ICON_NAME('MFHistoryItem') )
         _fm   = QFontMetrics( _painter.font() )
         # _elided_text = _fm.elidedText(_text, Qt.ElideMiddle, _rect.width(), Qt.TextWrapAnywhere)
         _painter.drawText(_rect, Qt.AlignHCenter|Qt.TextWrapAnywhere, _text )

@@ -12,8 +12,6 @@ COLOR_AUTUMN   = '#9F2D20'
 COLOR_WINTER   = '#1E90FF'
 COLOR_WEEKDAY  = ['gold', 'deeppink', 'green', 'darkorange', 'blue', 'indigo', 'red']
 
-MF_HINT_FONT      = ('Noto Sans CJK SC',11,QFont.Bold)
-INPUTBOX_FONT     = ('Noto Sans CJK SC',14)
 TOPBAR_BACKGROUND = '#FFFEF9' #xuebai
 MIN_TOPBAR_SIZE   = (600, 40)
 MIN_TOOLICON_SIZE = (72, 40)
@@ -37,7 +35,7 @@ class HintLabel(QLabel):
 
     def styleHelper(self):
         self.setWordWrap(True)
-        self.setFont(QFont(*MF_HINT_FONT))
+        self.setFont( CFG.FONT_DEFAULT(self) )
         self.setFixedSize(*MIN_TOPBAR_SIZE)
         # self.setAlignment(Qt.AlignHCenter | Qt.AlignCenter)
         pass
@@ -113,7 +111,7 @@ class InputBox(QPlainTextEdit):
         pass
 
     def styleHelper(self):
-        self.setFont( QFont(*INPUTBOX_FONT) )
+        self.setFont( CFG.FONT_DEFAULT(self) )
         self.setPlaceholderText("Search with Regex ...")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

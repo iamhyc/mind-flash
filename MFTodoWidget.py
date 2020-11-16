@@ -6,9 +6,6 @@ from PyQt5.QtWidgets import (QListWidget, QListWidgetItem)
 from MFUtility import (CFG, POSIX, MF_HOSTNAME)
 
 MIN_TODO_SIZE       = (600, 20)
-TODO_ITEM_FONT      = ('Noto Sans CJK SC',12)
-TODO_TITLE_FONT     = ('Noto Sans CJK SC',8,QFont.Bold)
-TODO_TITLE_FONT_ALT = ('Noto Sans CJK SC',8,-1,1)
 TODO_BACKGROUND     = 'rgba(255,255,255, 0.25)'
 TODO_BACKGROUND_ALT = 'rgba(255,255,255, 0.00)'
 
@@ -26,16 +23,16 @@ class TodoItemWrapper(QListWidgetItem):
         if stat=='title':
             self.setToolTip('Add: <Alt+Q>\nToggle: right click\nDelete: double click')
             self.setFlags(self.flags() & (not Qt.ItemIsSelectable))
-            self.setFont(QFont(*TODO_TITLE_FONT))
+            self.setFont( CFG.FONT_TITLE_ON('MFTodoWidget') )
             self.setText(text)
             pass
         elif stat=='+': #https://www.compart.com/en/unicode/U+25A1
-            self.setFont(QFont(*TODO_ITEM_FONT))
+            self.setFont( CFG.FONT_ITEM('MFTodoWidget') )
             _prefix = b'\xE2\x96\xA1'.decode('utf-8')
             self.setText('{}  {}'.format(_prefix, text))
             pass
         elif stat=='-': #https://www.compart.com/en/unicode/U+25A0
-            _font = QFont(*TODO_ITEM_FONT); _font.setStrikeOut(True)
+            _font = CFG.FONT_ITEM('MFTodoWidget'); _font.setStrikeOut(True)
             self.setFont(_font)
             _prefix = b'\xE2\x96\xA0'.decode('utf-8')
             self.setText('{}  {}'.format(_prefix, text))
@@ -67,11 +64,11 @@ class MFTodoWidget(QListWidget):
     def alterBackground(self):
         if self.count() > 1:
             background_color = TODO_BACKGROUND
-            self.item(0).setFont( QFont(*TODO_TITLE_FONT) )
+            self.item(0).setFont( CFG.FONT_TITLE_ON(self) )
             self.item(0).setForeground(QColor('black'))
         else:
             background_color = TODO_BACKGROUND_ALT
-            self.item(0).setFont( QFont(*TODO_TITLE_FONT_ALT) )
+            self.item(0).setFont( CFG.FONT_TITLE_OFF(self) )
             self.item(0).setForeground(QColor('#BDC3C7'))
         
         self.setStyleSheet('''
