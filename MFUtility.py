@@ -9,10 +9,11 @@ from PyQt5.QtCore import (Qt, QObject, QThread, pyqtSignal, pyqtSlot)
 from datetime import datetime
 from dateutil.relativedelta import FR, MO, SA, SU, TH, TU, WE
 from dateutil.relativedelta import relativedelta
+from configparser import ConfigParser
 
 MF_HOSTNAME = platform.node().split('-')[0]
 # locale.setlocale(locale.LC_ALL, "en_GB.utf8")
-POSIX = lambda x: x.as_posix() if hasattr(x, 'as_posix') else x
+POSIX  = lambda x: x.as_posix() if hasattr(x, 'as_posix') else x
 
 icon_filter = re.compile("<-file://(.*?)->")
 link_filter = re.compile('(?P<tag>!?)\[(?P<alt>[^\]]*)\]\((?P<path>.*?)(?=\"|\))\)')
@@ -393,6 +394,41 @@ class MFWorker(QObject):
         self.thread.exit(0)
         pass
     pass
+
+class MFConfig:
+    def __init__(self, filename=''):
+        self.config = ConfigParser(allow_no_value=True, default_section='General')
+        if filename:
+            self.config.read(filename)
+        pass
+
+    def read(self, filenames=''):
+        return self.config.read(filenames)
+
+    def keys(self, ref, keyword=''):
+        if keyword=='':
+            keyword  = ref
+            _section = 'General'
+        else:
+            _section = type(ref).__name__
+        #
+        _keys = self.config[_section][keyword].split('+')
+        ret = list()
+        for _key in _keys:
+            _key = _key.strip().upper()
+            if _key=='CTRL':    _key = 'Control'
+            elif _key=='ALT':   _key = 'Alt'
+            elif _key=='SHIFT': _key = 'Shift'
+            elif _key=='ENTER': _key = 'Enter'
+            elif _key=='RETURN':_key = 'Return'
+            elif _key in ['ESC','ESCAPE']:
+                _key = 'Escape'
+            if hasattr(Qt, 'Key_'+_key):
+                ret.append( getattr(Qt, 'Key_'+_key) )
+        return ret
+
+    pass
+CONFIG = MFConfig()
 
 def signal_emit(_signal, _slot, _msg=None):
     _signal.connect(_slot)

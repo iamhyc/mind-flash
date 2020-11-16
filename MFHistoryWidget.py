@@ -5,7 +5,7 @@ from datetime import datetime
 from dateutil.tz import tzlocal, tzutc
 from MFUtility import (POSIX, MF_HOSTNAME, signal_emit,
                         TextStamp, MimeDataManager, MFWorker)
-from MFUtility import (icon_filter, link_filter)
+from MFUtility import (CONFIG, icon_filter, link_filter)
 from MFPreviewWidget import MFImagePreviewer
 from MFHistoryTopbar import TopbarManager
 from PyQt5.QtCore import (Qt, QUrl, QMimeData, QRect, QSize, QThread, pyqtSignal, pyqtSlot)
