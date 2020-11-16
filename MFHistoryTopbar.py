@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
 from pathlib import Path
-from MFUtility import (CONFIG, MF_RNG, KeysReactor, MFWorker)
+from MFUtility import (CFG, MF_RNG, KeysReactor, MFWorker)
 from PyQt5.QtCore import (Qt, QSize, QPoint, QEvent, pyqtSlot)
 from PyQt5.QtGui import (QIcon, QFont)
 from PyQt5.QtWidgets import (QWidget, QLabel, QPlainTextEdit, QBoxLayout, QGridLayout)
@@ -122,8 +122,8 @@ class InputBox(QPlainTextEdit):
         pass
 
     def registerKeys(self):
-        self.keysFn.register(CONFIG.keys(self,'KEYS_EDIT'), lambda:self.setFilter())
-        self.keysFn.register(CONFIG.keys('KEYS_CLOSE'), lambda:self.focusOut())
+        self.keysFn.register(CFG.keys(self,'KEYS_EDIT'), lambda:self.setFilter())
+        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.focusOut())
         pass
 
     def setFilter(self):

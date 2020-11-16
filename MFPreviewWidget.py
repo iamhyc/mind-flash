@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtCore import (Qt, QRect, QSize)
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QLabel,
                         QLayout, QGridLayout, QPlainTextEdit, QSizePolicy)
-from MFUtility import (CONFIG, KeysReactor)
+from MFUtility import (CFG, KeysReactor)
 
 class MFPreviewWidget(QWidget):
     def __init__(self, item):
@@ -39,9 +39,9 @@ class MFImagePreviewer(QWidget):
         self.move(qr.topLeft())
         #
         self.keysFn = KeysReactor(self)
-        self.keysFn.register(CONFIG.keys('KEYS_CLOSE'), lambda:self.close())
-        self.keysFn.register(CONFIG.keys(self,'KEYS_CLOSE1'), lambda:self.close())
-        self.keysFn.register(CONFIG.keys(self,'KEYS_CLOSE2'),  lambda:self.close())
+        self.keysFn.register(CFG.keys('KEYS_CLOSE'), lambda:self.close())
+        self.keysFn.register(CFG.keys(self,'KEYS_CLOSE1'), lambda:self.close())
+        self.keysFn.register(CFG.keys(self,'KEYS_CLOSE2'),  lambda:self.close())
         #
         self.styleHelper()
         self.setFocus()

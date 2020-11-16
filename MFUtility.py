@@ -428,7 +428,7 @@ class MFConfig:
         return ret
 
     pass
-CONFIG = MFConfig()
+CFG = MFConfig()
 
 def signal_emit(_signal, _slot, _msg=None):
     _signal.connect(_slot)
