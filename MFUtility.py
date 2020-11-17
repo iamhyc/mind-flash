@@ -432,41 +432,53 @@ class MFConfig:
         return self.config.read(filenames)
 
     def parseSize(self, section, keyword):
-        ret = self.config[section][keyword].strip('[]()').split(',')
-        ret = tuple( [int(x) for x in ret] )
-        if len(ret) == 1:
-            ret = ret[0]
-        return ret
+        try:
+            ret = self.config[section][keyword].strip('[]()').split(',')
+            ret = tuple( [int(x) for x in ret] )
+            if len(ret) == 1:
+                ret = ret[0]
+            return ret
+        except KeyError as e:
+            print('No config "%s" found in section <%s>'%(keyword, section))
+            return 0
 
     def parseFont(self, section, keyword):
         ret = QFont('Noto Sans CJK SC')
-        val = self.config[section][keyword].strip('[]()').split(',')
-        for x in val:
-            x = x.strip().strip('\'\"')
-            if x.isdigit():
-                ret.setPointSize( int(x) )
-            elif x in ['*', '**', '***']:
-                ret.setItalic(x=='*' or x=='***')
-                ret.setBold(x=='**'  or x=='***')
-            else:
-                ret.setFamily(x)
-        return ret
+        try:
+            val = self.config[section][keyword].strip('[]()').split(',')
+            for x in val:
+                x = x.strip().strip('\'\"')
+                if x.isdigit():
+                    ret.setPointSize( int(x) )
+                elif x in ['*', '**', '***']:
+                    ret.setItalic(x=='*' or x=='***')
+                    ret.setBold(x=='**'  or x=='***')
+                else:
+                    ret.setFamily(x)
+        except KeyError as e:
+            print('No config "%s" found in section <%s>'%(keyword, section))
+        finally:
+            return ret
 
     def parseKeys(self, section, keyword):
         ret = list()
-        _keys = self.config[section][keyword].split('+')
-        for _key in _keys:
-            _key = _key.strip().upper()
-            if _key=='CTRL':    _key = 'Control'
-            elif _key=='ALT':   _key = 'Alt'
-            elif _key=='SHIFT': _key = 'Shift'
-            elif _key=='ENTER': _key = 'Enter'
-            elif _key=='RETURN':_key = 'Return'
-            elif _key in ['ESC','ESCAPE']:
-                _key = 'Escape'
-            if hasattr(Qt, 'Key_'+_key):
-                ret.append( getattr(Qt, 'Key_'+_key) )
-        return ret
+        try:
+            _keys = self.config[section][keyword].split('+')
+            for _key in _keys:
+                _key = _key.strip().upper()
+                if _key=='CTRL':    _key = 'Control'
+                elif _key=='ALT':   _key = 'Alt'
+                elif _key=='SHIFT': _key = 'Shift'
+                elif _key=='ENTER': _key = 'Enter'
+                elif _key=='RETURN':_key = 'Return'
+                elif _key in ['ESC','ESCAPE']:
+                    _key = 'Escape'
+                if hasattr(Qt, 'Key_'+_key):
+                    ret.append( getattr(Qt, 'Key_'+_key) )
+        except KeyError as e:
+            print('No config "%s" found in section <%s>'%(keyword, section))
+        finally:
+            return ret
     pass
 CFG = MFConfig()
 
