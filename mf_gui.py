@@ -402,6 +402,7 @@ if __name__ == '__main__':
     CFG.read('res/config.ini')
     # init MF Entity
     mf_exec = MFEntity(MF_DIR)
+    CFG.read( Path(MF_DIR, 'config.ini').as_posix() )
     # init MF GUI
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
