@@ -434,6 +434,8 @@ class MFConfig:
     def parseSize(self, section, keyword):
         ret = self.config[section][keyword].strip('[]()').split(',')
         ret = tuple( [int(x) for x in ret] )
+        if len(ret) == 1:
+            ret = ret[0]
         return ret
 
     def parseFont(self, section, keyword):

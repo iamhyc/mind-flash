@@ -14,10 +14,6 @@ from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics,
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
                             QListWidget, QListWidgetItem, QGridLayout)
 
-ITEM_MARGIN      = 5#px
-OFFSET_FIX       = 2#px
-MAX_NUM_SCROLL   = 7#wheel
-
 img_filter    = re.compile("\.(gif|jpe?g|tiff?|png|bmp)")
 bold_filter   = re.compile("\*\*([^\*]+)\*\*")
 italic_filter = re.compile("\*(.*?)\*")
@@ -37,7 +33,7 @@ class QLabelWrapper(QLabel):
         if self.type=='item_hint':
             self.setFont( CFG.FONT_ITEM_HINT('MFHistoryItem') )
             self.setStyleSheet( CFG.STYLE_HINT('MFHistoryItem') )
-            self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
+            self.setFixedHeight( QFontMetrics(self.font()).height()+CFG.SIZE_HINT_HEIGHT_FIX('MFHistoryItem') )
             #
             _user,_date,_time = self.text().split()
             t_rng = int(_time.split(':')[0])
@@ -75,7 +71,8 @@ class QLabelWrapper(QLabel):
             pass
         elif self.type=='file_label':
             _pixmap = self.getFileIcon()
-            self.setPixmap( _pixmap.scaledToWidth(75, Qt.SmoothTransformation) )
+            _icon_size = CFG.SIZE_FILE_ICON('MFHistoryItem')
+            self.setPixmap( _pixmap.scaledToWidth(_icon_size[0], Qt.SmoothTransformation) )
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             pass
         else:
@@ -123,7 +120,7 @@ class QLabelWrapper(QLabel):
                 w_history = self.parent.parent
                 _text     = "Image copied."
                 self.worker = MFWorker(w_history.showHint,
-                                        args=(_text, 1000))
+                                        args=( _text, CFG.CFG_HINT_SHOW_MS() ))
                 self.worker.start()
             except Exception:
                 pass
@@ -140,7 +137,7 @@ class QLabelWrapper(QLabel):
                 w_history = self.parent.parent
                 _text     = "File <u>%s</u> copied."%self.alt.name
                 self.worker = MFWorker(w_history.showHint,
-                                        args=(_text, 1600))
+                                        args=( _text, CFG.CFG_HINT_SHOW_MS() ))
                 self.worker.start()
             except:
                 pass
@@ -181,16 +178,16 @@ class MFHistoryItem(QFrame):
             _text = _doc.toPlainText()
             fm    = QFontMetrics(label_ref.font())
             if label_ref.type=='item_hint':
-                fm_rect = QRect(0,0,590,100)
+                fm_rect = QRect( *CFG.SIZE_ITEM_FULL() )
                 _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
                 size   = QSize(_height, _height)
             else:
-                fm_rect = QRect(0,0,590,100) if not self.draw_image else QRect(0,0,590/3*2,100)
+                fm_rect = QRect(*CFG.SIZE_ITEM_FULL()) if not self.draw_image else QRect(*CFG.SIZE_ITEM_SIDE())
                 _height = fm.boundingRect(fm_rect, Qt.TextWordWrap, _text).size().height()
                 size   = QSize(0, _height)
             pass
         else:
-            _height = min(label_ref.pixmap().height()+25, CFG.SIZE_HISTORY_ITEM()[1])
+            _height = min(label_ref.pixmap().height()+CFG.SIZE_IMG_ONLY_HEIGHT(self), CFG.SIZE_HISTORY_ITEM()[1])
             size  = QSize(_height, 0)
             pass
         return size
@@ -267,13 +264,13 @@ class MFHistoryItem(QFrame):
             pass
         else:
             if not draw_text:
-                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]-ITEM_MARGIN*2,   x.width()), CFG.SIZE_HISTORY_ITEM()[1])
+                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0] - CFG.SIZE_ITEM_MARGIN(self)*2,   x.width()), CFG.SIZE_HISTORY_ITEM()[1])
                 IconSize = (1, 3)
-                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]-ITEM_MARGIN*2-OFFSET_FIX
+                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]-CFG.SIZE_ITEM_MARGIN(self)*2 - CFG.SIZE_ITEM_WIDTH_FIX(self)
             else:
-                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]/3-ITEM_MARGIN*1, x.width()), CFG.SIZE_HISTORY_ITEM()[1])
+                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]/3 - CFG.SIZE_ITEM_MARGIN(self)*1, x.width()), CFG.SIZE_HISTORY_ITEM()[1])
                 IconSize = (1, 1)
-                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]/3-ITEM_MARGIN*1-OFFSET_FIX
+                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]/3-CFG.SIZE_ITEM_MARGIN(self)*1 - CFG.SIZE_ITEM_WIDTH_FIX(self)
             #
             for (i,_item) in enumerate(self.rich_text):
                 if _item[1]=='img':
@@ -382,7 +379,7 @@ class MFHistoryList(QListWidget):
             self.to_bound = 0
         self.offset = _offset
         #
-        if self.to_bound>=MAX_NUM_SCROLL:
+        if self.to_bound>=int( CFG.CFG_SCROLL_TO_GO() ):
             self.to_bound = 0
             _direction = -1 if _move_up else +1
             self.parent.updateHistory(0, _direction)
@@ -491,7 +488,7 @@ class MFHistory(QWidget):
             if (self.filter is None) or self.filter.search(_text):
                 w_item = QListWidgetItem(self.w_history_list)
                 w_item_widget = MFHistoryItem(self, w_item, self.base_path, item)
-                size_hint = QSize(0, w_item_widget.sizeHint().height()+ITEM_MARGIN) # do not adjust width
+                size_hint = QSize(0, w_item_widget.sizeHint().height()+CFG.SIZE_ITEM_MARGIN('MFHistoryItem')) # do not adjust width
                 w_item.setSizeHint(size_hint)
                 self.w_history_list.addItem(w_item)
                 self.w_history_list.setItemWidget(w_item, w_item_widget)

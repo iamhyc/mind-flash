@@ -166,7 +166,7 @@ class MFTodoWidget(QListWidget):
     
     def sizeHint(self):
         height = sum( [self.sizeHintForRow(i) for i in range(self.todo_count)] ) #self.count()
-        return QSize(600, height)
+        return QSize(CFG.SIZE_EDIT()[0], height)
 
     def safe_close(self):
         all_status = [x[0]=='-' for x in self.todos]

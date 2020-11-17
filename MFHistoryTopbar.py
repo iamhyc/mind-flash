@@ -152,7 +152,7 @@ class ToolBarIcon(QLabel):
 
     def styleHelper(self):
         if self.name=='_':
-            _width = CFG.SIZE_TOPBAR_MAIN()[0] - CFG.SIZE_TOPBAR_ICON()[0]*TOOL_ICON_NUM - 33 #33 for one rightmost icon
+            _width = CFG.SIZE_TOPBAR_MAIN()[0] - CFG.SIZE_TOPBAR_ICON()[0]*TOOL_ICON_NUM - (CFG.SIZE_ICON(self)[0]+1) #33 for one rightmost icon
             self.setFixedSize( _width, CFG.SIZE_TOPBAR_MAIN()[1] )
             self.setStyleSheet('QLabel { border-width: 1px 0px 1px 0px; }')
             self.setTextFormat(Qt.RichText)
@@ -162,7 +162,7 @@ class ToolBarIcon(QLabel):
             return
         
         self.icon_name = self.name
-        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(32,32) )
+        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(*CFG.SIZE_ICON(self)) )
         self.setPixmap(_icon)
         self.setToolTip(self.attr['hint'])
         self.callback = self.__getattribute__( self.attr['func'] )
@@ -212,7 +212,7 @@ class ToolBarIcon(QLabel):
         #
         _idx = self.topbar.parent.updateHistory(+1, None, True)
         self.icon_name = _icons[_idx]
-        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(32,32) )
+        _icon = QIcon( './res/svg/{}.svg'.format(self.icon_name) ).pixmap( QSize(*CFG.SIZE_ICON(self)) )
         self.setPixmap(_icon)
         pass
 
