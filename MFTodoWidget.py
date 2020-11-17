@@ -5,10 +5,6 @@ from PyQt5.QtGui import (QColor, QFont, QFontMetrics)
 from PyQt5.QtWidgets import (QListWidget, QListWidgetItem)
 from MFUtility import (CFG, POSIX, MF_HOSTNAME)
 
-MIN_TODO_SIZE       = (600, 20)
-TODO_BACKGROUND     = 'rgba(255,255,255, 0.25)'
-TODO_BACKGROUND_ALT = 'rgba(255,255,255, 0.00)'
-
 class TodoItemWrapper(QListWidgetItem):
     def __init__(self, parent, todo_item):
         super().__init__(parent, 0)
@@ -63,54 +59,21 @@ class MFTodoWidget(QListWidget):
 
     def alterBackground(self):
         if self.count() > 1:
-            background_color = TODO_BACKGROUND
+            self.setStyleSheet( CFG.STYLE_TITLE_ON(self) )
             self.item(0).setFont( CFG.FONT_TITLE_ON(self) )
             self.item(0).setForeground(QColor('black'))
         else:
-            background_color = TODO_BACKGROUND_ALT
+            self.setStyleSheet( CFG.STYLE_TITLE_OFF(self) )
             self.item(0).setFont( CFG.FONT_TITLE_OFF(self) )
             self.item(0).setForeground(QColor('#BDC3C7'))
-        
-        self.setStyleSheet('''
-            QListWidget {
-                border: 0px;
-                background: %s;
-            }
-        '''%(background_color))
         pass
 
     def styleHelper(self):
-        # self.setFixedSize(*MIN_TODO_SIZE)
-        self.setMinimumSize(*MIN_TODO_SIZE)
+        # self.setFixedSize(*CFG.SIZE_TODO())
+        self.setMinimumSize(*CFG.SIZE_TODO())
         self.setMaximumHeight(105)
         self.setVisible(True)
-        self.verticalScrollBar().setStyleSheet("""
-            QScrollBar:vertical {
-                border: none;
-                background:palette(base);
-                width:3px;
-                margin: 0px 0px 0px 0px;
-            }
-            QScrollBar::handle:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop:1 rgb(32, 47, 130));
-                min-height: 0px;
-            }
-            QScrollBar::add-line:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
-                height: 0px;
-                subcontrol-position: bottom;
-                subcontrol-origin: margin;
-            }
-            QScrollBar::sub-line:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
-                height: 0 px;
-                subcontrol-position: top;
-                subcontrol-origin: margin;
-            }
-        """)
+        self.verticalScrollBar().setStyleSheet( CFG.STYLE_SCROLLBAR() )
         pass
 
     def renderTodos(self):

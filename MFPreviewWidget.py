@@ -51,11 +51,7 @@ class MFImagePreviewer(QWidget):
     def styleHelper(self):
         self.setWindowTitle('Image Previewer')
         self.setWindowFlags( Qt.Dialog | Qt.FramelessWindowHint )
-        self.setStyleSheet('''
-            QWidget {
-                background: rgba(255,254,249, 1.00);
-            }
-        ''')
+        self.setStyleSheet( CFG.STYLESHEET(self) )
         pass
 
     def mousePressEvent(self, e):

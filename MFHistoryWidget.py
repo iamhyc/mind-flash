@@ -14,18 +14,7 @@ from PyQt5.QtGui import (QColor, QPen, QFont, QFontMetrics,
 from PyQt5.QtWidgets import (QApplication, QWidget, QFrame, QLabel, QAbstractItemView,
                             QListWidget, QListWidgetItem, QGridLayout)
 
-COLOR_DAYTIME  = ['#856d72', '#83cbac', '#f1939c', '#93b5cf'] #00-06, 06-12, 12-18, 18-24
-# color reference: http://zhongguose.com/, https://nipponcolors.com/
-MIN_HISTORY_SIZE = (600, 450)
-MIN_ITEM_SIZE    = (600, 150)
-ITEM_USER_COLOR  = 'silver'
-ITEM_DATE_COLOR  = '#2b1216'
-ITEM_TEXT_COLOR  = '#252526'
-LIST_BACKGROUND  = '#FFFEF9' #xuebai
-ITEM_BACKGROUND  = '#EEF7F2'
-ITEM_BORDERCOLOR = '#DFECD5'
 ITEM_MARGIN      = 5#px
-ITEM_RADIUS      = 10#px
 OFFSET_FIX       = 2#px
 MAX_NUM_SCROLL   = 7#wheel
 
@@ -47,18 +36,27 @@ class QLabelWrapper(QLabel):
         self.setWordWrap(True)
         if self.type=='item_hint':
             self.setFont( CFG.FONT_ITEM_HINT('MFHistoryItem') )
-            self.setStyleSheet('QLabel { background-color: %s; }'%(ITEM_BACKGROUND))
+            self.setStyleSheet( CFG.STYLE_HINT('MFHistoryItem') )
             self.setFixedHeight( QFontMetrics(self.font()).height()+8 )
-
+            #
             _user,_date,_time = self.text().split()
-            _time_color = COLOR_DAYTIME[ int(_time.split(':')[0])//6 ] #for 24Hr timing
+            t_rng = int(_time.split(':')[0])
+            if t_rng in range(0, 6):
+                _time_color = CFG.COLOR_LATE_NIGHT()
+            elif t_rng in range(6, 12):
+                _time_color = CFG.COLOR_MORNING()
+            elif t_rng in range(12, 18):
+                _time_color = CFG.COLOR_AFTERNOON()
+            else:
+                _time_color = CFG.COLOR_NIGHT()
+            #
             self.setText('''
                         <a style="color:{date_color}">{date}</a>
                         <a style="color:{time_color}">{time}</a>
                         <a style="color:{user_color}">@ {user}</a>
                         '''.format(
-                            user_color=ITEM_USER_COLOR, user=_user,
-                            date_color=ITEM_DATE_COLOR, date=_date,
+                            user=_user, user_color=CFG.COLOR_HINT_USER('MFHistoryItem'),
+                            date=_date, date_color=CFG.COLOR_HINT_DATE('MFHistoryItem'),
                             time_color=_time_color, time=_time
                         ))
             self.setToolTip(self.alt)
@@ -69,12 +67,7 @@ class QLabelWrapper(QLabel):
             self.setTextFormat(Qt.RichText)
             self.setTextInteractionFlags(Qt.TextBrowserInteraction)
             self.setOpenExternalLinks(True)
-            self.setStyleSheet('''
-                QLabel {
-                    background-color: %r;
-                    color: %r;
-                }
-            '''%(ITEM_BACKGROUND, ITEM_TEXT_COLOR))
+            self.setStyleSheet( CFG.STYLE_TEXT('MFHistoryItem') )
             pass
         elif self.type=='img_label':
             self.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -177,18 +170,8 @@ class MFHistoryItem(QFrame):
         self.setLayout(self.layout)
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0,0,0,0)
-        self.setFixedWidth(MIN_ITEM_SIZE[0])
-        self.setStyleSheet('''
-            QFrame{
-                background-color: %s;
-                border: 1px solid %s;
-                border-radius: %dpx;
-                margin: 5px;
-            }
-            QLabel{
-                border: 0px;
-            }
-        '''%(ITEM_BACKGROUND, ITEM_BORDERCOLOR, ITEM_RADIUS))
+        self.setFixedWidth( CFG.SIZE_HISTORY_ITEM()[0] )
+        self.setStyleSheet( CFG.STYLESHEET(self) )
         pass
 
     def getHeightHint(self, label_ref, pos):
@@ -207,7 +190,7 @@ class MFHistoryItem(QFrame):
                 size   = QSize(0, _height)
             pass
         else:
-            _height = min(label_ref.pixmap().height()+25, MIN_ITEM_SIZE[1])
+            _height = min(label_ref.pixmap().height()+25, CFG.SIZE_HISTORY_ITEM()[1])
             size  = QSize(_height, 0)
             pass
         return size
@@ -284,13 +267,13 @@ class MFHistoryItem(QFrame):
             pass
         else:
             if not draw_text:
-                CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]-ITEM_MARGIN*2,   x.width()), MIN_ITEM_SIZE[1])
+                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]-ITEM_MARGIN*2,   x.width()), CFG.SIZE_HISTORY_ITEM()[1])
                 IconSize = (1, 3)
-                ImgWidth = MIN_ITEM_SIZE[0]-ITEM_MARGIN*2-OFFSET_FIX
+                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]-ITEM_MARGIN*2-OFFSET_FIX
             else:
-                CropRect = lambda x: QRect(0, 0, min(MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1, x.width()), MIN_ITEM_SIZE[1])
+                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]/3-ITEM_MARGIN*1, x.width()), CFG.SIZE_HISTORY_ITEM()[1])
                 IconSize = (1, 1)
-                ImgWidth = MIN_ITEM_SIZE[0]/3-ITEM_MARGIN*1-OFFSET_FIX
+                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]/3-ITEM_MARGIN*1-OFFSET_FIX
             #
             for (i,_item) in enumerate(self.rich_text):
                 if _item[1]=='img':
@@ -332,46 +315,11 @@ class MFHistoryList(QListWidget):
         pass
 
     def styleHelper(self):
-        self.setStyleSheet('''
-            QListWidget {
-                border: 1px solid #5D6D7E;
-                border-top: 0px;
-            }
-            QListView::item:selected {
-                border: 1px solid #6a6ea9;
-                border-radius: 10px;
-            }
-        ''')
-        self.verticalScrollBar().setStyleSheet("""
-            QScrollBar:vertical {
-                border: none;
-                background:palette(base);
-                width:3px;
-                margin: 0px 0px 0px 0px;
-            }
-            QScrollBar::handle:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop:1 rgb(32, 47, 130));
-                min-height: 0px;
-            }
-            QScrollBar::add-line:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
-                height: 0px;
-                subcontrol-position: bottom;
-                subcontrol-origin: margin;
-            }
-            QScrollBar::sub-line:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));
-                height: 0 px;
-                subcontrol-position: top;
-                subcontrol-origin: margin;
-            }
-        """)
+        self.setStyleSheet( CFG.STYLESHEET(self) )
+        self.verticalScrollBar().setStyleSheet( CFG.STYLE_SCROLLBAR() )
         self.setSpacing(0)
         self.setContentsMargins(0,0,0,0)
-        self.setFixedWidth(MIN_HISTORY_SIZE[0])
+        self.setFixedWidth( CFG.SIZE_HISTORY_MAIN()[0] )
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         pass
 
@@ -481,15 +429,9 @@ class MFHistory(QWidget):
         self.grid.addWidget(self.w_topbar,       0, 0)
         self.grid.addWidget(self.w_history_list, 1, 0)
         self.setLayout(self.grid)
-        self.setFixedSize(*MIN_HISTORY_SIZE)
+        self.setFixedSize(*CFG.SIZE_HISTORY_MAIN())
         self.setVisible(False)
-        self.setStyleSheet('''
-            QWidget {
-                border: 1px solid #5D6D7E;
-                border-bottom: 0px solid white;
-                background-color: %s;
-            }
-        '''%(LIST_BACKGROUND))
+        self.setStyleSheet( CFG.STYLESHEET(self) )
         pass
 
     def hideEvent(self, e):

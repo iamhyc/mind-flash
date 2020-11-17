@@ -407,7 +407,7 @@ class MFConfig:
     def __getattribute__(self, name):
         if name.isupper():
             def configWrap(ref=''):
-                if not ref:
+                if ref=='':
                     _section = self.default_sec
                 elif type(ref)==str:
                     _section = ref
@@ -421,7 +421,7 @@ class MFConfig:
                 elif name.startswith('SIZE_'):
                     ret = self.parseSize(_section, name)
                 else:
-                    ret = self.config[_section][name]
+                    ret = self.config[_section][name].strip('\t\r\n\'\"')
                 return ret
             return configWrap
         else:
@@ -432,16 +432,15 @@ class MFConfig:
         return self.config.read(filenames)
 
     def parseSize(self, section, keyword):
-        ret = list()
-        # ret = self.config[section][keyword].split(',')
-        # ret = tuple( [int(x) if x.isdigit() else x for x in ret] )
+        ret = self.config[section][keyword].strip('[]()').split(',')
+        ret = tuple( [int(x) for x in ret] )
         return ret
 
     def parseFont(self, section, keyword):
         ret = QFont('Noto Sans CJK SC')
         val = self.config[section][keyword].strip('[]()').split(',')
         for x in val:
-            x = x.strip().replace('\'', '').replace('\"', '')
+            x = x.strip().strip('\'\"')
             if x.isdigit():
                 ret.setPointSize( int(x) )
             elif x in ['*', '**', '***']:

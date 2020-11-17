@@ -21,7 +21,6 @@ MF_VERSION  = '1.0.1'
 MF_WEBSITE  = 'https://github.com/iamhyc/mind-flash'
 MF_STATUS   = 'https://api.github.com/repos/iamhyc/mind-flash/tags'
 MF_DIR      = Path('~/.mf/').expanduser()
-MIN_INPUTBOX_SIZE = (600, 70)
 INPUTBOX_RESIZE   = (0,0,0,1,2,3)
 
 mdm = MimeDataManager(MF_DIR)
@@ -50,13 +49,8 @@ class MFTextEdit(QPlainTextEdit):
     
     def styleHelper(self):
         # Basic Style
-        self.setStyleSheet("""
-            QPlainTextEdit {
-                border: 1px solid #D7DBDD;
-                background: rgba(255,254,249, 0.88)
-            }
-        """) #background color: #xuebai 
-        self.setFixedSize(*MIN_INPUTBOX_SIZE)
+        self.setStyleSheet( CFG.STYLESHEET(self) )
+        self.setFixedSize( *CFG.SIZE_EDIT() )
         self.setTabChangesFocus(True)
         self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -231,9 +225,9 @@ class MFTextEdit(QPlainTextEdit):
     
     def textChangedEvent(self):
         _lines = min(self.getLineCount(), len(INPUTBOX_RESIZE)-1)
-        _size  = QSize(MIN_INPUTBOX_SIZE[0], 70+35*INPUTBOX_RESIZE[_lines])
+        _size  = QSize(CFG.SIZE_EDIT()[0], 70+35*INPUTBOX_RESIZE[_lines])
         if _size!=self.size():
-            self.setFixedSize(MIN_INPUTBOX_SIZE[0], 70+35*INPUTBOX_RESIZE[_lines])
+            self.setFixedSize(CFG.SIZE_EDIT()[0], 70+35*INPUTBOX_RESIZE[_lines])
             self.parent.adjustSize()
             self.parent.resize(self.size())
         pass
