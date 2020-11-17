@@ -1,3 +1,16 @@
+mind-flash (1.0.5) unstable; urgency=low
+
+  * add tooltip for filter icon
+  * add window drag-to-move support on topbar
+  * add update check via `api.github.com`
+  * add Markdown link style support (as default, backward compatible)
+  * update Ctrl+V with enhanced response with Mime content
+  * dirty hack: reset keystroke list when Enter key released
+  * move current configurable items to config file ('/opt/mind-flash/res/config.ini')
+  * add user config file support ('~/.mf/config.ini')
+
+ -- iamhyc <sudofree@163.com>  Tue, 17 Nov 2020 23:59:59 +0000
+
 mind-flash (1.0.1) unstable; urgency=low
 
   * fix mkdir fail when parents folder absent
