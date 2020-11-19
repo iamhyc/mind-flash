@@ -120,7 +120,7 @@ class QLabelWrapper(QLabel):
                 w_history = self.parent.parent
                 _text     = "Image copied."
                 self.worker = MFWorker(w_history.showHint,
-                                        args=( _text, CFG.CFG_HINT_SHOW_MS() ))
+                                        args=( _text, int(CFG.CFG_HINT_SHOW_MS()) ))
                 self.worker.start()
             except Exception:
                 pass
@@ -137,7 +137,7 @@ class QLabelWrapper(QLabel):
                 w_history = self.parent.parent
                 _text     = "File <u>%s</u> copied."%self.alt.name
                 self.worker = MFWorker(w_history.showHint,
-                                        args=( _text, CFG.CFG_HINT_SHOW_MS() ))
+                                        args=( _text, int(CFG.CFG_HINT_SHOW_MS()) ))
                 self.worker.start()
             except:
                 pass
