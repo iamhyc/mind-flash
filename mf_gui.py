@@ -404,6 +404,7 @@ if __name__ == '__main__':
     mf_exec = MFEntity(MF_DIR)
     CFG.read( Path(MF_DIR, 'config.ini').as_posix() )
     # init MF GUI
+    QApplication.setAttribute( Qt.AA_EnableHighDpiScaling )
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     mf = MFGui()
