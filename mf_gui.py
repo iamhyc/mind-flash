@@ -226,7 +226,7 @@ class MFTextEdit(QPlainTextEdit):
     def textChangedEvent(self):
         _lines = min(self.getLineCount(), len(INPUTBOX_RESIZE)-1)
         _width, _height = CFG.SIZE_EDIT()
-        _size  = QSize( _width, (_height/2)*(2 + INPUTBOX_RESIZE[_lines]) )
+        _size  = QSize( _width, int(_height/2)*(2 + INPUTBOX_RESIZE[_lines]) )
         if _size!=self.size():
             self.setFixedSize(_size)
             self.parent.adjustSize()
