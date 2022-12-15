@@ -21,7 +21,7 @@ install:
 # sudo apt remove mind-flash -y && make build-dist && sudo dpkg -i dist/mind-flash.deb
 build-dist:clean-dist
 	@if [ "$(PLATFORM)" = "win32" ]; then \
-		rm -rf build dist; \
+		rm build,dist -r -force; \
 		pyinstaller mf_gui.py -wy; \
 		cp -r third-party/win32/* ./dist/; \
 		cp -r res ./dist/mf_gui; \

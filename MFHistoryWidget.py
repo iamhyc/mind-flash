@@ -187,7 +187,12 @@ class MFHistoryItem(QFrame):
                 size   = QSize(0, _height)
             pass
         else:
-            _height = min(label_ref.pixmap().height()+CFG.SIZE_IMG_ONLY_HEIGHT(self), CFG.SIZE_HISTORY_ITEM()[1])
+            try:
+                _img_hight = label_ref.pixmap().height()
+            except:
+                print('none picture')
+                _img_hight = 0
+            _height = min(_img_hight+CFG.SIZE_IMG_ONLY_HEIGHT(self), CFG.SIZE_HISTORY_ITEM()[1])
             size  = QSize(_height, 0)
             pass
         return size
@@ -268,9 +273,9 @@ class MFHistoryItem(QFrame):
                 IconSize = (1, 3)
                 ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]-CFG.SIZE_ITEM_MARGIN(self)*2 - CFG.SIZE_ITEM_WIDTH_FIX(self)
             else:
-                CropRect = lambda x: QRect(0, 0, min(CFG.SIZE_HISTORY_ITEM()[0]/3 - CFG.SIZE_ITEM_MARGIN(self)*1, x.width()), CFG.SIZE_HISTORY_ITEM()[1])
+                CropRect = lambda x: QRect(0, 0, min(int(CFG.SIZE_HISTORY_ITEM()[0]/3) - CFG.SIZE_ITEM_MARGIN(self)*1, x.width()), CFG.SIZE_HISTORY_ITEM()[1])
                 IconSize = (1, 1)
-                ImgWidth = CFG.SIZE_HISTORY_ITEM()[0]/3-CFG.SIZE_ITEM_MARGIN(self)*1 - CFG.SIZE_ITEM_WIDTH_FIX(self)
+                ImgWidth = int(CFG.SIZE_HISTORY_ITEM()[0]/3)-CFG.SIZE_ITEM_MARGIN(self)*1 - CFG.SIZE_ITEM_WIDTH_FIX(self)
             #
             for (i,_item) in enumerate(self.rich_text):
                 if _item[1]=='img':
