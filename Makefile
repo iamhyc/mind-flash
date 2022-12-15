@@ -1,4 +1,4 @@
-VERSION=1.0.5
+VERSION=1.0.6
 PLATFORM=$(shell python3 -c 'import sys; print(sys.platform)')
 PYTHON_MINOR=$(shell python3 -c 'import sys; print(sys.version_info.minor)')
 

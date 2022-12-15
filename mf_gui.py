@@ -17,7 +17,7 @@ from MFTodoWidget import MFTodoWidget
 from MFUtility import (CFG, KeysReactor, MimeDataManager, MFWorker, signal_emit, link_filter)
 
 MF_NAME     = 'Mind Flash'
-MF_VERSION  = '1.0.5'
+MF_VERSION  = '1.0.6'
 MF_WEBSITE  = 'https://github.com/iamhyc/mind-flash'
 MF_STATUS   = 'https://api.github.com/repos/iamhyc/mind-flash/tags'
 MF_DIR      = Path('~/.mf/').expanduser()
